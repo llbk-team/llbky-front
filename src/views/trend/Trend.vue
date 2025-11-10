@@ -8,11 +8,7 @@
       <div v-for="(card, i) in summaryCards" :key="i" class="summary-card">
         <p class="label">{{ card.label }}</p>
         <h3 class="value">{{ card.value }}</h3>
-        <span
-          v-if="card.change"
-          class="change"
-          :class="{ up: card.change > 0, down: card.change < 0 }"
-        >
+        <span v-if="card.change" class="change" :class="{ up: card.change > 0, down: card.change < 0 }">
           {{ card.change > 0 ? "+" : "" }}{{ card.change }}%
         </span>
       </div>
@@ -184,7 +180,7 @@ onMounted(async () => {
     },
   });
 
-  // 워드클라우드
+  // 워드클라우드 (가중치 기반 색상 단계 적용)
   const words = [
     ["Kubernetes", 40],
     ["AI", 30],
@@ -199,11 +195,19 @@ onMounted(async () => {
     ["Node.js", 10],
     ["클라우드", 8],
   ];
+
   WordCloud(document.getElementById("wordCloud"), {
     list: words,
     gridSize: 12,
     weightFactor: 4,
-    color: () => "#71EBBE",
+    color: (word, weight) => {
+      if (weight > 30) return "#00C896";  // 진한 민트
+      if (weight > 25) return "#3CC3D3";  // 청록 (시원한 대비)
+      if (weight > 20) return "#5B8DEF";  // 하늘/블루 계열
+      if (weight > 15) return "#B47EFF";  // 보라 계열
+      if (weight > 10) return "#FFA07A";  // 코랄/살구톤
+      return "#CFFFE2";                   // 파스텔 톤 (보조)
+    },
     rotateRatio: 0,
     backgroundColor: "#ffffff",
   });
@@ -212,7 +216,8 @@ onMounted(async () => {
 
 <style scoped>
 .trend-page {
-  background: #ffffff; /* ✅ 페이지 전체 흰색 */
+  background: #ffffff;
+  /* ✅ 페이지 전체 흰색 */
   padding: 40px 80px 100px;
   font-family: "Pretendard", sans-serif;
   color: #111;
@@ -225,6 +230,7 @@ onMounted(async () => {
   color: #111;
   margin-bottom: 6px;
 }
+
 .page-subtitle {
   color: #666;
   font-size: 14px;
@@ -237,38 +243,47 @@ onMounted(async () => {
   gap: 20px;
   margin-bottom: 36px;
 }
+
 .summary-card {
   flex: 1;
   background: #ffffff;
   border-radius: 14px;
   padding: 22px 24px;
   text-align: center;
-  border: 1px solid #e5e5e5; /* ✅ 경계선 */
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04); /* ✅ 은은한 그림자 */
+  border: 1px solid #e5e5e5;
+  /* ✅ 경계선 */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  /* ✅ 은은한 그림자 */
   transition: all 0.25s ease;
 }
+
 .summary-card:hover {
   transform: translateY(-3px);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
   border-color: #d0d0d0;
 }
+
 .summary-card .label {
   font-size: 13px;
   color: #777;
   margin-bottom: 5px;
 }
+
 .summary-card .value {
   font-size: 21px;
   font-weight: 700;
   color: #00c896;
 }
+
 .summary-card .change {
   font-size: 13px;
   font-weight: 600;
 }
+
 .change.up {
   color: #00c896;
 }
+
 .change.down {
   color: #e85b5b;
 }
@@ -276,27 +291,33 @@ onMounted(async () => {
 /* Keyword Trend Section */
 .pretty-trend {
   background: #ffffff;
-  border: 1px solid #e5e5e5; /* ✅ 경계선 */
+  border: 1px solid #e5e5e5;
+  /* ✅ 경계선 */
   border-radius: 16px;
   padding: 28px 30px;
   margin-bottom: 36px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04); /* ✅ 그림자 */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  /* ✅ 그림자 */
 }
+
 .chart-title {
   font-size: 17px;
   font-weight: 700;
   color: #111;
   margin-bottom: 4px;
 }
+
 .chart-subtitle {
   font-size: 13px;
   color: #777;
   margin-bottom: 16px;
 }
+
 .chart-wrapper {
   height: 280px;
   margin-bottom: 20px;
 }
+
 .trend-stats {
   display: flex;
   justify-content: space-around;
@@ -304,23 +325,28 @@ onMounted(async () => {
   border-top: 1px solid #eee;
   padding-top: 10px;
 }
+
 .trend-item {
   text-align: center;
   width: 100px;
   padding: 6px 0;
 }
+
 .trend-item .keyword {
   font-size: 13px;
   font-weight: 600;
   color: #333;
 }
+
 .trend-item .change {
   font-size: 12px;
   font-weight: 500;
 }
+
 .trend-item .change.up {
   color: #00b37e;
 }
+
 .trend-item .change.down {
   color: #ff5f5f;
 }
@@ -332,34 +358,42 @@ onMounted(async () => {
   gap: 26px;
   margin-bottom: 40px;
 }
+
 .card {
   background: #ffffff;
   border-radius: 16px;
-  border: 1px solid #e5e5e5; /* ✅ 경계선 */
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04); /* ✅ 그림자 */
+  border: 1px solid #e5e5e5;
+  /* ✅ 경계선 */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  /* ✅ 그림자 */
   padding: 22px 26px;
 }
+
 .card-header h4 {
   font-size: 16px;
   font-weight: 700;
   color: #111;
 }
+
 .card-header p {
   font-size: 13px;
   color: #777;
   margin-bottom: 14px;
 }
+
 .wordcloud {
   width: 100%;
   height: 260px;
   margin-top: 6px;
 }
+
 .sentiment-chart-container {
   position: relative;
   width: 100%;
   min-height: 340px;
   height: 340px;
 }
+
 .sentiment-chart-container canvas {
   position: absolute;
   inset: 0;
@@ -371,11 +405,14 @@ onMounted(async () => {
 .insight-summary {
   background: #ffffff;
   border-radius: 16px;
-  border: 1px solid #e5e5e5; /* ✅ 경계선 */
+  border: 1px solid #e5e5e5;
+  /* ✅ 경계선 */
   padding: 26px 30px;
   line-height: 1.8;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04); /* ✅ 그림자 */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  /* ✅ 그림자 */
 }
+
 .insight-summary h4 {
   font-size: 17px;
   font-weight: 700;
@@ -384,24 +421,30 @@ onMounted(async () => {
   border-left: 4px solid #71ebbe;
   padding-left: 10px;
 }
+
 .insight-summary ul {
   padding-left: 18px;
   margin-bottom: 16px;
 }
+
 .insight-summary li {
   font-size: 14px;
   color: #333;
   margin-bottom: 8px;
 }
+
 .insight-summary b {
   color: #00c896;
 }
+
 .insight-summary span {
   color: #555;
 }
+
 .insight-link {
   text-align: right;
 }
+
 .btn-link {
   font-size: 14px;
   font-weight: 600;
@@ -409,6 +452,7 @@ onMounted(async () => {
   text-decoration: none;
   transition: 0.2s;
 }
+
 .btn-link:hover {
   text-decoration: underline;
   color: #00a67a;
