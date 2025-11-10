@@ -81,7 +81,7 @@ const subMenus = {
     { label: "멘토링", path: "/my/mentoring" },
   ],
   resume: [
-    {label:"서류",path:"/resume"},
+    {label:"서류",path:"/resume/list"},
     { label: "서류작성", path: "/resume/write" },
     { label: "서류코칭", path: "/resume/coach" },
     
@@ -112,7 +112,7 @@ const selectMenu = (menuName) => {
 
   const defaultPaths = {
     my: "/my/page",
-    resume: "/resume",
+    resume: "/resume/list",
     interview: "/interview/report",
     learning: "/learning/coach",
     trend: "/trend/news",

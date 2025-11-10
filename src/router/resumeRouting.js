@@ -1,7 +1,7 @@
 // 이력서 관련 라우터 설정
 const resumeRouting = [
   {
-    path: '/resume',
+    path: '/resume/list',
     name: 'resume',
     component: () => import('../views/resume/ResumeMain.vue'),
     meta: { 
