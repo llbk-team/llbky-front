@@ -99,7 +99,7 @@ const subMenus = {
   trend: [
     { label: "뉴스 요약", path: "/trend/news" },
     { label: "트렌드 분석", path: "/trend/analysis" },
-    { label: "AI 채팅", path: "/trend/chat" },
+    { label: "직무 인사이트", path: "/trend/insight" },
   ],
 };
 
