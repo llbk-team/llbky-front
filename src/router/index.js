@@ -3,6 +3,7 @@ import HomeView from '../views/HomeView.vue'
 import interviewRouting from "@/router/interviewRouting"
 import trendRouting from "@/router/trendRouting"
 import myRouting from "@/router/myRouting"
+import resumeRouting from './resumeRouting'
 
 
 const routes = [
@@ -29,7 +30,8 @@ const routes = [
   },
   ...interviewRouting,
   ...trendRouting,
-  ...myRouting
+  ...myRouting,
+  ...resumeRouting
 
 ]
 
