@@ -2,8 +2,9 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import interviewRouting from "@/router/interviewRouting"
 import trendRouting from "@/router/trendRouting"
+import learningRouting from './learningRouting'
 import myRouting from "@/router/myRouting"
-
+import resumeRouting from './resumeRouting'
 
 const routes = [
   {
@@ -12,11 +13,12 @@ const routes = [
     component: HomeView
   },
   {
-    path: '/login',
-    name: 'login',
+    path: '/about',
+    name: 'about',
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
+
     component: () => import(/* webpackChunkName: "login" */ '../views/LoginView.vue')
   },
   {
@@ -29,7 +31,10 @@ const routes = [
   },
   ...interviewRouting,
   ...trendRouting,
-  ...myRouting
+  ...myRouting,
+  ...learningRouting,
+  ...resumeRouting
+
 
 ]
 
@@ -38,4 +43,4 @@ const router = createRouter({
   routes
 })
 
-export default router
+export default router;
