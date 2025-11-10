@@ -4,6 +4,7 @@ import interviewRouting from "@/router/interviewRouting"
 import trendRouting from "@/router/trendRouting"
 import learningRouting from './learningRouting'
 import myRouting from "@/router/myRouting"
+import resumeRouting from './resumeRouting'
 
 const routes = [
   {
@@ -31,7 +32,9 @@ const routes = [
   ...interviewRouting,
   ...trendRouting,
   ...myRouting,
-  ...learningRouting
+  ...learningRouting,
+  ...resumeRouting
+
 
 ]
 
