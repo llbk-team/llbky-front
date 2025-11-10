@@ -6,4 +6,14 @@ import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue-3/dist/bootstrap-vue-3.css';
 import 'bootstrap-icons/font/bootstrap-icons.css'
 
+// remixicon 
+// npm install remixicon로 추가해주세요!
+import "remixicon/fonts/remixicon.css";
+
+// bootstrap
+import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap";
+
+import "./assets/main.css";
+
 createApp(App).use(store).use(router).mount('#app')
