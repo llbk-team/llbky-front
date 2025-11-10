@@ -1,52 +1,55 @@
 <template>
   <div class="trend-news">
-    <!-- Hero 영역 -->
+    <!-- Hero -->
     <section class="hero">
       <h2>AI가 분석해주는 채용 트렌드</h2>
+
       <div class="search-bar">
         <input
           type="text"
           placeholder="키워드를 입력하세요 (예: 인공지능, 백엔드, AI 개발자)"
           v-model="keyword"
+          @keyup.enter="searchNews"
         />
         <button @click="searchNews">검색</button>
       </div>
     </section>
 
-    <!-- 필터바 -->
+    <!-- ✅ 필터바 -->
     <FilterBar @filter-change="applyFilter" />
 
     <!-- 뉴스 카드 리스트 -->
     <section class="news-section">
       <h3>AI 뉴스 요약</h3>
-      <p class="desc">팩트체크·편향감지까지 적용된 신뢰할 수 있는 채용 시장 뉴스 인사이트</p>
+      <p class="desc">
+        팩트체크·편향감지까지 적용된 신뢰할 수 있는 채용 시장 뉴스 인사이트
+      </p>
 
       <div class="news-grid">
         <div
-          v-for="(item, i) in filteredNews"
+          v-for="(item, i) in visibleNews"
           :key="i"
           class="news-card"
           @click="openDetail(item)"
         >
-          <div class="card-header">
-            <span class="sentiment" :class="item.sentiment">
-              {{ item.sentimentLabel }}
-            </span>
-            <span class="date">{{ item.date }}</span>
+          <!-- 상단 태그 -->
+          <div class="tag-row">
+            <span class="tag category">채용 시장</span>
+            <span class="tag" :class="item.sentiment">{{ item.sentimentLabel }}</span>
           </div>
 
+          <!-- 제목 -->
           <h4 class="title">{{ item.title }}</h4>
 
-          <div class="summary-box">
-            <p>{{ item.summary }}</p>
-          </div>
+          <!-- 요약 -->
+          <div class="summary-box" v-html="formatSummary(item.summary_short)"></div>
 
+          <!-- 키워드 -->
           <div class="keywords">
             <span v-for="(k, j) in item.keywords" :key="j">#{{ k }}</span>
           </div>
 
-          <div class="divider" />
-
+          <!-- 편향 감지 -->
           <div class="bias">
             <span class="bias-label">편향 감지</span>
             <span
@@ -57,6 +60,7 @@
             </span>
           </div>
 
+          <!-- 신뢰도 + 출처 -->
           <div class="card-footer">
             <div class="trust">
               <span class="label">신뢰도</span>
@@ -65,13 +69,13 @@
               </div>
               <span class="score">{{ item.trust }}%</span>
             </div>
-            <div class="source">출처: {{ item.source }}</div>
+            <div class="source">출처: {{ item.source }} · {{ item.date }}</div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- 모달 -->
+    <!-- 상세보기 -->
     <NewsDetailModal
       v-if="selectedNews"
       :news="selectedNews"
@@ -87,107 +91,129 @@ import NewsDetailModal from "@/components/modal/NewsDetailModal.vue";
 
 const keyword = ref("");
 const selectedNews = ref(null);
-
 const filters = ref({
   period: "week",
   sentiment: "",
-  biasOnly: false, // '편향 없는 뉴스만'
+  biasOnly: false,
   trustMin: 70,
 });
 
-// 더미 뉴스 데이터 (백엔드 연동시 교체)
+/* ------------------------------
+   뉴스 데이터 (예시 8개)
+------------------------------ */
 const newsList = ref([
   {
-    title: "AI 개발자 채용 급증, 평균 연봉 30% 상승",
-    summary:
-      "AI 산업 성장으로 인해 관련 개발자 수요가 폭발적으로 증가하고 있다. 특히 백엔드·데이터 분야의 인력 확보 경쟁이 치열하며, 연봉 상승 폭도 30%에 달한다.",
-    keywords: ["AI", "Backend", "데이터"],
-    trust: 88,
+    title: "백엔드 개발자 채용 시장 안정세, 경력직 선호",
+    summary_short: `
+백엔드 개발자 채용은 전년 대비 소폭 증가세를 보이고 있습니다.
+신입보다 3년 이상 경력직 선호 현상이 지속되고 있습니다.
+MSA·쿠버네티스 등 인프라 지식 보유자 우대 경향이 나타납니다.
+`,
+    keywords: ["백엔드", "Spring", "Node.js", "MSA", "Kubernetes"],
+    trust: 90,
+    sentiment: "neutral",
+    sentimentLabel: "중립적",
+    bias_detected: false,
+    bias_type: "",
+    date: "2025.11.01",
+    source: "커리어 인사이트",
+  },
+  {
+    title: "AI 인재 확보 경쟁 심화, 스타트업도 대규모 채용",
+    summary_short: `
+AI/머신러닝 관련 채용은 전년 대비 45% 증가했습니다.
+LLM, RAG, MLOps 등 신기술 직군 수요가 꾸준히 확대 중입니다.
+스타트업에서도 연구 인력 채용이 활발히 이루어지고 있습니다.
+`,
+    keywords: ["AI", "LLM", "MLOps", "RAG", "데이터"],
+    trust: 87,
     sentiment: "positive",
     sentimentLabel: "긍정적",
-    date: "2025.11.10",
-    source: "네이버 뉴스",
-    bias_detected: false,
-    bias_type: "",
-  },
-  {
-    title: "기업들, AI 인력 확보 경쟁 과열... 개발자 '이직 전쟁'",
-    summary:
-      "대기업들이 AI 개발자 확보를 위해 연봉 인상 경쟁을 벌이고 있다. 일부 전문가는 과도한 인재 쏠림 현상으로 산업 균형이 무너질 수 있다고 지적했다.",
-    keywords: ["AI", "이직", "대기업"],
-    trust: 74,
-    sentiment: "negative",
-    sentimentLabel: "부정적",
-    date: "2025.11.09",
-    source: "한국경제",
-    bias_detected: true,
-    bias_type: "감정적 표현 있음",
-  },
-  {
-    title: "클라우드 기술 인력 채용 확대, 스타트업 중심 활발",
-    summary:
-      "국내 스타트업 중심으로 클라우드 전문 인력 채용이 확대되고 있다. AWS·Azure 등 주요 기술 스택 수요가 증가하며, 중소기업에서도 적극적으로 채용에 나섰다.",
-    keywords: ["Cloud", "AWS", "Azure"],
-    trust: 83,
-    sentiment: "neutral",
-    sentimentLabel: "중립적",
-    date: "2025.11.08",
-    source: "ZDNet Korea",
-    bias_detected: false,
-    bias_type: "",
-  },
-  {
-    title: "AI 면접 솔루션, 채용시장 표준으로 자리잡아",
-    summary:
-      "AI 기반 영상 면접 솔루션의 도입이 급속히 확산되며, 기업 채용 과정의 효율성이 크게 높아지고 있다. 다만 개인정보 보호와 윤리적 사용에 대한 논의도 이어진다.",
-    keywords: ["AI면접", "채용", "HR테크"],
-    trust: 80,
-    sentiment: "neutral",
-    sentimentLabel: "중립적",
-    date: "2025.11.06",
-    source: "머니투데이",
     bias_detected: true,
     bias_type: "기술 과도 홍보 경향",
+    date: "2025.11.09",
+    source: "ZDNet Korea",
   },
   {
-    title: "자동차 산업, 전기차 전환 가속... 인력 재교육 시급",
-    summary:
-      "내연기관 중심 산업 구조가 빠르게 전기차 중심으로 재편되고 있다. 이에 따라 제조·정비 인력의 재교육과 전환 지원이 산업 전반의 핵심 과제로 떠오르고 있다.",
-    keywords: ["전기차", "제조업", "인력전환"],
-    trust: 89,
+    title: "클라우드 및 DevOps 직군 채용 32% 증가",
+    summary_short: `
+클라우드 아키텍처 및 DevOps 인력 수요가 전년 대비 32% 증가했습니다.
+스타트업 중심으로 인프라 엔지니어 채용이 활발히 진행 중입니다.
+AWS, Azure 등 주요 스택 경험 보유자가 우대받고 있습니다.
+`,
+    keywords: ["클라우드", "DevOps", "AWS", "Azure"],
+    trust: 84,
     sentiment: "positive",
     sentimentLabel: "긍정적",
-    date: "2025.11.05",
-    source: "매일경제",
     bias_detected: false,
     bias_type: "",
+    date: "2025.11.08",
+    source: "매일경제",
   },
   {
-    title: "직장인 10명 중 7명, 'AI가 내 일자리를 대체할 것' 우려",
-    summary:
-      "한 조사에 따르면 72%의 직장인이 AI 기술로 인한 일자리 감소를 우려하고 있는 것으로 나타났다. 특히 단순 사무직과 고객 응대 직군에서 불안감이 가장 높았다.",
-    keywords: ["AI", "일자리", "자동화"],
-    trust: 77,
+    title: "보안·블록체인 채용 수요 15% 감소, 시장 조정기 진입",
+    summary_short: `
+보안 및 블록체인 분야 채용은 전년 대비 15% 감소했습니다.
+시장 불확실성과 투자 위축으로 인한 인력 수요 하락이 원인입니다.
+전문가는 내년 중반 이후 회복세를 전망하고 있습니다.
+`,
+    keywords: ["보안", "블록체인", "정보보호", "암호화"],
+    trust: 79,
     sentiment: "negative",
     sentimentLabel: "부정적",
-    date: "2025.11.03",
-    source: "서울경제",
     bias_detected: true,
-    bias_type: "감정적 불안 조장",
+    bias_type: "감정적 표현 있음",
+    date: "2025.11.06",
+    source: "디지털데일리",
+  },
+  {
+    title: "데이터 분석가 채용 수요 급증",
+    summary_short: `
+데이터 기반 의사결정 확산으로 데이터 분석 직군의 수요가 급증했습니다.
+Python, SQL, Tableau 등 기술 스택 활용도가 높습니다.
+AI·BI 툴 활용 능력이 채용 평가의 핵심 지표가 되고 있습니다.
+`,
+    keywords: ["데이터", "SQL", "Tableau", "AI"],
+    trust: 85,
+    sentiment: "positive",
+    sentimentLabel: "긍정적",
+    bias_detected: false,
+    bias_type: "",
+    date: "2025.11.07",
+    source: "조선비즈",
+  },
+  {
+    title: "프론트엔드 시장 안정, 리액트 중심 지속",
+    summary_short: `
+프론트엔드 채용 수요가 전년 대비 비슷한 수준을 유지하고 있습니다.
+React, Vue.js 중심 기술 선호도가 여전히 높습니다.
+UI/UX 복합 역량 보유자의 수요가 증가하고 있습니다.
+`,
+    keywords: ["프론트엔드", "React", "Vue.js", "UI/UX"],
+    trust: 82,
+    sentiment: "neutral",
+    sentimentLabel: "중립적",
+    bias_detected: false,
+    bias_type: "",
+    date: "2025.11.05",
+    source: "IT조선",
   },
 ]);
 
+/* ------------------------------
+   필터 및 검색 적용
+------------------------------ */
 const filteredNews = computed(() =>
   newsList.value.filter((n) => {
     if (filters.value.sentiment && n.sentiment !== filters.value.sentiment)
       return false;
-    if (filters.value.biasOnly && n.bias_detected) return false; // 편향 없는 뉴스만
+    if (filters.value.biasOnly && n.bias_detected) return false;
     if (n.trust < filters.value.trustMin) return false;
     if (
       keyword.value &&
       !(
         n.title.includes(keyword.value) ||
-        n.summary.includes(keyword.value) ||
+        n.summary_short.includes(keyword.value) ||
         n.keywords.some((k) => k.includes(keyword.value))
       )
     )
@@ -196,23 +222,32 @@ const filteredNews = computed(() =>
   })
 );
 
-const applyFilter = (newFilters) => {
-  filters.value = newFilters;
-};
+// 6개만 표시
+const visibleNews = computed(() => filteredNews.value.slice(0, 6));
 
-const searchNews = () => {
-  // 백엔드 붙이면 여기서 API 호출
-  // 지금은 UI 설계용
+/* ------------------------------
+   함수
+------------------------------ */
+const formatSummary = (summary) => {
+  if (!summary) return "";
+  return (
+    `<ul>` +
+    summary
+      .trim()
+      .split("\n")
+      .map((line) => `<li>${line.trim()}</li>`)
+      .join("") +
+    `</ul>`
+  );
 };
-
-const openDetail = (item) => {
-  selectedNews.value = item;
-};
+const applyFilter = (newFilters) => (filters.value = newFilters);
+const openDetail = (item) => (selectedNews.value = item);
+const searchNews = () => {};
 </script>
 
 <style scoped>
 .trend-news {
-  background: #f1f2f3;
+  background: #fff; /* ✅ 페이지 전체 배경을 흰색으로 */
   color: #000;
   font-family: "Pretendard", sans-serif;
 }
@@ -252,26 +287,11 @@ const openDetail = (item) => {
   padding: 10px 22px;
   border-radius: 25px;
   cursor: pointer;
-  transition: all 0.2s;
-}
-.search-bar button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 2px 6px rgba(113, 235, 190, 0.3);
 }
 
 /* 뉴스 섹션 */
 .news-section {
   padding: 40px 80px 100px;
-}
-.news-section h3 {
-  font-size: 20px;
-  font-weight: 700;
-  margin-bottom: 4px;
-}
-.desc {
-  color: #666;
-  font-size: 13px;
-  margin-bottom: 28px;
 }
 .news-grid {
   display: grid;
@@ -281,51 +301,34 @@ const openDetail = (item) => {
 
 /* 카드 */
 .news-card {
-  background: #fff;
+  background: #ffffff;
   border-radius: 16px;
-  padding: 22px 26px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-  transition: all 0.3s ease;
+  padding: 24px;
+  /* ✅ 카드 경계선 + 부드러운 그림자 */
+  border: 1px solid #e5e5e5;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+  transition: 0.2s;
   cursor: pointer;
 }
+
 .news-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+  transform: translateY(-3px);
+  /* ✅ hover 시 조금 더 강조 */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+  border-color: #d0d0d0;
 }
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-}
-.sentiment {
-  font-size: 12px;
-  font-weight: 600;
-  padding: 3px 10px;
-  border-radius: 12px;
-}
-.sentiment.positive {
-  background: #eafff5;
-  color: #00c896;
-}
-.sentiment.neutral {
-  background: #f5f5f5;
-  color: #555;
-}
-.sentiment.negative {
-  background: #ffecec;
-  color: #e85b5b;
-}
-.date {
-  font-size: 11px;
-  color: #999;
-}
+
+
+/* 제목 */
 .title {
-  font-size: 15px;
+  font-size: 16px; /* ✅ 살짝 줄임 */
   font-weight: 700;
-  margin-bottom: 12px;
-  line-height: 1.4;
+  color: #111;
+  margin: 8px 0 12px 0; /* ✅ 상하 여백으로 띄움 */
+  line-height: 1.4; /* ✅ 줄 간격 조정 */
 }
+
+/* 요약 */
 .summary-box {
   background: #f9fdfb;
   border: 1px solid #e4f7ee;
@@ -334,30 +337,66 @@ const openDetail = (item) => {
   font-size: 13px;
   color: #333;
   line-height: 1.6;
-  margin-bottom: 14px;
+  margin-bottom: 12px; /* ✅ 키워드와 간격 추가 */
 }
+.summary-box ul {
+  margin: 0;
+  padding-left: 18px;
+}
+.summary-box li {
+  list-style-type: disc;
+  margin-bottom: 4px;
+}
+
+/* 키워드 */
 .keywords {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 .keywords span {
-  background: #f5f5f5;
+  background: #f3f3f3;
   border-radius: 8px;
   padding: 3px 8px;
   font-size: 12px;
   color: #444;
 }
-.divider {
-  border-top: 1px solid #eee;
-  margin: 10px 0;
+
+/* 태그 */
+.tag-row {
+  display: flex;
+  gap: 6px;
 }
+.tag {
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 10px;
+  padding: 3px 8px;
+}
+.tag.category {
+  background: #eafff5;
+  color: #00a877;
+}
+.tag.positive {
+  background: #eafff5;
+  color: #00c896;
+}
+.tag.neutral {
+  background: #f5f5f5;
+  color: #555;
+}
+.tag.negative {
+  background: #ffecec;
+  color: #e85b5b;
+}
+
+/* 편향 */
 .bias {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 .bias-label {
   font-size: 12px;
@@ -377,30 +416,36 @@ const openDetail = (item) => {
   background: #f3f3f3;
   color: #555;
 }
+
+/* 신뢰도 + 출처 */
 .card-footer {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  font-size: 12px;
 }
 .trust {
   display: flex;
   align-items: center;
   gap: 8px;
 }
-.bar {
-  width: 80px;
+.trust .label {
+  font-size: 12px;
+  color: #777;
+}
+.trust .bar {
+  flex: 1;
   height: 6px;
   background: #eee;
   border-radius: 4px;
   overflow: hidden;
 }
-.fill {
+.trust .fill {
   height: 100%;
   background: #71ebbe;
 }
-.score {
-  font-weight: 600;
+.trust .score {
+  font-weight: 700;
+  font-size: 12px;
 }
 .source {
   font-size: 11px;
@@ -408,3 +453,4 @@ const openDetail = (item) => {
   text-align: right;
 }
 </style>
+

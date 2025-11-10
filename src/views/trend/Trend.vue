@@ -107,7 +107,7 @@ const keywordData = [
 ];
 
 onMounted(async () => {
-  // === 키워드 트렌드 차트 ===
+  // 키워드 트렌드 차트
   const ctx1 = document.getElementById("trendChart");
   new Chart(ctx1, {
     type: "bar",
@@ -135,7 +135,7 @@ onMounted(async () => {
     },
   });
 
-  // === 산업별 채용 감정 분석 (누적형) ===
+  // 산업별 채용 감정 분석 차트
   await nextTick();
   const ctx2 = document.getElementById("sentimentChart");
   new Chart(ctx2, {
@@ -184,7 +184,7 @@ onMounted(async () => {
     },
   });
 
-  // === 워드클라우드 ===
+  // 워드클라우드
   const words = [
     ["Kubernetes", 40],
     ["AI", 30],
@@ -205,22 +205,20 @@ onMounted(async () => {
     weightFactor: 4,
     color: () => "#71EBBE",
     rotateRatio: 0,
-    backgroundColor: "#fff",
+    backgroundColor: "#ffffff",
   });
 });
 </script>
 
 <style scoped>
 .trend-page {
-  background: #f9fafb;
+  background: #ffffff; /* ✅ 페이지 전체 흰색 */
   padding: 40px 80px 100px;
   font-family: "Pretendard", sans-serif;
   color: #111;
 }
 
-/* -------------------------------
-   Header
---------------------------------*/
+/* Header */
 .page-title {
   font-size: 24px;
   font-weight: 700;
@@ -233,9 +231,7 @@ onMounted(async () => {
   margin-bottom: 32px;
 }
 
-/* -------------------------------
-   Summary Cards
---------------------------------*/
+/* Summary Cards */
 .summary-cards {
   display: flex;
   gap: 20px;
@@ -247,13 +243,14 @@ onMounted(async () => {
   border-radius: 14px;
   padding: 22px 24px;
   text-align: center;
-  border: 1px solid #e8e8e8;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e5e5e5; /* ✅ 경계선 */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04); /* ✅ 은은한 그림자 */
   transition: all 0.25s ease;
 }
 .summary-card:hover {
   transform: translateY(-3px);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  border-color: #d0d0d0;
 }
 .summary-card .label {
   font-size: 13px;
@@ -276,16 +273,14 @@ onMounted(async () => {
   color: #e85b5b;
 }
 
-/* -------------------------------
-   Keyword Trend Section
---------------------------------*/
+/* Keyword Trend Section */
 .pretty-trend {
-  background: #fff;
-  border: 1px solid #eee;
+  background: #ffffff;
+  border: 1px solid #e5e5e5; /* ✅ 경계선 */
   border-radius: 16px;
   padding: 28px 30px;
   margin-bottom: 36px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04); /* ✅ 그림자 */
 }
 .chart-title {
   font-size: 17px;
@@ -330,9 +325,7 @@ onMounted(async () => {
   color: #ff5f5f;
 }
 
-/* -------------------------------
-   Insight Row (Wordcloud + Sentiment)
---------------------------------*/
+/* Insight Row */
 .insight-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -342,8 +335,8 @@ onMounted(async () => {
 .card {
   background: #ffffff;
   border-radius: 16px;
-  border: 1px solid #e8e8e8;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+  border: 1px solid #e5e5e5; /* ✅ 경계선 */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04); /* ✅ 그림자 */
   padding: 22px 26px;
 }
 .card-header h4 {
@@ -356,15 +349,11 @@ onMounted(async () => {
   color: #777;
   margin-bottom: 14px;
 }
-
-/* 워드클라우드 */
 .wordcloud {
   width: 100%;
   height: 260px;
   margin-top: 6px;
 }
-
-/* 감정 차트 영역 */
 .sentiment-chart-container {
   position: relative;
   width: 100%;
@@ -378,16 +367,14 @@ onMounted(async () => {
   height: 100% !important;
 }
 
-/* -------------------------------
-   시장 인사이트 요약
---------------------------------*/
+/* Insight Summary */
 .insight-summary {
   background: #ffffff;
   border-radius: 16px;
-  border: 1px solid #e8e8e8;
+  border: 1px solid #e5e5e5; /* ✅ 경계선 */
   padding: 26px 30px;
   line-height: 1.8;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04); /* ✅ 그림자 */
 }
 .insight-summary h4 {
   font-size: 17px;
@@ -427,4 +414,3 @@ onMounted(async () => {
   color: #00a67a;
 }
 </style>
-

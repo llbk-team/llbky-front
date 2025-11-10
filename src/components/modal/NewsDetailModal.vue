@@ -1,16 +1,13 @@
 <template>
   <div class="modal-overlay" @click.self="$emit('close')">
     <div class="modal-content">
-      <!-- 상단 -->
       <div class="modal-header">
         <h2>뉴스 요약 분석</h2>
         <button class="close-btn" @click="$emit('close')">✕</button>
       </div>
 
       <div class="modal-body">
-        <!-- 좌측: 선택 뉴스 상세 -->
         <div class="left">
-          <!-- 감정 비율 (샘플 값, 백엔드 연동 시 교체 가능) -->
           <div class="sentiment-box">
             <div class="sentiment-item positive">
               <div class="circle">49%</div>
@@ -26,7 +23,6 @@
             </div>
           </div>
 
-          <!-- 신뢰도 -->
           <div class="trust-box">
             <span class="trust-label">신뢰도</span>
             <div class="trust-bar">
@@ -35,13 +31,13 @@
             <span class="trust-score">{{ news.trust }}%</span>
           </div>
 
-          <!-- 기사 내용 -->
+          <!-- ✅ 긴 요약문 -->
           <div class="article">
             <h3>{{ news.title }}</h3>
             <div class="meta">
               <span>{{ news.source }}</span> · <span>{{ news.date }}</span>
             </div>
-            <p>{{ news.summary }}</p>
+            <p>{{ news.summary_long || news.summary_short }}</p>
 
             <div class="keywords">
               <span v-for="(k, i) in news.keywords" :key="i">#{{ k }}</span>
@@ -49,7 +45,6 @@
           </div>
         </div>
 
-        <!-- 우측: 관련 뉴스 (더미) -->
         <div class="right">
           <h4>관련 뉴스</h4>
           <ul>
@@ -69,23 +64,10 @@ defineProps({
   news: { type: Object, required: true },
 });
 
-// 화면 설계용 더미 데이터
 const relatedNews = [
-  {
-    title: "AI 인재 확보에 나선 글로벌 기업 동향",
-    source: "브릿지경제",
-    date: "2025-11-04",
-  },
-  {
-    title: "클라우드·데이터 인프라 인력 수요 확대",
-    source: "매일경제",
-    date: "2025-11-03",
-  },
-  {
-    title: "HR테크와 AI 면접 솔루션 도입 가속화",
-    source: "머니투데이",
-    date: "2025-11-02",
-  },
+  { title: "AI 인재 확보에 나선 글로벌 기업 동향", source: "브릿지경제", date: "2025-11-04" },
+  { title: "클라우드·데이터 인프라 인력 수요 확대", source: "매일경제", date: "2025-11-03" },
+  { title: "HR테크와 AI 면접 솔루션 도입 가속화", source: "머니투데이", date: "2025-11-02" },
 ];
 </script>
 

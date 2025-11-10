@@ -1,12 +1,10 @@
 <template>
   <div class="insight-page">
-    <!-- 헤더 -->
     <h2 class="page-title">AI 직무 인사이트</h2>
     <p class="page-subtitle">
       뉴스 트렌드와 커리어 관심사를 분석해 AI가 추천하는 맞춤 직무
     </p>
 
-    <!-- 분석 요약 -->
     <div class="summary-box">
       <h4>맞춤 분석 결과</h4>
       <p>
@@ -19,11 +17,9 @@
       </div>
     </div>
 
-    <!-- 추천 직무 카드 -->
     <div class="job-grid">
       <div v-for="(job, i) in jobs" :key="i" class="job-card">
         <div class="job-header">
-          <!-- 🔹 Trend 페이지로 이동 (쿼리 파라미터 전달) -->
           <router-link
             :to="`/trend?keyword=${encodeURIComponent(job.title)}`"
             class="job-link"
@@ -76,10 +72,25 @@ const jobs = [
 
 <style scoped>
 .insight-page {
-  background: #f1f2f3;
+  background: #ffffff;
   padding: 40px 80px 100px;
   font-family: "Pretendard", sans-serif;
   color: #111111;
+}
+
+/* 공통 카드 효과 */
+.summary-box,
+.job-card {
+  background: #ffffff;
+  border: 1px solid #e5e5e5;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  border-radius: 14px;
+  transition: 0.25s ease;
+}
+.summary-box:hover,
+.job-card:hover {
+  border-color: #d0d0d0;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
 }
 
 /* 헤더 */
@@ -96,12 +107,8 @@ const jobs = [
 
 /* 분석 요약 */
 .summary-box {
-  background: #ddf3eb;
-  border: 1px solid #a2f1d6;
-  border-radius: 12px;
   padding: 20px 28px;
   margin-bottom: 36px;
-  box-shadow: 0 2px 4px rgba(17, 17, 17, 0.05);
 }
 .summary-box h4 {
   font-size: 16px;
@@ -129,19 +136,8 @@ const jobs = [
   gap: 24px;
 }
 .job-card {
-  background: #ffffff;
-  border: 1px solid #eaecec;
-  border-radius: 14px;
   padding: 22px 26px;
-  box-shadow: 0 2px 6px rgba(17, 17, 17, 0.04);
-  transition: all 0.25s ease;
 }
-.job-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 10px rgba(17, 17, 17, 0.08);
-}
-
-/* 상단 헤더 */
 .job-header {
   display: flex;
   justify-content: space-between;
