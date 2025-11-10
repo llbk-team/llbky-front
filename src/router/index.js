@@ -8,11 +8,6 @@ const routes = [
     name: 'home',
     component: HomeView
   },
-<<<<<<< Updated upstream
-
-  ...interviewRouting
-
-=======
   {
     path: '/login',
     name: 'login',
@@ -28,8 +23,9 @@ const routes = [
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
     component: () => import(/* webpackChunkName: "signup" */ '../views/SignupView.vue')
-  }
->>>>>>> Stashed changes
+  },
+    ...interviewRouting
+
 ]
 
 const router = createRouter({
