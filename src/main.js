@@ -16,6 +16,7 @@ import "remixicon/fonts/remixicon.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap";
 
+import "./assets/fonts.css";
 import "./assets/main.css";
 
 createApp(App).use(store).use(router).mount("#app");

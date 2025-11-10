@@ -6,13 +6,8 @@
         <h1 class="logo" @click="goHome">Career Coach</h1>
 
         <nav class="main-nav">
-          <span
-            v-for="menu in mainMenus"
-            :key="menu.name"
-            class="nav-item"
-            :class="{ active: activeMenu === menu.name }"
-            @click="selectMenu(menu.name)"
-          >
+          <span v-for="menu in mainMenus" :key="menu.name" class="nav-item"
+            :class="{ active: activeMenu === menu.name }" @click="selectMenu(menu.name)">
             {{ menu.label }}
           </span>
         </nav>
@@ -24,13 +19,8 @@
     </div>
 
     <div v-if="subMenus[activeMenu]" class="sub-menu">
-      <router-link
-        v-for="(sub, idx) in subMenus[activeMenu]"
-        :key="idx"
-        :to="sub.path"
-        class="sub-item"
-        :class="{ active: isActive(sub.path) }"
-      >
+      <router-link v-for="(sub, idx) in subMenus[activeMenu]" :key="idx" :to="sub.path" class="sub-item"
+        :class="{ active: isActive(sub.path) }">
         {{ sub.label }}
       </router-link>
     </div>
@@ -81,10 +71,10 @@ const subMenus = {
     { label: "멘토링", path: "/my/mentoring" },
   ],
   resume: [
-    {label:"서류",path:"/resume/list"},
+    { label: "서류", path: "/resume/list" },
     { label: "서류작성", path: "/resume/write" },
     { label: "서류코칭", path: "/resume/coach" },
-    
+
   ],
   interview: [
     { label: "면접 리포트", path: "/interview/report" },
@@ -153,7 +143,6 @@ const isActive = (path) => route.path.startsWith(path);
   width: 100%;
   background: #fff;
   border-bottom: 1px solid #eee;
-  font-family: "Pretendard", sans-serif;
 }
 
 /* 상단: 로고 + 메뉴 */
