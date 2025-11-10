@@ -1,18 +1,7 @@
 <template>
   <div class="app-container">
     <!-- 사이드바 -->
-    <div class="sidebar">
-      <div class="sidebar-header">
-        <h3>MY</h3>
-      </div>
-      <div class="sidebar-menu">
-        <div class="menu-item active">이력서 작성</div>
-        <div class="menu-item">자기소개서</div>
-        <div class="menu-item">포트폴리오</div>
-        <div class="menu-item">지원 현황</div>
-        <div class="menu-item">채팅 기록</div>
-      </div>
-    </div>
+   <SideBar/>
 
     <!-- 메인 컨테이너 -->
     <div class="main-container">
@@ -328,6 +317,7 @@
 </template>
 
 <script setup>
+import SideBar from '@/components/sidebar/SideBar.vue'
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 

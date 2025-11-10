@@ -3,18 +3,8 @@
     <!-- 컨테이너 -->
     <div class="main-container">
       <!-- 사이드바 -->
-      <div class="sidebar">
-        <ul class="sidebar-menu">
-          <li
-           v-for="menu in sidebarMenus" 
-            :key="menu.id"
-            :class="['menu-item', { active: menu.active }]"
-           
-          >
-          {{ menu.label }}
-          </li>
-        </ul>
-      </div>
+      <SideBar />
+      
 
       <!-- 메인 콘텐츠 -->
       <div class="main-content">
@@ -83,6 +73,7 @@
 </template>
 
 <script setup>
+import SideBar from '@/components/sidebar/SideBar.vue'
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -98,7 +89,6 @@ const sidebarMenus = ref([
   { id: 'coverletter', label: '자기소개서', active: false },
   { id: 'portfolio', label: '포트폴리오', active: false },
  
-  
 ])
 
 
