@@ -2,7 +2,6 @@
 node_modules
 /dist
 
-
 # local env files
 .env.local
 .env.*.local
@@ -21,3 +20,12 @@ pnpm-debug.log*
 *.njsproj
 *.sln
 *.sw?
+
+# Node.js
+node_modules/
+dist/
+build/
+
+# 프로젝트 설정 파일 무시
+package.json
+package-lock.json
