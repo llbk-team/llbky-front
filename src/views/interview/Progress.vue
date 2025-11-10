@@ -8,7 +8,7 @@
         <small class="fw-semibold">질문 {{ current }}/{{ total }}</small>
         <div class="flex-grow-1 progress" style="height: 5px;">
           <div
-            class="progress-bar bg-success"
+            class="progress-bar bg-mint"
             role="progressbar"
             :style="{ width: (current / total) * 100 + '%' }"
           ></div>
@@ -46,7 +46,6 @@
       <div class="col-lg-6">
         <div class="bg-dark text-white rounded-4 p-4 text-center mb-3 preview-box">
           <div class="d-flex flex-column justify-content-center align-items-center h-100">
-            <!-- 미리보기 화면 (대기 중) -->
             <template v-if="!isRecording">
               <i class="ri-video-line fs-1 mb-2 text-secondary"></i>
               <p class="text-muted small mb-0">
@@ -54,7 +53,6 @@
               </p>
             </template>
 
-            <!-- 녹화/녹음 중 -->
             <template v-else>
               <i v-if="mode === 'video'" class="ri-record-circle-fill fs-1 text-danger mb-2"></i>
               <i v-else class="ri-mic-fill fs-1 text-danger mb-2"></i>
@@ -71,7 +69,7 @@
           <div class="d-flex justify-content-between align-items-center mb-4">
             <h6 class="fw-bold text-dark mb-0">답변 녹음/녹화</h6>
             <button
-              class="btn btn-success fw-semibold rounded-pill px-3 py-1"
+              class="btn btn-mint rounded-pill px-3 py-1 fw-medium"
               @click="handleSubmit"
             >
               {{ current < total ? "답변 제출 >" : "면접 완료 >" }}
@@ -81,15 +79,15 @@
           <!-- 모드 선택 -->
           <div class="d-flex justify-content-center gap-3 mb-4">
             <button
-              class="btn w-50 py-3 fw-semibold border"
-              :class="mode === 'video' ? 'btn-success text-dark border-0' : 'btn-outline-dark bg-white text-dark'"
+              class="btn w-50 py-3 fw-medium border mode-btn"
+              :class="mode === 'video' ? 'active' : ''"
               @click="setMode('video')"
             >
               <i class="ri-video-line me-1"></i> 영상 녹화
             </button>
             <button
-              class="btn w-50 py-3 fw-semibold border"
-              :class="mode === 'audio' ? 'btn-success text-dark border-0' : 'btn-outline-dark bg-white text-dark'"
+              class="btn w-50 py-3 fw-medium border mode-btn"
+              :class="mode === 'audio' ? 'active' : ''"
               @click="setMode('audio')"
             >
               <i class="ri-mic-line me-1"></i> 음성 녹음
@@ -108,11 +106,11 @@
             </div>
           </div>
 
-          <!-- 녹음/녹화 시작/중지 버튼 추가 -->
-          <div class="d-flex justify-content-center">
+          <!-- 녹음/녹화 시작/중지 -->
+          <div class="d-flex justify-content-center mt-3">
             <button
-              class="btn"
-              :class="isRecording ? 'btn-danger text-white px-4 py-2' : 'btn-success text-dark px-4 py-2'"
+              class="btn fw-medium px-4 py-2"
+              :class="isRecording ? 'btn-danger text-white' : 'btn-mint text-dark'"
               @click="isRecording ? stopRecording() : startRecording()"
             >
               <i :class="isRecording ? 'ri-stop-fill me-1' : 'ri-record-circle-fill me-1'"></i>
@@ -120,7 +118,6 @@
             </button>
           </div>
         </div>
-
       </div>
 
       <!-- 오른쪽 AI 피드백 -->
@@ -143,9 +140,9 @@
               <li>끝맺음은 조금 더 또렷하게!</li>
             </ul>
           </div>
-          
+
           <div class="small text-muted mb-3">
-            <strong class="text-dark">"😊 톤 & 표정 분석"</strong><br />
+            <strong class="text-dark">😊 톤 & 표정 분석</strong><br />
             <ul class="ps-3 mb-0">
               <li>표정: 자연스러움 😊</li>
               <li>시선: 안정적 👀</li>
@@ -160,11 +157,11 @@
               <li>도입-핵심-마무리 구성 적절합니다.</li>
             </ul>
           </div>
-          
+
           <div class="small text-muted mb-3">
             <strong class="text-dark">📄 내용 분석</strong><br />
             <ul class="ps-3 mb-0">
-              <li>핵심 키워드 전달력 우수.<br>직무 관련 키워드 추가 시 설득력 상승 가능.</li>
+              <li>핵심 키워드 전달력 우수.<br />직무 관련 키워드 추가 시 설득력 상승 가능.</li>
             </ul>
           </div>
 
@@ -179,7 +176,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from "vue";
+import { ref, onUnmounted } from "vue";
 import "remixicon/fonts/remixicon.css";
 import router from "@/router";
 
@@ -202,21 +199,16 @@ const questions = [
 const startRecording = () => {
   isRecording.value = true;
   recordTime.value = 0;
-  timer = setInterval(() => {
-    recordTime.value++;
-  }, 1000);
+  timer = setInterval(() => recordTime.value++, 1000);
 };
-
 const stopRecording = () => {
   isRecording.value = false;
   clearInterval(timer);
 };
-
 const setMode = (newMode) => {
   mode.value = newMode;
   stopRecording();
 };
-
 const handleSubmit = () => {
   if (current.value < total) {
     alert(`질문 ${current.value}의 답변이 제출되었습니다.`);
@@ -228,36 +220,66 @@ const handleSubmit = () => {
     router.push("/interview/report");
   }
 };
-
 const formatTime = (seconds) => {
   const min = Math.floor(seconds / 60);
   const sec = seconds % 60;
   return `${min}:${sec.toString().padStart(2, "0")}`;
 };
-
 onUnmounted(() => clearInterval(timer));
 </script>
 
 <style scoped>
-.bg-dark {
-  background-color: #0e1111 !important;
+/* 🔹 민트 색상 통일 */
+.bg-mint,
+.progress-bar.bg-mint {
+  background-color: #71ebbe !important;
 }
-.btn-success {
+
+/* 🔹 버튼 폰트 & 간격 */
+.btn {
+  font-weight: 500 !important;
+  letter-spacing: 0.2px;
+  transition: all 0.2s ease;
+}
+
+/* 🔹 기본 민트 버튼 */
+.btn-mint {
   background-color: #71ebbe !important;
   color: #000 !important;
   border: none !important;
 }
-.btn-success:hover {
+.btn-mint:hover {
   background-color: #5cd8ab !important;
 }
-.btn-danger {
-  background-color: #ff6464;
-  border: none;
+
+/* 🔹 모드 선택 버튼 (비활성 시 DDF3EB) */
+.mode-btn {
+  background-color: #ddf3eb !important;
+  color: #000 !important;
+  border: none !important;
 }
-.btn-danger:hover {
-  background-color: #e45454;
+.mode-btn.active {
+  background-color: #71ebbe !important;
+  color: #000 !important;
+  border: none !important;
+}
+.mode-btn:hover {
+  background-color: #b8ecdb !important;
 }
 
+/* 🔹 기타 스타일 */
+.bg-dark {
+  background-color: #0e1111 !important;
+}
+.btn-danger {
+  background-color: #ff6464 !important;
+  border: none !important;
+}
+.btn-danger:hover {
+  background-color: #e45454 !important;
+}
+
+/* 미리보기 박스 */
 .preview-box {
   height: 320px;
   background-color: #0e1111 !important;
