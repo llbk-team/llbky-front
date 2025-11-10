@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import interviewRouting from "@/router/interviewRouting"
 import trendRouting from "@/router/trendRouting"
+import myRouting from "@/router/myRouting"
 
 
 const routes = [
@@ -27,7 +28,9 @@ const routes = [
     component: () => import(/* webpackChunkName: "about" */ '../views/SignupView.vue')
   },
   ...interviewRouting,
-  ...trendRouting
+  ...trendRouting,
+  ...myRouting
+
 ]
 
 const router = createRouter({
