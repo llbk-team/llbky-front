@@ -112,7 +112,7 @@ const selectMenu = (menuName) => {
 
   const defaultPaths = {
     my: "/my/page",
-    resume: "/resume/write",
+    resume: "/resume",
     interview: "/interview/report",
     learning: "/learning/coach",
     trend: "/trend/news",
