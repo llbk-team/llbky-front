@@ -5,12 +5,7 @@
       <h2>AI가 분석해주는 채용 트렌드</h2>
 
       <div class="search-bar">
-        <input
-          type="text"
-          placeholder="키워드를 입력하세요 (예: 인공지능, 백엔드, AI 개발자)"
-          v-model="keyword"
-          @keyup.enter="searchNews"
-        />
+        <input type="text" placeholder="키워드를 입력하세요 (예: 인공지능, 백엔드, AI 개발자)" v-model="keyword" @keyup.enter="searchNews" />
         <button @click="searchNews">검색</button>
       </div>
     </section>
@@ -26,12 +21,7 @@
       </p>
 
       <div class="news-grid">
-        <div
-          v-for="(item, i) in visibleNews"
-          :key="i"
-          class="news-card"
-          @click="openDetail(item)"
-        >
+        <div v-for="(item, i) in visibleNews" :key="i" class="news-card" @click="openDetail(item)">
           <!-- 상단 태그 -->
           <div class="tag-row">
             <span class="tag category">채용 시장</span>
@@ -52,10 +42,7 @@
           <!-- 편향 감지 -->
           <div class="bias">
             <span class="bias-label">편향 감지</span>
-            <span
-              class="bias-status"
-              :class="{ biasYes: item.bias_detected, biasNo: !item.bias_detected }"
-            >
+            <span class="bias-status" :class="{ biasYes: item.bias_detected, biasNo: !item.bias_detected }">
               {{ item.bias_detected ? item.bias_type : "없음" }}
             </span>
           </div>
@@ -76,11 +63,7 @@
     </section>
 
     <!-- 상세보기 -->
-    <NewsDetailModal
-      v-if="selectedNews"
-      :news="selectedNews"
-      @close="selectedNews = null"
-    />
+    <NewsDetailModal v-if="selectedNews" :news="selectedNews" @close="selectedNews = null" />
   </div>
 </template>
 
@@ -103,6 +86,23 @@ const filters = ref({
 ------------------------------ */
 const newsList = ref([
   {
+    title: "AI 인재 확보 경쟁 심화, 스타트업도 대규모 채용",
+    summary_short: `
+AI/머신러닝 관련 채용은 전년 대비 45% 증가했습니다.
+LLM, RAG, MLOps 등 신기술 직군 수요가 꾸준히 확대 중입니다.
+스타트업에서도 연구 인력 채용이 활발히 이루어지고 있습니다.
+`,
+    keywords: ["AI", "LLM", "MLOps", "RAG", "데이터"],
+    trust: 87,
+    sentiment: "positive",
+    sentimentLabel: "긍정적",
+    bias_detected: true,
+    bias_type: "기술 과도 홍보 경향",
+    date: "2025.11.09",
+    source: "ZDNet Korea",
+    source_url: "https://zdnet.co.kr/news/ai-hiring"
+  },
+  {
     title: "백엔드 개발자 채용 시장 안정세, 경력직 선호",
     summary_short: `
 백엔드 개발자 채용은 전년 대비 소폭 증가세를 보이고 있습니다.
@@ -118,22 +118,7 @@ MSA·쿠버네티스 등 인프라 지식 보유자 우대 경향이 나타납�
     date: "2025.11.01",
     source: "커리어 인사이트",
   },
-  {
-    title: "AI 인재 확보 경쟁 심화, 스타트업도 대규모 채용",
-    summary_short: `
-AI/머신러닝 관련 채용은 전년 대비 45% 증가했습니다.
-LLM, RAG, MLOps 등 신기술 직군 수요가 꾸준히 확대 중입니다.
-스타트업에서도 연구 인력 채용이 활발히 이루어지고 있습니다.
-`,
-    keywords: ["AI", "LLM", "MLOps", "RAG", "데이터"],
-    trust: 87,
-    sentiment: "positive",
-    sentimentLabel: "긍정적",
-    bias_detected: true,
-    bias_type: "기술 과도 홍보 경향",
-    date: "2025.11.09",
-    source: "ZDNet Korea",
-  },
+
   {
     title: "클라우드 및 DevOps 직군 채용 32% 증가",
     summary_short: `
@@ -242,12 +227,13 @@ const formatSummary = (summary) => {
 };
 const applyFilter = (newFilters) => (filters.value = newFilters);
 const openDetail = (item) => (selectedNews.value = item);
-const searchNews = () => {};
+const searchNews = () => { };
 </script>
 
 <style scoped>
 .trend-news {
-  background: #fff; /* ✅ 페이지 전체 배경을 흰색으로 */
+  background: #fff;
+  /* ✅ 페이지 전체 배경을 흰색으로 */
   color: #000;
   font-family: "Pretendard", sans-serif;
 }
@@ -261,16 +247,19 @@ const searchNews = () => {};
   width: 100vw;
   margin-left: calc(50% - 50vw);
 }
+
 .hero h2 {
   font-size: 22px;
   font-weight: 600;
   margin-bottom: 28px;
 }
+
 .search-bar {
   display: flex;
   justify-content: center;
   gap: 10px;
 }
+
 .search-bar input {
   width: 440px;
   padding: 12px 18px;
@@ -279,6 +268,7 @@ const searchNews = () => {};
   outline: none;
   font-size: 14px;
 }
+
 .search-bar button {
   background: #71ebbe;
   border: none;
@@ -293,6 +283,7 @@ const searchNews = () => {};
 .news-section {
   padding: 40px 80px 100px;
 }
+
 .news-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -321,11 +312,14 @@ const searchNews = () => {};
 
 /* 제목 */
 .title {
-  font-size: 16px; /* ✅ 살짝 줄임 */
+  font-size: 16px;
+  /* ✅ 살짝 줄임 */
   font-weight: 700;
   color: #111;
-  margin: 8px 0 12px 0; /* ✅ 상하 여백으로 띄움 */
-  line-height: 1.4; /* ✅ 줄 간격 조정 */
+  margin: 8px 0 12px 0;
+  /* ✅ 상하 여백으로 띄움 */
+  line-height: 1.4;
+  /* ✅ 줄 간격 조정 */
 }
 
 /* 요약 */
@@ -337,12 +331,15 @@ const searchNews = () => {};
   font-size: 13px;
   color: #333;
   line-height: 1.6;
-  margin-bottom: 12px; /* ✅ 키워드와 간격 추가 */
+  margin-bottom: 12px;
+  /* ✅ 키워드와 간격 추가 */
 }
+
 .summary-box ul {
   margin: 0;
   padding-left: 18px;
 }
+
 .summary-box li {
   list-style-type: disc;
   margin-bottom: 4px;
@@ -355,6 +352,7 @@ const searchNews = () => {};
   gap: 6px;
   margin-bottom: 8px;
 }
+
 .keywords span {
   background: #f3f3f3;
   border-radius: 8px;
@@ -368,24 +366,29 @@ const searchNews = () => {};
   display: flex;
   gap: 6px;
 }
+
 .tag {
   font-size: 11px;
   font-weight: 600;
   border-radius: 10px;
   padding: 3px 8px;
 }
+
 .tag.category {
   background: #eafff5;
   color: #00a877;
 }
+
 .tag.positive {
   background: #eafff5;
   color: #00c896;
 }
+
 .tag.neutral {
   background: #f5f5f5;
   color: #555;
 }
+
 .tag.negative {
   background: #ffecec;
   color: #e85b5b;
@@ -398,20 +401,24 @@ const searchNews = () => {};
   gap: 10px;
   margin-bottom: 8px;
 }
+
 .bias-label {
   font-size: 12px;
   color: #666;
 }
+
 .bias-status {
   font-size: 12px;
   font-weight: 600;
   border-radius: 8px;
   padding: 3px 8px;
 }
+
 .biasYes {
   background: #ffecec;
   color: #e85b5b;
 }
+
 .biasNo {
   background: #f3f3f3;
   color: #555;
@@ -423,15 +430,18 @@ const searchNews = () => {};
   flex-direction: column;
   gap: 6px;
 }
+
 .trust {
   display: flex;
   align-items: center;
   gap: 8px;
 }
+
 .trust .label {
   font-size: 12px;
   color: #777;
 }
+
 .trust .bar {
   flex: 1;
   height: 6px;
@@ -439,18 +449,20 @@ const searchNews = () => {};
   border-radius: 4px;
   overflow: hidden;
 }
+
 .trust .fill {
   height: 100%;
   background: #71ebbe;
 }
+
 .trust .score {
   font-weight: 700;
   font-size: 12px;
 }
+
 .source {
   font-size: 11px;
   color: #999;
   text-align: right;
 }
 </style>
-
