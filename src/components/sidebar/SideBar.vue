@@ -97,10 +97,11 @@ export default {
 
 /* Vue Router active-class="active" */
 .menu-item.active {
-  background: #E3F2FD;
-  color: #1976D2;
+  background: linear-gradient(135deg, #71EBBE, #A2F1D6);
+  color: #000;
   font-weight: 600;
-  border-left: 4px solid #1976D2;
+   box-shadow: 0 4px 15px rgba(113, 235, 190, 0.3);
+  border-left: 4px solid #71EBBE;
   padding-left: calc(1rem - 4px);
 }
 

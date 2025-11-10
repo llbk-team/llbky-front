@@ -1,11 +1,7 @@
 <template>
   <div class="page-wrapper">
 
- 
-
     <div class="main-layout">
-
-      <!-- ✅ 좌측 Sidebar -->
       <SideBar/>
 
       <!-- ✅ 컨텐츠 영역 -->

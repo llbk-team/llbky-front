@@ -1,9 +1,9 @@
 <template>
   <div class="portfolio-analysis-page d-flex">
     <!-- 사이드바 (고정 너비) -->
-    <div class="sidebar-container">
+    
       <SideBar />
-    </div>
+    
     
     <!-- 메인 콘텐츠 (나머지 너비) -->
     <div class="analysis-container d-flex flex-fill">
