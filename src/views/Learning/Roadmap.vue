@@ -26,25 +26,78 @@
           </div>
         </div>
       </div>
-
     </div>
+
+    <!-- ✅ AI 질문 모달 -->
+    <div v-if="showAiModal" class="ai-modal-overlay" @click.self="closeAiModal">
+      <div class="ai-modal-content shadow-lg">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="fw-bold mb-0">🧭 현재 로드맵 요약</h5>
+          <button class="btn-close" @click="closeAiModal"></button>
+        </div>
+
+        <ul class="list-group mb-3">
+          <li v-for="week in roadmapData" :key="week.week" class="list-group-item">{{ week.week }}주차: {{ week.title.replace(/\[.*?\]\s*/, '') }}</li>
+        </ul>
+
+        <p class="text-center text-muted mb-3">
+          질문을 입력하면 AI가 답변해드려요!<br />
+          <small>예: "Spring Security가 어려워요. 다른 순서로 바꿀 수 있나요?"</small>
+        </p>
+
+        <div class="ai-input">
+          <input v-model="aiInput" type="text" class="form-control" placeholder="Spring Security가 어려워요. 다른 순서로 바꿀 수 있나요?" />
+          <button class="btn btn-mint ms-2">전송</button>
+        </div>
+      </div>
+    </div>
+
 
     <footer class="d-flex justify-content-between align-items-center mt-4 pt-4 border-top">
 
-      <router-link :to="`/Learning/Skill`" class="btn btn-outline-secondary">
+      <router-link :to="`/learning/skill`" class="btn btn-outline-secondary">
         ← 이전
       </router-link>
 
       <div>
-        <button type="button" class="btn btn-mint me-2" @click="askAI">
+        <button type="button" class="btn btn-mint me-2" @click="openAiModal">
           AI 질문
         </button>
-        <button type="button" class="btn btn-dark" @click="savePlan">
+        <button type="button" class="btn btn-dark" @click="openSaveModal">
           플랜 저장
         </button>
-        
       </div>
     </footer>
+
+    <!-- ✅ 저장 완료 모달 -->
+    <div v-if="showSaveModal" class="save-modal-overlay" @click.self="closeSaveModal">
+      <div class="save-modal-content shadow-lg text-center">
+        <div class="check-icon mb-3">✅</div>
+        <h4 class="fw-bold mb-3">플랜이 저장되었습니다!</h4>
+
+        <div class="alert alert-mint-light mb-4">
+          🎯 <strong>'백엔드 개발자 – 취업 준비 + 자기계발'</strong><br />
+          4주 학습 로드맵이 내 학습함에 추가되었습니다.
+        </div>
+
+        <p class="fw-semibold mb-3">👉 다음 단계로 이동할까요?</p>
+
+        <div class="d-flex justify-content-center gap-3 mb-4">
+
+          <router-link :to="`/learning/start`" class="btn btn-green" @click="startLearning">
+            ▶ 학습 시작하기
+          </router-link>
+          <router-link :to="`/learning/coach`" class="btn btn-outline-mint" @click="goToMyLearning">
+            📁 내 학습함
+          </router-link>
+        </div>
+
+        <div class="ai-tip">
+          💬 <strong>AI 팁:</strong> 이제 주차별 학습을 진행하면,<br />
+          진행률과 피드백을 자동으로 기록해드릴게요!
+        </div>
+      </div>
+    </div>
 
   </div>
 </template>
@@ -53,6 +106,11 @@
 import { ref } from 'vue';
 // import { useRouter } from 'vue-router';
 // const router = useRouter();
+
+const selectedWeek = ref(null);
+const showAiModal = ref(false);
+const aiInput = ref("");
+const showSaveModal = ref(false);
 
 // 로드맵 데이터를 동적으로 관리합니다.
 const roadmapData = ref([
@@ -99,20 +157,40 @@ const roadmapData = ref([
   }
 ]);
 
-// 하단 버튼 클릭 이벤트
-function goToPrevious() {
-  console.log('이전 페이지로 이동');
-  // router.push('/coaching'); // 이전 페이지 라우터 경로
+function openModal(week) {
+  selectedWeek.value = week;
+}
+function closeModal() {
+  selectedWeek.value = null;
 }
 
-function askAI() {
-  console.log('AI 질문 모달 띄우기');
-  // AI 챗봇 모달 등을 띄우는 로직
+function openAiModal() {
+  showAiModal.value = true;
+}
+function closeAiModal() {
+  showAiModal.value = false;
 }
 
 function savePlan() {
   console.log('플랜 저장 API 호출');
   // API로 로드맵 데이터 전송
+}
+
+function openSaveModal() {
+  showSaveModal.value = true;
+}
+function closeSaveModal() {
+  showSaveModal.value = false;
+}
+
+function startLearning() {
+  console.log("학습 시작 페이지로 이동");
+  showSaveModal.value = false;
+}
+
+function goToMyLearning() {
+  console.log("내 학습함 페이지로 이동");
+  showSaveModal.value = false;
 }
 </script>
 
@@ -220,6 +298,149 @@ function savePlan() {
 .btn-mint:hover {
   background-color: #e0f3eb;
   border-color: #bbf7d0;
+}
+
+/* 모달 */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 0.75rem;
+  padding: 2rem;
+  width: 90%;
+  max-width: 600px;
+  text-align: left;
+}
+
+/* ✅ AI 질문 모달 */
+.ai-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.ai-modal-content {
+  background-color: #ffffff;
+  border-radius: 0.75rem;
+  padding: 2rem;
+  width: 90%;
+  max-width: 600px;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.list-group-item {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  margin-bottom: 0.4rem;
+}
+
+.ai-input {
+  display: flex;
+  align-items: center;
+  width: 95%;
+}
+
+.ai-input input {
+  height: 44px;
+  /* 입력창 높이 고정 */
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 0 12px;
+}
+
+/* ✅ 민트 베이스 저장 완료 모달 */
+.save-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3000;
+}
+
+.save-modal-content {
+  background: #f0fdf4;
+  /* 민트 톤 베이스 */
+  border-radius: 1rem;
+  padding: 2rem;
+  width: 90%;
+  max-width: 500px;
+  animation: fadeIn 0.3s ease-in-out;
+  color: #111;
+}
+
+.check-icon {
+  font-size: 3rem;
+}
+
+.alert-mint-light {
+  background-color: #ffffff;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+  border-radius: 0.75rem;
+  padding: 1rem;
+}
+
+.btn-green {
+  background-color: #10b981;
+  color: #fff;
+  font-weight: 600;
+  border-radius: 10px;
+  padding: 0.6rem 1.2rem;
+  border: none;
+}
+
+.btn-green:hover {
+  background-color: #059669;
+}
+
+.btn-outline-mint {
+  background-color: #ffffff;
+  color: #166534;
+  border: 2px solid #a7f3d0;
+  font-weight: 600;
+  border-radius: 10px;
+  padding: 0.6rem 1.2rem;
+}
+
+.btn-outline-mint:hover {
+  background-color: #dcfce7;
+}
+
+.ai-tip {
+  background-color: #ecfdf5;
+  color: #065f46;
+  border-radius: 10px;
+  padding: 0.8rem;
+  font-size: 0.9rem;
+  border: 1px solid #bbf7d0;
+  line-height: 1.5;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* (부트스트랩 .btn-dark, .btn-outline-secondary는 기본 스타일 사용) */

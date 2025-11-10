@@ -1,28 +1,28 @@
 const routes = [
   {
-    path: '/Learning/Coach',
-    component: () => import('@/views/Learning/Coach.vue')
+    path: '/learning/coach',
+    component: () => import('@/views/learning/coach.vue')
   },
   
   {
-    path: '/Learning/Goal',
-    component: () => import('@/views/Learning/Goal.vue')
+    path: '/learning/goal',
+    component: () => import('@/views/learning/goal.vue')
   },
   
   {
-    path: '/Learning/Skill',
-    component: () => import('@/views/Learning/Skill.vue')
+    path: '/learning/skill',
+    component: () => import('@/views/learning/skill.vue')
   },
 
 
   {
-    path: '/Learning/Roadmap',
-    component: () => import('@/views/Learning/Roadmap.vue')
+    path: '/learning/roadmap',
+    component: () => import('@/views/learning/roadmap.vue')
   },
 
   {
-    path: '/Learning/Start',
-    component: () => import('@/views/Learning/Start.vue')
+    path: '/learning/start',
+    component: () => import('@/views/learning/start.vue')
   }
 ]
 
