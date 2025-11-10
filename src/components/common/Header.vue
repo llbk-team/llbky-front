@@ -81,9 +81,10 @@ const subMenus = {
     { label: "멘토링", path: "/my/mentoring" },
   ],
   resume: [
+    {label:"서류",path:"/resume"},
     { label: "서류작성", path: "/resume/write" },
     { label: "서류코칭", path: "/resume/coach" },
-    { label: "면접 진행", path: "/resume/interview" },
+    
   ],
   interview: [
     { label: "면접 리포트", path: "/interview/report" },
