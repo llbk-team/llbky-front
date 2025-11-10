@@ -61,10 +61,10 @@
 
 
       <footer class="navigation-buttons">
-        <router-link :to="`/Learning/Goal`" class="btn btn-secondary">
+        <router-link :to="`/learning/goal`" class="btn btn-secondary">
           ← 이전
         </router-link>
-        <router-link :to="`/Learning/Roadmap`" class="btn btn-primary">
+        <router-link :to="`/learning/roadmap`" class="btn btn-primary">
           플랜 생성하기 ▶
         </router-link>
       </footer>
