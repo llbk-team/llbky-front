@@ -1,0 +1,172 @@
+<template>
+  <header class="header">
+    <div class="top-container">
+      <div class="logo-nav">
+        <h1 class="logo" @click="$router.push('/')">Career Coach</h1>
+
+        <nav class="main-nav">
+          <span v-for="menu in mainMenus" :key="menu.name" class="nav-item" :class="{ active: activeMenu === menu.name }" @click="selectMenu(menu.name)">
+            {{ menu.label }}
+          </span>
+        </nav>
+      </div>
+
+      <div class="login">
+        <router-link to="/login" :class="{ active: isActive('/login') }">로그인</router-link>
+      </div>
+    </div>
+
+    <div v-if="subMenus[activeMenu]" class="sub-menu">
+      <router-link v-for="(sub, idx) in subMenus[activeMenu]" :key="idx" :to="sub.path" class="sub-item" :class="{ active: isActive(sub.path) }">
+        {{ sub.label }}
+      </router-link>
+    </div>
+  </header>
+</template>
+
+<script setup>
+import { ref } from "vue";
+import { useRoute } from "vue-router";
+const route = useRoute();
+
+// 현재 선택된 상단 메뉴
+const activeMenu = ref("my");
+
+// 상단 메뉴
+const mainMenus = [
+  { name: "my", label: "MY" },
+  { name: "resume", label: "이력서" },
+  { name: "interview", label: "면접" },
+  { name: "learning", label: "학습" },
+  { name: "trend", label: "트렌드" },
+];
+
+// 하위 메뉴
+const subMenus = {
+  my: [
+    { label: "마이 페이지", path: "/my/page" },
+    { label: "내 정보수정", path: "/my/edit" },
+    { label: "통합 리포트", path: "/my/report" },
+    { label: "멘토링", path: "/my/mentoring" },
+  ],
+  resume: [
+    { label: "서류작성", path: "/resume/write" },
+    { label: "서류코칭", path: "/resume/coach" },
+    { label: "면접 진행", path: "/resume/interview" },
+  ],
+  interview: [
+    { label: "면접 리포트", path: "/interview/report" },
+    { label: "모의 면접", path: "/interview/mock" },
+    { label: "면접 진행", path: "/interview/progress" },
+  ],
+  learning: [
+    { label: "학습 코치", path: "/learning/coach" },
+    { label: "목표 설정", path: "/learning/goal" },
+    { label: "로드맵", path: "/learning/roadmap" },
+    { label: "학습하기", path: "/learning/start" },
+  ],
+  trend: [
+    { label: "뉴스 요약", path: "/trend/news" },
+    { label: "트렌드 분석", path: "/trend/analysis" },
+    { label: "AI 채팅", path: "/trend/chat" },
+  ],
+};
+
+// 상단 메뉴 선택
+const selectMenu = (menuName) => {
+  activeMenu.value = menuName;
+};
+
+// 하위 메뉴 활성화 감지
+const isActive = (path) => route.path.startsWith(path);
+</script>
+
+<style scoped>
+.header {
+  width: 100%;
+  background: #fff;
+  border-bottom: 1px solid #eee;
+  font-family: "Pretendard", sans-serif;
+}
+
+/* 상단: 로고 + 메뉴 */
+.top-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 36px 0 36px;
+}
+
+.logo-nav {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+}
+
+.logo {
+  font-size: 18px;
+  font-weight: 700;
+  color: #000;
+  cursor: pointer;
+}
+
+/* 상위 메뉴 */
+.main-nav {
+  display: flex;
+  gap: 28px;
+  align-items: center;
+}
+
+.nav-item {
+  cursor: pointer;
+  color: #000;
+  font-size: 14px;
+  transition: color 0.2s;
+}
+
+.nav-item.active {
+  color: #71EBBE;
+  font-weight: 600;
+}
+
+.nav-item:hover {
+  color: #71EBBE;
+}
+
+/* 로그인 */
+.login a {
+  text-decoration: none;
+  color: #000;
+  font-size: 13px;
+}
+
+.login a.active {
+  color: #71EBBE;
+}
+
+/* 하위 메뉴 */
+.sub-menu {
+  border-top: 1px solid #eaeaea;
+  padding: 10px 36px;
+  display: flex;
+  gap: 24px;
+  justify-content: flex-start;
+  background: #fff;
+}
+
+.sub-item {
+  text-decoration: none;
+  color: #777;
+  font-size: 13px;
+  transition: color 0.2s;
+}
+
+.sub-item.active {
+  color: #71EBBE;
+  font-weight: 600;
+}
+
+.sub-item:hover {
+  color: #71EBBE;
+}
+</style>
