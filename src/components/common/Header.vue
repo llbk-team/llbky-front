@@ -25,12 +25,22 @@
 </template>
 
 <script setup>
+import router from "@/router";
 import { ref } from "vue";
 import { useRoute } from "vue-router";
 const route = useRoute();
 
+const getMenuFromPath = (path) => {
+  if (path.startsWith("/my")) return "my";
+  if (path.startsWith("/resume")) return "resume";
+  if (path.startsWith("/interview")) return "interview";
+  if (path.startsWith("/learning")) return "learning";
+  if (path.startsWith("/trend")) return "trend";
+  return "my";
+};
+
 // 현재 선택된 상단 메뉴
-const activeMenu = ref("my");
+const activeMenu = ref(getMenuFromPath(route.path));
 
 // 상단 메뉴
 const mainMenus = [
@@ -75,6 +85,19 @@ const subMenus = {
 // 상단 메뉴 선택
 const selectMenu = (menuName) => {
   activeMenu.value = menuName;
+
+  // 면접 메뉴 클릭 시 기본 페이지 지정
+  const defaultPaths = {
+    my: "/my/page",
+    resume: "/resume/write",
+    interview: "/interview/report",
+    learning: "/learning/coach",
+    trend: "/trend/news",
+  };
+
+  if (defaultPaths[menuName]) {
+    router.push(defaultPaths[menuName]);
+  }
 };
 
 // 하위 메뉴 활성화 감지
