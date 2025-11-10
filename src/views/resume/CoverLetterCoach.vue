@@ -1,20 +1,6 @@
 <template>
   <div class="d-flex bg-light min-vh-100 overflow-auto">
-    <!-- Sidebar -->
-    <aside class="bg-white border-end p-4" style="width: 220px;">
-      <ul class="list-unstyled mb-0">
-        <li
-          v-for="item in sidebarItems"
-          :key="item.path"
-          @click="navigateTo(item.path)"
-          class="py-2 px-3 rounded mb-2 fw-medium"
-          :class="currentRoute === item.path ? 'bg-mint text-dark' : 'hover-light text-secondary'"
-          style="cursor: pointer;"
-        >
-          {{ item.icon }} {{ item.label }}
-        </li>
-      </ul>
-    </aside>
+    <SideBar />
 
     <!-- Main Content -->
     <section class="flex-grow-1 p-4">
@@ -197,6 +183,7 @@
 <script setup>
 import { ref, computed, reactive } from "vue";
 import { useRouter, useRoute } from "vue-router";
+import SideBar from '@/components/sidebar/SideBar.vue'
 
 const router = useRouter();
 const route = useRoute();
