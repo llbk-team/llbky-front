@@ -1,28 +1,29 @@
 <template>
-  <div class="report-container">
+  <div class="container py-5">
     <!-- 헤더 -->
-    <div class="report-header">
+    <div class="d-flex justify-content-between align-items-center mb-4">
       <div>
-        <h2 class="title">면접 리포트</h2>
-        <p class="subtitle">예상 질문 / 면접 이력 확인 및 상세 조회</p>
+        <h3 class="fw-bold mb-1">면접 리포트</h3>
+        <p class="text-muted small mb-0">예상 질문 / 면접 이력 확인 및 상세 조회</p>
       </div>
-      <button class="mock-btn" @click="$router.push('/interview/mock')">
-        <span class="icon">▶️</span> 모의 면접 시작
+      <button class="btn btn-mint rounded-pill px-3 py-2 fw-medium shadow-sm"
+        @click="$router.push('/interview/mock')">
+        ▶️ 모의 면접 시작하기
       </button>
     </div>
 
     <!-- 탭 -->
-    <div class="tab-wrapper">
+    <div class="d-flex bg-light rounded-pill p-1 mb-4">
       <button
-        class="tab"
-        :class="{ active: tab === 'question' }"
+        class="btn flex-fill rounded-pill fw-semibold py-2"
+        :class="tab === 'question' ? 'btn-mint text-dark' : 'btn-light text-secondary'"
         @click="tab = 'question'"
       >
         예상 질문
       </button>
       <button
-        class="tab"
-        :class="{ active: tab === 'history' }"
+        class="btn flex-fill rounded-pill fw-semibold py-2"
+        :class="tab === 'history' ? 'btn-mint text-dark' : 'btn-light text-secondary'"
         @click="tab = 'history'"
       >
         면접 이력
@@ -30,88 +31,98 @@
     </div>
 
     <!-- 예상 질문 탭 -->
-    <div v-if="tab === 'question'" class="question-section">
+    <div v-if="tab === 'question'">
       <!-- 직무 질문 -->
-      <div class="question-group">
-        <div class="group-header">
-          <h3>직무 질문 <span>{{ jobQuestions.length }}개</span></h3>
-          <!-- ✅ 5개 초과일 때만 전체보기/접기 버튼 표시 -->
-          <button 
+      <div class="mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h5 class="fw-bold mb-0">
+            직무 질문 <span class="text-muted small">{{ jobQuestions.length }}개</span>
+          </h5>
+          <button
             v-if="jobQuestions.length > 5"
-            class="view-all"
+            class="btn btn-outline-mint btn-sm rounded-pill px-3 py-1 fw-medium"
             @click="showAllJob = !showAllJob"
           >
             {{ showAllJob ? '접기' : '전체보기' }}
           </button>
         </div>
+
         <div
-          class="question-card"
           v-for="(q, i) in displayedJobQuestions"
           :key="i"
+          class="d-flex justify-content-between align-items-center border rounded-3 p-3 mb-2 bg-white shadow-sm-sm"
         >
-          <div class="q-left">
-            <span class="q-number">{{ i + 1 }}</span>
-            <p>{{ q.text }}</p>
+          <div class="d-flex align-items-center gap-3">
+            <span class="badge bg-mint text-dark rounded-pill">{{ i + 1 }}</span>
+            <span>{{ q.text }}</span>
           </div>
-          <div class="q-right">
-            <button class="icon-btn" title="음성 듣기">🎤</button>
-            <button class="icon-btn" title="답변 보기">🎞️</button>
+          <div class="d-flex gap-2">
+            <button class="btn btn-sm text-muted" title="음성 듣기">🎤</button>
+            <button class="btn btn-sm text-muted" title="답변 보기">🎞️</button>
           </div>
         </div>
       </div>
 
       <!-- 종합 질문 -->
-      <div class="question-group">
-        <div class="group-header">
-          <h3>종합 질문 <span>{{ generalQuestions.length }}개</span></h3>
-          <!-- ✅ 5개 초과일 때만 전체보기/접기 버튼 표시 -->
-          <button 
+      <div class="mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h5 class="fw-bold mb-0">
+            종합 질문 <span class="text-muted small">{{ generalQuestions.length }}개</span>
+          </h5>
+          <button
             v-if="generalQuestions.length > 5"
-            class="view-all"
+            class="btn btn-outline-mint btn-sm rounded-pill px-3 py-1 fw-medium"
             @click="showAllGeneral = !showAllGeneral"
           >
             {{ showAllGeneral ? '접기' : '전체보기' }}
           </button>
         </div>
+
         <div
-          class="question-card"
           v-for="(q, i) in displayedGeneralQuestions"
           :key="i"
+          class="d-flex justify-content-between align-items-center border rounded-3 p-3 mb-2 bg-white shadow-sm-sm"
         >
-          <div class="q-left">
-            <span class="q-number">{{ i + 1 }}</span>
-            <p>{{ q.text }}</p>
+          <div class="d-flex align-items-center gap-3">
+            <span class="badge bg-mint text-dark rounded-pill">{{ i + 1 }}</span>
+            <span>{{ q.text }}</span>
           </div>
-          <div class="q-right">
-            <button class="icon-btn" title="음성 듣기">🎤</button>
-            <button class="icon-btn" title="답변 보기">🎞️</button>
+          <div class="d-flex gap-2">
+            <button class="btn btn-sm text-muted" title="음성 듣기">🎤</button>
+            <button class="btn btn-sm text-muted" title="답변 보기">🎞️</button>
           </div>
         </div>
       </div>
-
     </div>
 
     <!-- 면접 이력 탭 -->
-    <div v-else class="history-section">
+    <div v-else>
       <div
         v-for="(h, i) in histories"
         :key="i"
-        class="history-card"
+        class="border rounded-3 bg-white p-3 mb-3 shadow-sm"
       >
-        <div class="history-top">
-          <div class="left">
-            <span class="badge">완료</span>
-            <span class="date">{{ h.date }}</span>
-            <span class="count">{{ h.questionCount }}개 질문</span>
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-mint text-dark">완료</span>
+            <small class="text-muted">{{ h.date }}</small>
+            <small class="text-muted">{{ h.questionCount }}개 질문</small>
           </div>
-          <button class="report-btn" @click="$router.push(`/interview/report/${i}`)">
+          <button
+            class="btn btn-outline-secondary btn-sm rounded-pill fw-medium px-3 py-1"
+            @click="$router.push(`/interview/report/${i}`)"
+          >
             📄 리포트 보기
           </button>
         </div>
-        <p class="summary">{{ h.scoreSummary }}</p>
-        <p class="feedback">{{ h.feedback }}</p>
-        <div class="progress-bar">
-          <div class="fill" :style="{ width: h.progress + '%' }"></div>
+        <p class="fw-semibold mb-1">{{ h.scoreSummary }}</p>
+        <p class="text-muted small mb-2">{{ h.feedback }}</p>
+        <div class="progress" style="height: 6px;">
+          <div
+            class="progress-bar bg-mint"
+            role="progressbar"
+            :style="{ width: h.progress + '%' }"
+          ></div>
         </div>
       </div>
     </div>
@@ -122,7 +133,6 @@
 import { ref, computed } from "vue";
 
 const tab = ref("question");
-
 const showAllJob = ref(false);
 const showAllGeneral = ref(false);
 
@@ -144,7 +154,6 @@ const generalQuestions = ref([
   { text: "실패 경험이 있다면 어떻게 극복했나요?" },
 ]);
 
-// 표시할 질문 개수 제어
 const displayedJobQuestions = computed(() =>
   showAllJob.value ? jobQuestions.value : jobQuestions.value.slice(0, 5)
 );
@@ -180,195 +189,20 @@ const histories = ref([
 </script>
 
 <style scoped>
-/* 전체 */
-.report-container {
-  max-width: 860px;
-  margin: 0 auto;
-  padding: 40px 20px;
-  font-family: "Pretendard", sans-serif;
-  color: #222;
+.btn-mint {
+  background-color: #71ebbe !important;
+  color: #000 !important;
+  border: none !important;
 }
-
-/* 헤더 */
-.report-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
+.btn-outline-mint {
+  border: 1px solid #71ebbe !important;
+  color: #000 !important;
 }
-.title {
-  font-weight: 700;
-  font-size: 22px;
+.btn-outline-mint:hover {
+  background-color: #71ebbe !important;
+  color: #000 !important;
 }
-.subtitle {
-  color: #777;
-  font-size: 13px;
-}
-.mock-btn {
-  background-color: #71ebbe;
-  color: #000;
-  border: none;
-  font-weight: 600;
-  padding: 10px 16px;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-.mock-btn:hover {
-  background-color: #5cd8ab;
-}
-
-/* 탭 */
-.tab-wrapper {
-  display: flex;
-  background: #f3f3f3;
-  border-radius: 30px;
-  padding: 4px;
-  margin-bottom: 24px;
-}
-.tab {
-  flex: 1;
-  border: none;
-  border-radius: 30px;
-  padding: 10px 0;
-  background: transparent;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  color: #666;
-}
-.tab.active {
-  background-color: #71ebbe;
-  color: #fff;
-}
-
-/* 질문 카드 */
-.question-group {
-  margin-bottom: 36px;
-}
-.group-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-}
-.group-header h3 {
-  font-size: 15px;
-  font-weight: 700;
-}
-.group-header span {
-  color: #888;
-  font-size: 13px;
-}
-.view-all {
-  font-size: 12px;
-  color: #000;
-  background: #fff;
-  border: 1px solid #71ebbe;
-  border-radius: 6px;
-  padding: 3px 8px;
-  cursor: pointer;
-}
-.view-all:hover {
-  background-color: #71ebbe;
-  color: #fff;
-}
-.question-card {
-  background: #f9f9f9;
-  border-radius: 10px;
-  padding: 10px 14px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-  transition: all 0.2s;
-}
-.question-card:hover {
-  background: #f2fef9;
-}
-.q-left {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.q-number {
-  background-color: #71ebbe;
-  color: #000;
-  font-weight: 700;
-  padding: 3px 8px;
-  border-radius: 10px;
-  font-size: 13px;
-}
-.q-right {
-  display: flex;
-  gap: 10px;
-}
-.icon-btn {
-  background: none;
-  border: none;
-  font-size: 17px;
-  cursor: pointer;
-  color: #666;
-  transition: color 0.2s;
-}
-.icon-btn:hover {
-  color: #000;
-}
-
-/* 면접 이력 */
-.history-card {
-  background: #fff;
-  border-radius: 10px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-  padding: 16px;
-  margin-bottom: 16px;
-}
-.history-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.left {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.badge {
-  background: #71ebbe;
-  color: #000;
-  padding: 3px 8px;
-  border-radius: 6px;
-  font-size: 12px;
-}
-.report-btn {
-  background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  font-size: 13px;
-  padding: 3px 8px;
-  cursor: pointer;
-}
-.report-btn:hover {
-  border-color: #71ebbe;
-}
-.summary {
-  font-weight: 600;
-  margin: 8px 0 2px;
-}
-.feedback {
-  font-size: 13px;
-  color: #666;
-  margin-bottom: 8px;
-}
-.progress-bar {
-  height: 6px;
-  background: #eee;
-  border-radius: 10px;
-  overflow: hidden;
-}
-.fill {
-  height: 100%;
-  background: #71ebbe;
-  transition: width 0.3s;
+.bg-mint {
+  background-color: #71ebbe !important;
 }
 </style>

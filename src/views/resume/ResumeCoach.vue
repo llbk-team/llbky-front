@@ -6,13 +6,7 @@
     <div class="main-layout">
 
       <!-- ✅ 좌측 Sidebar -->
-      <aside class="sidebar">
-        <ul>
-          <li :class="{selected: activeTab === 'resume'}" @click="switchTab('resume')">📄 이력서</li>
-          <li :class="{selected: activeTab === 'coverletter'}" @click="switchTab('coverletter')">✍️ 자기소개서</li>
-          <li :class="{selected: activeTab === 'portfolio'}" @click="switchTab('portfolio')">💼 포트폴리오</li>
-        </ul>
-      </aside>
+      <SideBar/>
 
       <!-- ✅ 컨텐츠 영역 -->
       <section class="content">
@@ -104,6 +98,7 @@
 </template>
 
 <script setup>
+import SideBar from "@/components/sidebar/SideBar.vue";
 import { ref } from "vue";
 
 const activeTab = ref("resume");

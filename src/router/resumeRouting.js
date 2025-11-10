@@ -35,6 +35,24 @@ const resumeRouting = [
       title: '서류코칭',
       requiresAuth: true 
     }
+  },
+  {
+    path: '/resume/portfolio/write',
+    name: 'portfolio-write',
+    component: () => import('../views/resume/PortfolioWrite.vue'),
+    meta: { 
+      title: '서류코칭',
+      requiresAuth: true 
+    }
+  },
+  {
+    path: '/resume/portfolio/coach',
+    name: 'portfolio-coach',
+    component: () => import('../views/resume/PortfolioCoach.vue'),
+    meta: { 
+      title: '서류코칭',
+      requiresAuth: true 
+    }
   }
   
 ]

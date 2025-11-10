@@ -1,5 +1,5 @@
 <template>
-  <div class="mock-interview py-5 bg-white">
+  <div class="py-5 bg-white">
     <div class="container">
       <div class="row g-4">
         <!-- 왼쪽 설정 영역 -->
@@ -15,24 +15,23 @@
               <label class="fw-semibold mb-2 text-dark">어떤 유형의 면접을 연습하실 건가요?</label>
               <div class="d-flex gap-3">
                 <button
-                  class="btn type-btn flex-fill"
-                  :class="type === 'comprehensive' ? 'btn-mint text-dark fw-bold' : 'btn-outline-dark'"
+                  class="btn type-btn flex-fill py-3 d-flex flex-column align-items-center border rounded-3"
+                  :class="type === 'comprehensive' ? 'btn-mint' : 'btn-outline-dark'"
                   @click="type = 'comprehensive'"
                 >
                   <span class="fw-bold">종합 면접</span>
-                  <small class="desc">직무+인성 질문을 함께 준비</small>
+                  <small class="text-muted">직무+인성 질문을 함께 준비</small>
                 </button>
                 <button
-                  class="btn type-btn flex-fill"
-                  :class="type === 'technical' ? 'btn-mint text-dark fw-bold' : 'btn-outline-dark'"
+                  class="btn type-btn flex-fill py-3 d-flex flex-column align-items-center border rounded-3"
+                  :class="type === 'technical' ? 'btn-mint' : 'btn-outline-dark'"
                   @click="type = 'technical'"
                 >
                   <span class="fw-bold">직무 면접</span>
-                  <small class="desc">기술 중심 평가</small>
+                  <small class="text-muted">기술 중심 평가</small>
                 </button>
               </div>
             </div>
-
 
             <!-- 기업 선택 -->
             <div class="mb-4">
@@ -57,11 +56,7 @@
             <div class="mb-4">
               <label class="fw-semibold mb-2 text-dark">관련 서류 선택</label>
               <div class="bg-light rounded-3 p-3 border">
-                <div
-                  v-for="(file, index) in files"
-                  :key="index"
-                  class="form-check mb-2"
-                >
+                <div v-for="(file, index) in files" :key="index" class="form-check mb-2">
                   <input
                     class="form-check-input"
                     type="checkbox"
@@ -73,9 +68,8 @@
                     {{ file }}
                   </label>
                 </div>
-
                 <button
-                  class="btn btn-deep-mint mt-2 w-100"
+                  class="btn btn-deep-mint w-100 mt-2 fw-medium py-2"
                   :disabled="!selectedFiles.length"
                   @click="applyFiles"
                 >
@@ -88,7 +82,7 @@
             </div>
 
             <!-- AI 질문 생성 -->
-            <button class="btn btn-mint w-100 py-3 mb-3" @click="generateQuestions">
+            <button class="btn btn-mint w-100 py-3 fw-medium mb-3" @click="generateQuestions">
               <i class="bi bi-stars me-2"></i>AI 예상 면접 질문 생성하기 →
             </button>
           </div>
@@ -96,42 +90,50 @@
 
         <!-- 오른쪽 AI 질문 영역 -->
         <div class="col-lg-6">
-          <div class="question-box rounded-4 border">
-            <div class="question-header bg-black text-white rounded-top-4 px-4 py-3 fw-bold">
+          <div class="border rounded-4 shadow-sm">
+            <div class="bg-dark text-white rounded-top-4 px-4 py-3 fw-bold">
               AI 생성 면접 예상 질문
             </div>
-            <div class="question-body p-4 bg-white rounded-bottom-4">
+            <div class="p-4 bg-white rounded-bottom-4">
               <div
                 v-for="(q, i) in questions"
                 :key="i"
-                class="border rounded-3 p-3 mb-3 text-dark bg-light-green"
+                class="border rounded-3 p-3 mb-3 bg-light-green text-dark"
               >
                 <strong>Q{{ i + 1 }}.</strong> {{ q }}
               </div>
 
               <!-- 새 질문 입력 -->
-              <div v-if="isAdding" class="add-question-box d-flex justify-content-center align-items-center gap-2 mb-3">
+              <div
+                v-if="isAdding"
+                class="d-flex align-items-center gap-2 mb-3 add-question-box"
+              >
                 <input
                   type="text"
                   v-model="newQuestion"
                   placeholder="새 질문을 입력하세요"
-                  class="form-control flex-grow-1"
+                  class="form-control flex-grow-1 w-auto"
                   @keyup.enter="addQuestion"
                 />
-                <button class="btn btn-mint px-4 py-2" @click="addQuestion">추가</button>
+                <button class="btn btn-mint px-4 flex-shrink-0" @click="addQuestion">
+                  추가
+                </button>
               </div>
 
               <!-- 플러스 버튼 -->
               <div class="d-flex justify-content-center my-3">
                 <button
-                  class="btn btn-outline-dark rounded-circle plus-btn"
+                  class="btn btn-outline-dark rounded-circle border-2"
                   @click="isAdding = !isAdding"
                 >
-                  <i class="ri-add-line"></i>
+                  <i class="ri-add-line fs-4"></i>
                 </button>
               </div>
 
-              <button class="btn btn-mint w-100 py-3" @click="$router.push('/interview/progress')">
+              <button
+                class="btn btn-mint w-100 py-3 fw-medium"
+                @click="$router.push('/interview/progress')"
+              >
                 모의 면접 시작하기 →
               </button>
             </div>
@@ -185,117 +187,52 @@ const generateQuestions = () => {
 </script>
 
 <style scoped>
-.mock-interview {
-  background-color: #fff;
-  font-family: "Pretendard", sans-serif;
-  color: #222;
-}
-
-/* 민트 컬러 */
 .btn-mint {
   background-color: #71ebbe !important;
   color: #000 !important;
-  border: none;
+  border: none !important;
 }
 .btn-mint:hover {
   background-color: #5cd8ab !important;
 }
 
-/* 짙은 민트 */
 .btn-deep-mint {
   background-color: #00b17f !important;
   color: #fff !important;
-  border: none;
+  border: none !important;
 }
 .btn-deep-mint:hover {
   background-color: #009a70 !important;
 }
 
-/* 유형 버튼 동일 크기 */
-.type-btn {
-  height: 110px;
-  width: 100%;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  font-size: 15px;
-  border-radius: 8px;
-  transition: 0.2s;
-  padding: 0; /* ✅ 버튼 내 여백 통일 */
-  line-height: 1.2; /* ✅ 높이 점프 방지 */
-  border: 1px solid #000; /* ✅ 기본 테두리 유지 */
-  background-color: #fff; /* ✅ 기본 배경 */
-}
-
-/* ✅ 선택된 버튼 스타일 (높이 유지) */
-.type-btn.btn-mint {
-  background-color: #71ebbe !important;
-  color: #000 !important;
-  border: 1px solid #71ebbe !important;
-  height: 110px; /* ✅ 클릭 시에도 동일 높이 */
-}
-
-/* ✅ 비활성 버튼 */
-.type-btn.btn-outline-dark {
-  background-color: #fff !important;
-  border: 1px solid #000 !important;
-  color: #000 !important;
-  height: 110px; /* ✅ 클릭 시에도 동일 높이 */
-}
-
-.type-btn .desc {
-  font-size: 13px;
-  color: #666;
-  margin-top: 4px;
-}
-
-.btn-outline-dark {
-  background-color: #fff !important;
-  border: 1px solid #000 !important;
-  color: #000 !important;
-}
-.btn-outline-dark:hover {
-  background-color: #f9f9f9 !important;
-}
-
-
-/* 질문 박스 */
-.question-box {
-  background-color: #fff;
-}
 .bg-light-green {
   background-color: #f3fef9 !important;
 }
 
-/* 플러스 버튼 */
-.add-question-box {
-  max-width: 500px;
-  margin: 0 auto;
+/* 면접 유형 버튼 높이 통일 */
+.type-btn {
+  height: 100px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 4px;
+  padding: 0 !important; /* py-3 덮어쓰기 */
+  white-space: nowrap;
+  text-align: center;
+}
+.type-btn span {
+  font-size: 16px;
+}
+.type-btn small {
+  font-size: 13px;
+  color: #666;
 }
 
-.plus-btn {
-  width: 45px;
-  height: 45px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-width: 2px;
-  font-size: 22px;
-  color: #000;
-}
+/* 입력칸이 flex에서 과도하게 넓어지지 않도록 */
+.add-question-box .form-control { min-width: 0; }
 
-.btn-mint {
-  background-color: #71ebbe !important;
-  color: #000 !important;
-  border: none !important;
-  white-space: nowrap; 
-  min-width: 70px;     
-  height: 45px;        
-}
-.btn-mint:hover {
-  background-color: #5cd8ab !important;
-}
+/* 버튼이 줄바꿈되지 않도록(안전장치) */
+.add-question-box .btn { white-space: nowrap; }
+
 </style>
