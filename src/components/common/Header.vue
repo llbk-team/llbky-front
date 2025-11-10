@@ -2,10 +2,17 @@
   <header class="header">
     <div class="top-container">
       <div class="logo-nav">
-        <h1 class="logo" @click="$router.push('/')">Career Coach</h1>
+        <!-- 로고 클릭 시 홈 이동 + 메뉴 비활성화 -->
+        <h1 class="logo" @click="goHome">Career Coach</h1>
 
         <nav class="main-nav">
-          <span v-for="menu in mainMenus" :key="menu.name" class="nav-item" :class="{ active: activeMenu === menu.name }" @click="selectMenu(menu.name)">
+          <span
+            v-for="menu in mainMenus"
+            :key="menu.name"
+            class="nav-item"
+            :class="{ active: activeMenu === menu.name }"
+            @click="selectMenu(menu.name)"
+          >
             {{ menu.label }}
           </span>
         </nav>
@@ -17,7 +24,13 @@
     </div>
 
     <div v-if="subMenus[activeMenu]" class="sub-menu">
-      <router-link v-for="(sub, idx) in subMenus[activeMenu]" :key="idx" :to="sub.path" class="sub-item" :class="{ active: isActive(sub.path) }">
+      <router-link
+        v-for="(sub, idx) in subMenus[activeMenu]"
+        :key="idx"
+        :to="sub.path"
+        class="sub-item"
+        :class="{ active: isActive(sub.path) }"
+      >
         {{ sub.label }}
       </router-link>
     </div>
@@ -25,24 +38,30 @@
 </template>
 
 <script setup>
-import router from "@/router";
-import { ref } from "vue";
-import { useRoute } from "vue-router";
+import { ref, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
+
+const router = useRouter();
 const route = useRoute();
 
+/* -------------------------
+  현재 라우트 기반 메뉴 감지
+-------------------------- */
 const getMenuFromPath = (path) => {
+  if (path === "/") return ""; // 홈에서는 메뉴 비활성
   if (path.startsWith("/my")) return "my";
   if (path.startsWith("/resume")) return "resume";
   if (path.startsWith("/interview")) return "interview";
   if (path.startsWith("/learning")) return "learning";
   if (path.startsWith("/trend")) return "trend";
-  return "my";
+  return "";
 };
 
-// 현재 선택된 상단 메뉴
 const activeMenu = ref(getMenuFromPath(route.path));
 
-// 상단 메뉴
+/* -------------------------
+  상단 메뉴 정의
+-------------------------- */
 const mainMenus = [
   { name: "my", label: "MY" },
   { name: "resume", label: "이력서" },
@@ -51,7 +70,9 @@ const mainMenus = [
   { name: "trend", label: "트렌드" },
 ];
 
-// 하위 메뉴
+/* -------------------------
+  하위 메뉴
+-------------------------- */
 const subMenus = {
   my: [
     { label: "마이 페이지", path: "/my/page" },
@@ -82,11 +103,12 @@ const subMenus = {
   ],
 };
 
-// 상단 메뉴 선택
+/* -------------------------
+  메뉴 클릭 시 이동
+-------------------------- */
 const selectMenu = (menuName) => {
   activeMenu.value = menuName;
 
-  // 면접 메뉴 클릭 시 기본 페이지 지정
   const defaultPaths = {
     my: "/my/page",
     resume: "/resume/write",
@@ -100,7 +122,28 @@ const selectMenu = (menuName) => {
   }
 };
 
-// 하위 메뉴 활성화 감지
+/* -------------------------
+  로고 클릭 시 홈 이동 + 메뉴 초기화
+-------------------------- */
+const goHome = () => {
+  activeMenu.value = ""; // 메뉴 비활성
+  router.push("/");
+};
+
+/* -------------------------
+  새로고침 시 메뉴 유지 (라우트 감시)
+-------------------------- */
+watch(
+  () => route.path,
+  (newPath) => {
+    activeMenu.value = getMenuFromPath(newPath);
+  },
+  { immediate: true }
+);
+
+/* -------------------------
+  하위 메뉴 활성 상태
+-------------------------- */
 const isActive = (path) => route.path.startsWith(path);
 </script>
 
