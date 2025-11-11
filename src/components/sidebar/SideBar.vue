@@ -1,19 +1,11 @@
 <template>
   <aside class="sidebar">
     <div class="sidebar-menu">
-      <!-- 서류관리 -->
-      <RouterLink 
-        to="/resume/list" 
-        class="menu-item" 
-        active-class="active"
-      >
-        <div class="menu-icon">📋</div>
-        <span class="menu-text">서류관리</span>
-      </RouterLink>
+     
 
       <!-- 이력서 -->
       <RouterLink 
-        to="/resume/coach" 
+        to="/resume/write" 
         class="menu-item" 
         active-class="active"
       >
@@ -33,7 +25,7 @@
 
       <!-- 포트폴리오 (특별 스타일) -->
       <RouterLink 
-        to="/resume/portfolio/coach" 
+        to="/resume/portfolio/write" 
         class="menu-item" 
         active-class="active-portfolio"
       >
