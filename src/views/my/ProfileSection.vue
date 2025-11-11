@@ -1,5 +1,6 @@
 <template>
   <aside class="profile-card">
+    <!-- 상단 프로필 영역 -->
     <div class="profile-header">
       <div class="avatar"></div>
       <div class="profile-info">
@@ -8,6 +9,7 @@
       </div>
     </div>
 
+    <!-- 기본 정보 -->
     <div class="profile-body">
       <div class="profile-row" v-for="(item, i) in infoList" :key="i">
         <span class="label">{{ item.label }}</span>
@@ -16,37 +18,29 @@
 
       <div class="divider"></div>
 
+      <!-- 기술 스택 -->
       <section class="stack">
         <h3>보유 기술 스택</h3>
         <div class="tags">
           <span class="tag tag-border">Java</span>
           <span class="tag tag-fill">Spring</span>
+          <span class="tag tag-border">MyBatis</span>
+          <span class="tag tag-border">Vue3</span>
         </div>
       </section>
 
       <div class="divider"></div>
 
+      <!-- AI 성격 분석 -->
       <section class="ai-personality">
         <h3>AI 성격 기반 분석</h3>
         <p class="desc">
-          당신은 명확한 목표가 있을 때 가장 빠르게 성장합니다.<br />
-          기술 깊이를 유지하면서 감정·공감 표현력을 조금만 확장해보세요.
+          명확한 목표 설정과 체계적 사고를 바탕으로 빠르게 성장합니다.<br />
+          감정 표현과 협업 커뮤니케이션을 함께 확장해보세요.
         </p>
 
-        <div v-for="item in mbtiData" :key="item.key" class="mbti-row">
-          <div class="mbti-labels">
-            <span :class="{ active: item.leftActive }">{{ item.left }}</span>
-            <span :class="{ active: item.rightActive }">{{ item.right }}</span>
-          </div>
-          <div class="mbti-bar">
-            <div class="bar-left" :style="{ width: item.leftPercent + '%' }"></div>
-            <div class="bar-right" :style="{ width: item.rightPercent + '%' }"></div>
-          </div>
-          <div class="mbti-percent">
-            <span>{{ item.leftPercent }}%</span>
-            <span>{{ item.rightPercent }}%</span>
-          </div>
-        </div>
+        <!-- ✅ 최신 MBTI 컴포넌트 -->
+        <MbtiTest />
       </section>
     </div>
   </aside>
@@ -54,18 +48,12 @@
 
 <script setup>
 import { ref } from "vue";
+import MbtiTest from "./MbtiTest.vue";
 
 const infoList = ref([
   { label: "경력", value: "신입" },
   { label: "직군", value: "개발" },
   { label: "직무", value: "백엔드 개발자" },
-]);
-
-const mbtiData = ref([
-  { key: "EI", left: "E", right: "I", leftPercent: 56, rightPercent: 44, leftActive: true, rightActive: false },
-  { key: "SN", left: "S", right: "N", leftPercent: 51, rightPercent: 49, leftActive: true, rightActive: false },
-  { key: "TF", left: "T", right: "F", leftPercent: 56, rightPercent: 44, leftActive: true, rightActive: false },
-  { key: "PJ", left: "P", right: "J", leftPercent: 45, rightPercent: 55, leftActive: false, rightActive: true },
 ]);
 </script>
 
@@ -74,108 +62,111 @@ const mbtiData = ref([
   grid-area: profile;
   background-color: #111111;
   color: #ffffff;
-  border-radius: 10px;
-  padding: 25px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+  border-radius: 16px;
+  padding: 28px 26px 32px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+  width: 100%;
+  max-width: 360px;
+  box-sizing: border-box;
 }
+
+/* 헤더 */
 .profile-header {
   display: flex;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 22px;
 }
+
 .avatar {
-  width: 60px;
-  height: 60px;
-  border-radius: 15px;
-  background-color: #91efcd;
-  margin-right: 15px;
+  width: 64px;
+  height: 64px;
+  border-radius: 18px;
+  background: linear-gradient(145deg, #a2f1d6, #71ebbe);
+  box-shadow: 0 0 10px rgba(113, 235, 190, 0.4);
+  margin-right: 16px;
 }
+
 .profile-info h2 {
-  font-size: 25px;
+  font-size: 22px;
   font-weight: 800;
+  margin: 0 0 4px 0;
 }
+
 .email {
   font-size: 13px;
-  color: #949494;
+  color: #a7a7a7;
+  margin: 0;
 }
+
+/* 정보 행 */
 .profile-row {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   margin-bottom: 6px;
 }
+
 .label {
-  font-size: 16px;
+  font-size: 15px;
+  color: #f1f2f3;
 }
+
 .value {
   font-size: 14px;
-  color: #a2f1d6;
+  color: #71ebbe;
+  font-weight: 600;
 }
+
+/* 구분선 */
 .divider {
-  border-top: 1px solid #757575;
-  margin: 20px 0;
+  border-top: 1px solid #2a2a2a;
+  margin: 22px 0;
 }
+
+/* 기술 스택 */
 .stack h3 {
-  font-size: 16px;
-  font-weight: 800;
-  margin-bottom: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: #f1f2f3;
 }
+
 .tags {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
 }
+
 .tag {
-  font-size: 15px;
-  padding: 4px 14px;
-  border-radius: 30px;
-}
-.tag-border {
-  border: 1px solid #91efcd;
-  color: #91efcd;
-}
-.tag-fill {
-  background-color: #374e46;
-  color: #91efcd;
-}
-.ai-personality h3 {
-  font-size: 16px;
-  font-weight: 800;
-  margin-bottom: 6px;
-}
-.desc {
   font-size: 13px;
-  color: #c2c2c2;
-  margin-bottom: 14px;
+  padding: 5px 14px;
+  border-radius: 24px;
+  letter-spacing: 0.3px;
 }
-.mbti-row {
-  margin-bottom: 10px;
-}
-.mbti-labels {
-  display: flex;
-  justify-content: space-between;
-  font-size: 12px;
-  font-weight: 900;
-}
-.mbti-labels span {
-  color: #eaebec;
-}
-.mbti-labels span.active {
+
+.tag-border {
+  border: 1px solid #71ebbe;
   color: #71ebbe;
+  background-color: transparent;
 }
-.mbti-bar {
-  display: flex;
-  height: 11px;
-  margin-top: 4px;
+
+.tag-fill {
+  background-color: rgba(113, 235, 190, 0.15);
+  color: #71ebbe;
+  border: 1px solid transparent;
 }
-.bar-left {
-  background-color: #71ebbe;
+
+/* AI 성격 분석 */
+.ai-personality h3 {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 8px;
 }
-.bar-right {
-  background-color: #eaebec;
-}
-.mbti-percent {
-  display: flex;
-  justify-content: space-between;
-  font-size: 10px;
-  margin-top: 2px;
+
+.desc {
+  font-size: 12.5px;
+  color: #c7c7c7;
+  line-height: 1.6;
+  margin-bottom: 18px;
 }
 </style>
