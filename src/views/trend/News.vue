@@ -147,6 +147,7 @@ LLM, RAG, MLOps 등 신기술 직군 수요가 꾸준히 확대 중입니다.
     bias_type: "기술 과도 홍보 경향",
     date: "2025.11.09",
     source: "ZDNet Korea",
+    source_url: "https://biz.chosun.com/it-science/2025/11/07/ai-data-analyst-hiring/"
   },
   {
     title: "백엔드 개발자 채용 시장 안정세, 경력직 선호",

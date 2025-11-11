@@ -26,13 +26,10 @@
               <div class="type-icon">🔗</div>
               <div class="type-label">포트폴리오 링크</div>
             </div>
-            <div class="type-btn" :class="{ active: selectedType === 'document' }" @click="selectType('document')">
-              <div class="type-icon">📄</div>
-              <div class="type-label">자기 소개서</div>
-            </div>
+            
             <div class="type-btn" :class="{ active: selectedType === 'project' }" @click="selectType('project')">
               <div class="type-icon">📊</div>
-              <div class="type-label">프로젝트 문서</div>
+              <div class="type-label">문서PDF/img</div>
             </div>
           </div>
 
@@ -232,6 +229,8 @@ function startAnalysis() {
   // }
   
   alert('포트폴리오 분석을 시작합니다!')
+
+  router.push('/resume/portfolio/coach')
 }
 
 function downloadReport() {
@@ -286,7 +285,7 @@ function getCurrentTabName() {
 }
 
 .portfolio-coaching {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  
   background: #F5F5F5;
   min-height: 100vh;
 }
@@ -338,7 +337,7 @@ function getCurrentTabName() {
 /* Main Container */
 .main-container {
   display: flex;
-  margin-top: 80px;
+  margin-top: 0px;
   min-height: calc(100vh - 80px);
 }
 
