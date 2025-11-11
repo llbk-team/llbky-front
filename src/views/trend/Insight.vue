@@ -20,7 +20,7 @@
       </p>
     </div>
 
-    <!-- 추가 안내 문구 (이유 설명) -->
+    <!-- 이유 설명 -->
     <div class="context-box">
       <p>
         ℹ️ <strong>왜 다른 직무도 함께 보이나요?</strong><br />
@@ -32,7 +32,7 @@
 
     <!-- AI 추천 인사이트 -->
     <div class="recommend-section">
-      <h3>🤖 AI 추천 인사이트</h3>
+      <h3> AI 추천 인사이트</h3>
       <p class="sub-desc">
         최근 뉴스·트렌드 분석과 저장된 키워드를 바탕으로 AI가 추천한 직무 방향과 핵심 기술 키워드입니다.
       </p>
@@ -69,7 +69,7 @@
     </div>
 
     <div class="hint-box">
-      💾 클릭한 키워드는 <strong>내 키워드</strong> 페이지에서 다시 확인할 수 있습니다.
+      💾 클릭한 키워드는 <strong>내 키워드</strong>에서 다시 확인할 수 있습니다.
     </div>
   </div>
 </template>
@@ -84,7 +84,7 @@ onMounted(() => {
   savedCount.value = saved.length;
 });
 
-// AI 추천 인사이트 (직무별 예시)
+// AI 추천 인사이트 예시
 const jobs = ref([
   {
     title: "AI 엔지니어",
@@ -128,9 +128,11 @@ const saveKeyword = (tag) => {
 <style scoped>
 .insight-page {
   background: #f9faf9;
-  padding: 40px 80px;
+  padding: 40px 60px 60px 60px;
   color: #111;
   font-family: "NexonLv1Gothic", sans-serif;
+  max-width: 1300px;
+  margin: 0 auto;
 }
 
 /* Header */
@@ -138,6 +140,7 @@ const saveKeyword = (tag) => {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
   margin-bottom: 28px;
 }
 .title-section h2 {
@@ -147,6 +150,7 @@ const saveKeyword = (tag) => {
 .title-section p {
   font-size: 14px;
   color: #555;
+  margin-top: 4px;
 }
 .saved-btn {
   background: #00c896;
@@ -156,12 +160,13 @@ const saveKeyword = (tag) => {
   padding: 8px 16px;
   border-radius: 8px;
   text-decoration: none;
+  transition: 0.2s;
 }
 .saved-btn:hover {
   background: #00b487;
 }
 
-/* Notice */
+/* Notice & Context */
 .notice-box {
   background: #e9f8f2;
   border: 1px solid #a2f1d6;
@@ -170,8 +175,6 @@ const saveKeyword = (tag) => {
   font-size: 14px;
   margin-bottom: 16px;
 }
-
-/* Context Explanation */
 .context-box {
   background: #fff8ea;
   border: 1px solid #ffe19d;
@@ -197,18 +200,31 @@ const saveKeyword = (tag) => {
   color: #555;
   margin-bottom: 20px;
 }
+
+/* ✅ 그리드형 카드 정렬 */
 .recommend-grid {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 24px;
 }
+
+/* 카드 스타일 */
 .recommend-card {
   background: #fff;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   border: 1px solid #eee;
   padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: 0.2s;
 }
+.recommend-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
 .recommend-card h4 {
   font-size: 16px;
   font-weight: 700;
@@ -247,9 +263,11 @@ const saveKeyword = (tag) => {
   border-radius: 8px;
   font-size: 12px;
   cursor: pointer;
+  transition: 0.2s;
 }
 .tag-btn:hover {
   background: #a2f1d6;
+  transform: scale(1.05);
 }
 .note {
   font-size: 12px;
@@ -265,5 +283,6 @@ const saveKeyword = (tag) => {
   padding: 10px 16px;
   font-size: 13px;
   margin-top: 28px;
+  text-align: center;
 }
 </style>
