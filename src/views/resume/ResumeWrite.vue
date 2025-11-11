@@ -522,6 +522,9 @@ const getDetailedAnalysis = async () => {
   } catch (error) {
     console.error('상세 분석 요청 실패:', error)
   }
+
+
+  
 }
 
 // 이력서 미리보기

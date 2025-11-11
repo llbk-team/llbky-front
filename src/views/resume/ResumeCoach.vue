@@ -1,13 +1,19 @@
 <template>
   <div class="page-wrapper">
     <div class="main-layout">
-      
+
 
       <!-- ✅ 컨텐츠 영역 -->
       <section class="content">
         <div class="breadcrumb">my &gt; 서류관리 &gt; 이력서</div>
         <h1 class="page-title">서류 AI 코칭</h1>
-
+        <div class="resume-header">
+          <button class="button-item" 
+          :class="{ active: $route.path === '/resume/coverletter' }" 
+          @click="$router.push('/resume/coverletter')">
+            자기소개서 첨삭받기
+          </button>
+        </div>
         <div class="resume-layout">
 
           <!-- ✅ 상단: 이력서 상세(2) + AI 첨삭 제안(1) - 2:1 비율 -->
@@ -50,8 +56,8 @@
                 <div class="section">
                   <h3>기본 정보</h3>
                   <p class="text-paragraph">
-                    저는 <strong>{{ resumeData.name }}</strong>이며, 
-                    <strong>{{ resumeData.email }}</strong>으로 연락 가능합니다. 
+                    저는 <strong>{{ resumeData.name }}</strong>이며,
+                    <strong>{{ resumeData.email }}</strong>으로 연락 가능합니다.
                     전화번호는 <strong>{{ resumeData.phone }}</strong>입니다.
                   </p>
                 </div>
@@ -59,13 +65,13 @@
                 <div class="section">
                   <h3>경력 및 성과</h3>
                   <p class="text-paragraph">
-                    <strong>{{ resumeData.career.company }}</strong>에서 
-                    <strong>{{ resumeData.career.position }}</strong>으로 
+                    <strong>{{ resumeData.career.company }}</strong>에서
+                    <strong>{{ resumeData.career.position }}</strong>으로
                     {{ resumeData.career.period }} 근무하였습니다.
                   </p>
                   <p class="text-paragraph">
-                    주요 업무로는 Spring Boot 기반 전자상거래 플랫폼을 개발하고 운영하였으며, 
-                    MSA 아키텍처 전환 프로젝트를 리드하여 응답속도를 50% 개선하는 성과를 달성했습니다. 
+                    주요 업무로는 Spring Boot 기반 전자상거래 플랫폼을 개발하고 운영하였으며,
+                    MSA 아키텍처 전환 프로젝트를 리드하여 응답속도를 50% 개선하는 성과를 달성했습니다.
                     또한 Redis 캐싱을 도입하여 DB 부하를 40% 감소시켰습니다.
                   </p>
                 </div>
@@ -73,7 +79,7 @@
                 <div class="section">
                   <h3>보유 기술</h3>
                   <p class="text-paragraph">
-                    {{ resumeData.skills }}에 대한 실무 경험을 보유하고 있으며, 
+                    {{ resumeData.skills }}에 대한 실무 경험을 보유하고 있으며,
                     이를 활용하여 다양한 프로젝트를 성공적으로 수행하였습니다.
                   </p>
                 </div>
@@ -193,22 +199,14 @@
 
               <div class="d-flex gap-4 mb-4 justify-content-center">
                 <!-- 줄글 형식 이력서 버튼 -->
-                <button 
-                  class="btn btn-resume-format" 
-                  :class="{ active: resumeFormat === 'text' }"
-                  data-bs-toggle="modal" 
-                  data-bs-target="#textFormatModal">
+                <button class="btn btn-resume-format" :class="{ active: resumeFormat === 'text' }" data-bs-toggle="modal" data-bs-target="#textFormatModal">
                   <div class="format-icon">📝</div>
                   <div class="format-title">줄글 형식 이력서</div>
                   <div class="format-desc">자유로운 텍스트 형식</div>
                 </button>
 
                 <!-- 규격화된 이력서 버튼 -->
-                <button 
-                  class="btn btn-resume-format" 
-                  :class="{ active: resumeFormat === 'standard' }"
-                  data-bs-toggle="modal" 
-                  data-bs-target="#standardFormatModal">
+                <button class="btn btn-resume-format" :class="{ active: resumeFormat === 'standard' }" data-bs-toggle="modal" data-bs-target="#standardFormatModal">
                   <div class="format-icon">📋</div>
                   <div class="format-title">규격화된 이력서</div>
                   <div class="format-desc">표준 양식 형식</div>
@@ -324,7 +322,7 @@ const formatLabel = computed(() => {
 // ✅ 줄글 형식 적용
 const applyTextFormat = () => {
   console.log('줄글 형식 이력서 적용');
-  
+
   // TODO: API 호출하여 줄글 형식으로 변환
   // const response = await fetch('http://localhost:8081/ai/resume/convert-format', {
   //   method: 'POST',
@@ -334,10 +332,10 @@ const applyTextFormat = () => {
   //     targetFormat: 'text'
   //   })
   // });
-  
+
   // 형식 변경
   resumeFormat.value = 'text';
-  
+
   // Bootstrap 모달 닫기 (개선된 방법)
   const modalElement = document.getElementById('textFormatModal');
   if (modalElement) {
@@ -350,11 +348,11 @@ const applyTextFormat = () => {
         document.body.classList.remove('modal-open');
         document.body.style.removeProperty('overflow');
         document.body.style.removeProperty('padding-right');
-        
+
         // 이벤트 리스너 제거 (메모리 누수 방지)
         modalElement.removeEventListener('hidden.bs.modal', handler);
       }, { once: true });
-      
+
       modal.hide();
     }
   }
@@ -365,7 +363,7 @@ const applyTextFormat = () => {
 // ✅ 규격화된 형식 적용
 const applyStandardFormat = () => {
   console.log('규격화된 이력서 적용');
-  
+
   // TODO: API 호출하여 규격화된 형식으로 변환
   // const response = await fetch('http://localhost:8081/ai/resume/convert-format', {
   //   method: 'POST',
@@ -375,10 +373,10 @@ const applyStandardFormat = () => {
   //     targetFormat: 'standard'
   //   })
   // });
-  
+
   // 형식 변경
   resumeFormat.value = 'standard';
-  
+
   // Bootstrap 모달 닫기 (개선된 방법)
   const modalElement = document.getElementById('standardFormatModal');
   if (modalElement) {
@@ -391,11 +389,11 @@ const applyStandardFormat = () => {
         document.body.classList.remove('modal-open');
         document.body.style.removeProperty('overflow');
         document.body.style.removeProperty('padding-right');
-        
+
         // 이벤트 리스너 제거 (메모리 누수 방지)
         modalElement.removeEventListener('hidden.bs.modal', handler);
       }, { once: true });
-      
+
       modal.hide();
     }
   }
@@ -442,6 +440,7 @@ const applyStandardFormat = () => {
   flex-direction: column;
   gap: 1.5rem;
 }
+
 
 /* ✅ 상단 섹션: 2:1 비율로 분할 */
 .top-section {
@@ -505,6 +504,48 @@ const applyStandardFormat = () => {
   margin-bottom: 0.4rem;
   line-height: 1.6;
 }
+.resume-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1rem;
+  margin-bottom: 10px;
+
+}
+
+.button-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #000; /* 글씨 검정 */
+  font-weight: 600;
+  background: linear-gradient(135deg, #71EBBE, #A2F1D6); /* 기본 민트색 */
+  box-shadow: 0 4px 15px rgba(113, 235, 190, 0.3);
+  border: none;
+}
+
+.button-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(113, 235, 190, 0.4);
+}
+
+
+/* Vue Router active-class="active" */
+.button-item.active {
+  background: linear-gradient(135deg, #71EBBE, #A2F1D6);
+  color: #000;
+  font-weight: 600;
+  box-shadow: 0 4px 15px rgba(113, 235, 190, 0.3);
+  border-left: 4px solid #71EBBE;
+  padding-left: calc(1rem - 4px);
+}
+
+
+
 
 /* ✅ 줄글 형식 스타일 */
 .text-format .text-paragraph {
@@ -516,7 +557,7 @@ const applyStandardFormat = () => {
 }
 
 /* ✅ 규격화된 형식 스타일 */
-.standard-format h3, 
+.standard-format h3,
 .standard-format h4 {
   font-size: 1.1rem;
   font-weight: 600;
@@ -757,29 +798,29 @@ const applyStandardFormat = () => {
 // ✅ 주요 변경 사항:
 //
 // 1. **상태 관리**
-//    - resumeFormat ref로 현재 선택된 형식 관리 ('default', 'text', 'standard')
-//    - resumeData ref로 이력서 데이터 관리
+// - resumeFormat ref로 현재 선택된 형식 관리 ('default', 'text', 'standard')
+// - resumeData ref로 이력서 데이터 관리
 //
 // 2. **조건부 렌더링**
-//    - v-if, v-else-if로 형식에 따라 다른 레이아웃 표시
-//    - 기본 형식: 기존 섹션 기반 레이아웃
-//    - 줄글 형식: 문단 중심의 자유로운 텍스트
-//    - 규격화된 형식: 테이블 기반 표준 양식
+// - v-if, v-else-if로 형식에 따라 다른 레이아웃 표시
+// - 기본 형식: 기존 섹션 기반 레이아웃
+// - 줄글 형식: 문단 중심의 자유로운 텍스트
+// - 규격화된 형식: 테이블 기반 표준 양식
 //
 // 3. **형식 전환 함수**
-//    - applyTextFormat(): 줄글 형식으로 변경
-//    - applyStandardFormat(): 규격화된 형식으로 변경
-//    - TODO 주석으로 API 연동 부분 표시
+// - applyTextFormat(): 줄글 형식으로 변경
+// - applyStandardFormat(): 규격화된 형식으로 변경
+// - TODO 주석으로 API 연동 부분 표시
 //
 // 4. **UI 개선**
-//    - 선택된 형식에 대한 배지 표시 (formatLabel computed)
-//    - 활성화된 버튼에 .active 클래스 적용
-//    - 모달에 샘플 미리보기 추가
+// - 선택된 형식에 대한 배지 표시 (formatLabel computed)
+// - 활성화된 버튼에 .active 클래스 적용
+// - 모달에 샘플 미리보기 추가
 //
 // 5. **API 연동 준비** (TODO)
-//    - POST http://localhost:8081/ai/resume/convert-format
-//    - Content-Type: application/json
-//    - Body: { resumeId: number, targetFormat: 'text' | 'standard' }
+// - POST http://localhost:8081/ai/resume/convert-format
+// - Content-Type: application/json
+// - Body: { resumeId: number, targetFormat: 'text' | 'standard' }
 //-----
 
 ## 📝 Postman 테스트 설정 (추후 백엔드 구현 시)
