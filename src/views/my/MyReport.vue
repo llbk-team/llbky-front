@@ -141,6 +141,17 @@ const saveSelectedReports = () => {
     margin-bottom: 30px;
 }
 
+.report-title h2 {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.report-title p {
+  font-size: 13px;
+  color: #666;
+}
+
 .save-btn {
     background-color: #71ebbe;
     border: none;
