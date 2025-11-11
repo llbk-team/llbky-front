@@ -2,7 +2,6 @@
   <div class="roadmap-container container py-5">
 
     <h2 class="main-title text-center">나의 맞춤 학습 로드맵</h2>
-
     <div class="alert alert-mint shadow-sm" role="alert">
       AI 학습 코치가 목표 <strong>'백엔드 개발자'</strong>를 기준으로 <strong>'취업 준비 + 자기계발'</strong> 플랜을 생성했어요!
     </div>

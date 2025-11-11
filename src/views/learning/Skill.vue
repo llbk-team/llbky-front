@@ -2,7 +2,7 @@
   <div class="container py-4">
     <form @submit.prevent="generatePlan">
 
-      <h2 class="main-title">AI 학습 코치</h2>
+      <LearningHeader :current-step="2" />
 
       <section class="info-section">
         <div class="info-box green-info">
@@ -102,6 +102,7 @@
 
 <script setup>
 import { ref } from 'vue';
+import LearningHeader from '@/components/bar/LearningHeader.vue'
 
 // 폼 전체 데이터를 관리하는 ref
 const formData = ref({
