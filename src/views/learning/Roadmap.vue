@@ -200,7 +200,6 @@ function goToMyLearning() {
 */
 
 .roadmap-container {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   max-width: 1100px;
 }
 

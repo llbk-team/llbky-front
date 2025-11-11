@@ -7,7 +7,7 @@
         <p class="text-muted mb-0">안녕하세요! 오늘의 학습 계획을 이어가볼까요?</p>
       </div>
 
-      <router-link :to="`/learning/goal`" class="btn btn-green shadow-sm px-3 fw-semibold">
+      <router-link :to="`/learning/goal`" class="btn btn-green">
         + 새 학습 시작하기
       </router-link>
     </div>
@@ -93,7 +93,6 @@ const aiComment = {
 
 <style scoped>
 body {
-  font-family: 'Pretendard', sans-serif;
   background-color: #F1F2F3;
   color: #111111;
 }

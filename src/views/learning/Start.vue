@@ -99,7 +99,6 @@ const weeklyItems = ref([
 
 <style scoped>
 .learning-progress {
-  font-family: 'Pretendard', sans-serif;
   color: #111;
 }
 

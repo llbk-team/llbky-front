@@ -192,7 +192,6 @@ function goToPrevious() {
   max-width: 1000px;
   margin: 20px auto;
   padding: 24px;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   background-color: #ffffff;
   border-radius: 8px;
 }
