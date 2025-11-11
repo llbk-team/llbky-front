@@ -127,10 +127,10 @@
               v-for="resume in resumeList" 
               :key="resume.id" 
               class="resume-card"
-              @click="goToResumeDetail(resume.id)"
+              @click="goToPortfolioDetail(resume.id)"
             >
               <div class="card-content">
-                <div class="resume-icon">📄</div>
+                <div class="resume-icon">🎨</div>
                 <div class="resume-info">
                   <h3 class="resume-title">{{ resume.title }}</h3>
                   <p class="resume-description">{{ resume.description }}</p>
@@ -182,6 +182,14 @@ const resumeList = ref([
 const goToResumeDetail = (resumeId) => {
   router.push(`/resume/coach?id=${resumeId}`)
 }
+
+const goToPortfolioDetail = () => {
+  router.push(`/resume/portfolio/coach`)
+}
+
+
+
+
 
 // API 호출로 이력서 리스트 조회
 const fetchResumeList = async () => {
@@ -375,6 +383,7 @@ onMounted(() => {
 /* 이력서 섹션 */
 .resume-section {
   background: white;
+  margin-top: 15px;
   border-radius: 12px;
   padding: 24px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.06);
