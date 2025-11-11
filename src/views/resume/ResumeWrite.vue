@@ -571,30 +571,6 @@ onMounted(() => {
   
 }
 
-/* 사이드바 */
-.sidebar {
-  width: 200px;
-  background: #fff;
-  border-right: 1px solid #e5e5e5;
-  padding: 20px 0;
-}
-
-.sidebar-header {
-  padding: 0 20px 20px;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.sidebar-header h3 {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 700;
-  color: #333;
-}
-
-.sidebar-menu {
-  padding-top: 20px;
-}
-
 .menu-item {
   padding: 12px 20px;
   cursor: pointer;
