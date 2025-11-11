@@ -68,7 +68,7 @@ const subMenus = {
     { label: "마이 페이지", path: "/my/page" },
     // { label: "내 정보수정", path: "/my/edit" },
     { label: "통합 리포트", path: "/my/report" },
-    { label: "리포트 보관함", path: "/my/mentoring" },
+    { label: "리포트 보관함", path: "/my/save" },
   ],
   resume: [
     { label: "서류", path: "/resume/list" },

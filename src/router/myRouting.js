@@ -17,6 +17,12 @@ const routes = [
     component: () =>
       import(/*webpackChunkName: "myRouting"*/ "@/views/my/MyEdit.vue"),
   },
+  {
+    path: "/my/save",
+    name: "MySave",
+    component: () =>
+      import(/*webpackChunkName: "myRouting"*/ "@/views/my/MySave.vue"),
+  },
 ];
 
 export default routes;
