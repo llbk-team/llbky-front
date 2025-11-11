@@ -184,7 +184,6 @@ const handleSignup = () => {
 
 <style scoped>
 .signup-page {
-  font-family: "Pretendard", sans-serif;
   background: #fff;
   min-height: 100vh;
   padding: 60px 20px;

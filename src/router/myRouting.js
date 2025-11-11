@@ -11,6 +11,12 @@ const routes = [
     component: () =>
       import(/*webpackChunkName: "myRouting"*/ "@/views/my/MyReport.vue"),
   },
+  {
+    path: "/my/edit",
+    name: "MyEdit",
+    component: () =>
+      import(/*webpackChunkName: "myRouting"*/ "@/views/my/MyEdit.vue"),
+  },
 ];
 
 export default routes;
