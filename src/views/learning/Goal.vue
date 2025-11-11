@@ -11,7 +11,7 @@
       </div>
     </div> -->
 
-    <LearningHeader :current-step="1" />
+    <LearningHeader :progress="progress" :current-step="1" />
 
     <div class="row g-4">
       <!-- 왼쪽 -->
@@ -70,8 +70,19 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, watch} from 'vue'
+import { useStore } from "vuex"
 import LearningHeader from '@/components/bar/LearningHeader.vue'
+
+const store = useStore();
+const goals = ["취업 준비", "이직 준비", "기술 심화", "자기계발"];
+const selectedGoals = ref([]);
+
+store.dispatch("learning/updateProgress", 0); // ✅ 모듈명 명시
+
+watch(selectedGoals, (newVal) => {
+  store.dispatch("learning/updateProgress", newVal.length > 0 ? 50 : 0);
+});
 
 const formData = ref({
   careerGoals: [],
@@ -111,6 +122,10 @@ const goalSections = [
     ]
   }
 ]
+
+
+
+
 </script>
 
 <style scoped>

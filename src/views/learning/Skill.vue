@@ -101,8 +101,25 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import LearningHeader from '@/components/bar/LearningHeader.vue'
+import { ref, watch, onMounted } from "vue";
+import { useStore } from "vuex";
+import LearningHeader from "@/components/bar/LearningHeader.vue";
+
+const store = useStore();
+const skills = ["SQL", "Spring", "Docker", "AWS"];
+const selectedSkills = ref([]);
+
+onMounted(() => {
+  if (store.getters["learning/getProgress"] < 50) {
+    store.dispatch("learning/updateProgress", 50);
+  }
+});
+
+watch(selectedSkills, (newVal) => {
+  store.dispatch("learning/updateProgress", newVal.length > 0 ? 100 : 50);
+});
+
+
 
 // 폼 전체 데이터를 관리하는 ref
 const formData = ref({
