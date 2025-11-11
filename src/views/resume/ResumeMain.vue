@@ -19,11 +19,11 @@
             <div class="banner-content">
               <div class="banner-icon">🎓</div>
               <div class="banner-text">
-                <h2>지금 당장 가구응기업 포트폴리오 완성해 보세요!</h2>
-                <p>A기업 분석부터 공유까지 빠르게 모두 할 수 있어요</p>
+                <h2>커리어를 관리해보세요!</h2>
+                <p>AI를 통한 이력서 분석부터 서류분석 빠르게 분석할 수 있어요!</p>
               </div>
               <button class="banner-button" @click="$router.push('/resume/write')">
-                내 이력서 가져와서리
+                내 커리어 기록하러 가기
               </button>
             </div>
           </div>

@@ -41,15 +41,7 @@
         <span class="menu-text">포트폴리오</span>
       </RouterLink>
 
-      <!-- 면접 -->
-      <RouterLink 
-        to="/interview/report" 
-        class="menu-item" 
-        active-class="active"
-      >
-        <div class="menu-icon">🎤</div>
-        <span class="menu-text">면접</span>
-      </RouterLink>
+      
     </div>
   </aside>
 </template>
