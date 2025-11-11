@@ -64,10 +64,10 @@
 
 <script setup>
 import { ref } from "vue";
-import ResumeReport from "../report/ResumeReport.vue";
-import InterviewReport from "../report/InterviewReport.vue";
-import LearningReport from "../report/LearningReport.vue";
-import ActivityReport from "../report/ActivityReport.vue";
+import ResumeReport from "./report/ResumeReport.vue";
+import InterviewReport from "./report/InterviewReport.vue";
+import LearningReport from "./report/LearningReport.vue";
+import ActivityReport from "./report/ActivityReport.vue";
 
 const selectedReports = ref([]);
 

@@ -20,11 +20,11 @@
 </template>
 
 <script setup>
-import ProfileSection from "./ProfileSection.vue";
-import RadarSection from "./RadarSection.vue";
-import MentoringSection from "./MentoringSection.vue";
-import HeatmapSection from "./HeatmapSection.vue";
-import LogList from "./LogList.vue";
+import ProfileSection from "./report/ProfileSection.vue";
+import RadarSection from "./report/RadarSection.vue";
+import MentoringSection from "./report/MentoringSection.vue";
+import HeatmapSection from "./report/HeatmapSection.vue";
+import LogList from "./report/LogList.vue";
 </script>
 
 <style scoped>
