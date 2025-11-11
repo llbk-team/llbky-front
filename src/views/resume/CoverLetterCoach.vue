@@ -2,71 +2,125 @@
   <div class="d-flex bg-light min-vh-100 overflow-auto">
     <SideBar />
 
-    <!-- Main Content -->
+    <!-- 메인 -->
     <section class="flex-grow-1 p-4">
-      <div class="text-muted small mb-2">my &gt; 서류관리 &gt; 이력서</div>
-      <h2 class="fw-semibold mb-4 text-dark">서류 AI 코칭</h2>
+      <div class="text-muted small mb-2">my &gt; 서류관리 &gt; 자기소개서</div>
+      <h2 class="fw-semibold mb-4 text-dark">AI 자기소개서 코칭</h2>
 
-      <!-- 상단 영역 -->
       <div class="row g-4">
-        <!-- Left Panel -->
+        <!-- 왼쪽: 작성 영역 -->
         <div class="col-lg-7">
-          <!-- Tabs -->
-          <div class="d-flex flex-wrap gap-2 mb-3">
-            <button
-              v-for="tab in tabs"
-              :key="tab"
-              @click="activeTab = tab"
-              class="btn fw-medium btn-sm"
-              :class="activeTab === tab ? 'btn-mint text-dark' : 'btn-outline-secondary bg-white'"
+
+          <!-- 자기소개서 입력 -->
+          <div v-if="!isCoachingStarted">
+            <h5 class="fw-bold text-dark mb-3">✏️ 자기소개서 작성</h5>
+            <p class="text-muted small mb-4">
+              각 항목에 맞게 자기소개서를 입력한 후 “AI 코칭 받기” 버튼을 눌러보세요.
+            </p>
+
+            <!-- 항목별 작성칸 -->
+            <div
+              v-for="(content, section) in introFields"
+              :key="section"
+              class="mb-4"
             >
-              {{ tab }}
-            </button>
+              <h6 class="fw-bold text-dark mb-2">{{ section }}</h6>
+              <textarea
+                v-model="introFields[section]"
+                class="form-control border rounded small text-secondary"
+                rows="4"
+                placeholder="이 항목에 대한 내용을 입력하세요..."
+              ></textarea>
+            </div>
+
+            <div class="d-flex justify-content-end">
+              <button class="btn btn-mint fw-medium btn-sm px-4" @click="startCoaching">
+                🚀 AI 코칭 받기
+              </button>
+            </div>
           </div>
 
-          <!-- 작성 영역 -->
-          <div class="card border-0 shadow-sm">
-            <div class="card-body">
-              <h5 class="fw-semibold mb-3 text-dark">작성 내용</h5>
+          <!-- AI 코칭 결과 & 문체 버전 (AI 시작 후 표시) -->
+          <div v-else>
+            <!-- 문체 버전 선택 -->
+            <div class="card border-0 shadow-sm mb-4" style="max-width: 95%;">
+              <div class="card-body">
+                <h5 class="fw-semibold mb-1 text-dark">문체 버전 선택</h5>
+                <p class="text-muted small mb-4">
+                  원하는 문체 스타일을 선택하면 자동으로 변환됩니다
+                </p>
 
-              <div class="d-flex gap-3">
-                <!-- 좌측 버튼 -->
-                <div class="d-flex flex-column gap-2">
-                  <button class="btn btn-mint fw-medium btn-sm" @click="enableEdit">✏️ 첨삭</button>
-                  <button class="btn btn-outline-secondary fw-medium btn-sm">🔍 분석</button>
+                <div class="d-flex flex-wrap gap-2 mb-2">
                   <button
-                    class="btn btn-mint fw-medium btn-sm"
-                    @click="saveEdit"
-                    :disabled="!isEditing"
+                    v-for="version in versions"
+                    :key="version.id"
+                    class="btn btn-outline-secondary w-auto px-3 py-2 fw-medium btn-sm"
+                    data-bs-toggle="modal"
+                    :data-bs-target="'#modal-' + version.id"
                   >
-                    💾 저장
+                    {{ version.name }}
                   </button>
                 </div>
+              </div>
+            </div>
 
-                <!-- 작성 내용 -->
-                <div class="flex-grow-1">
-                  <div class="border rounded p-3 bg-white small text-secondary" style="min-height: 250px;">
-                    <template v-if="isEditing">
-                      <textarea
-                        v-model="editedText"
-                        class="form-control border-0 shadow-none small text-secondary"
-                        rows="8"
-                      ></textarea>
+            <!-- 작성 내용 카드 -->
+            <div
+              v-for="(content, section) in tabContent"
+              :key="section"
+              class="mb-4"
+            >
+              <h5 class="fw-bold text-dark mb-2">📌 {{ section }}</h5>
+              <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                  <!-- 통으로 수정 가능한 영역 -->
+                  <div
+                    ref="editableRefs"
+                    class="small text-secondary"
+                    :class="{ 'border rounded p-3': isEditing && editingSection === section }"
+                    :data-section="section"
+                    @input="handleFullEdit($event, section)"
+                    :contenteditable="isEditing && editingSection === section"
+                    style="white-space: pre-line; outline: none; min-height: 120px;"
+                  >
+                    {{ content.join('\n') }}
+                  </div>
+
+                  <!-- 버튼 영역 -->
+                  <div class="text-end mt-2 d-flex justify-content-end gap-2">
+                    <template v-if="isEditing && editingSection === section">
+                      <button class="btn btn-mint btn-sm fw-medium" @click="saveEdit(section)">
+                        💾 저장
+                      </button>
+                      <button class="btn btn-outline-secondary btn-sm fw-medium" @click="cancelEdit">
+                        ❌ 취소
+                      </button>
                     </template>
                     <template v-else>
-                      <p v-for="(para, idx) in tabContent[activeTab]" :key="idx" class="mb-2">
-                        {{ para }}
-                      </p>
+                      <button
+                        class="btn btn-outline-secondary btn-sm fw-medium"
+                        @click="enableEdit(section)"
+                      >
+                        ✏️ 수정
+                      </button>
                     </template>
                   </div>
                 </div>
               </div>
             </div>
+
+            <!-- 리포트 생성 버튼 (전체 카드 하단, 오른쪽 정렬) -->
+            <div class="text-end mt-4">
+              <button class="btn btn-outline-secondary fw-medium btn-sm px-4 py-2">
+                📄 리포트 생성하기
+              </button>
+            </div>
+
           </div>
         </div>
 
-        <!-- Right Panel (AI 코칭 결과 그대로 유지) -->
-        <div class="col-lg-5">
+        <!-- 오른쪽: 코칭 결과 -->
+        <div class="col-lg-5" v-if="isCoachingStarted">
           <div class="card border-0 shadow-sm">
             <div class="card-body">
               <h5 class="fw-bold mb-3">AI 코칭 결과</h5>
@@ -103,43 +157,7 @@
         </div>
       </div>
 
-      <!-- 문체 버전 선택 -->
-      <div class="card border-0 shadow-sm mt-5">
-        <div class="card-body">
-          <h4 class="fw-semibold mb-1 text-dark">문체 버전 선택</h4>
-          <p class="text-muted small mb-4">
-            원하는 문체 스타일을 선택하면 자동으로 변환됩니다
-          </p>
-
-          <!-- 버전 버튼 -->
-          <div class="d-flex flex-wrap gap-3 mb-4">
-            <button
-              v-for="version in versions"
-              :key="version.id"
-              class="btn btn-outline-secondary flex-fill py-2 fw-medium btn-sm"
-              data-bs-toggle="modal"
-              :data-bs-target="'#modal-' + version.id"
-            >
-              {{ version.name }}
-            </button>
-          </div>
-
-          <!-- 하단 버튼 -->
-          <div class="d-flex gap-3">
-            <button class="btn btn-outline-secondary flex-fill fw-medium btn-sm">
-              📄 리포트 다운로드
-            </button>
-            <button class="btn btn-mint flex-fill fw-medium btn-sm">
-              ✏️ 서류 수정하기
-            </button>
-            <button class="btn btn-outline-secondary flex-fill fw-medium btn-sm">
-              💾 저장하기
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- 모달 -->
+      <!-- 문체 버전 모달 -->
       <div
         v-for="version in versions"
         :key="'modal-' + version.id"
@@ -181,27 +199,21 @@
 </template>
 
 <script setup>
-import { ref, computed, reactive } from "vue";
-import { useRouter, useRoute } from "vue-router";
-import SideBar from '@/components/sidebar/SideBar.vue'
+import { ref, reactive } from "vue";
+import SideBar from "@/components/sidebar/SideBar.vue";
 
-const router = useRouter();
-const route = useRoute();
-const currentRoute = computed(() => route.path);
-const navigateTo = (path) => router.push(path);
+// 입력
+const introFields = reactive({
+  "지원 동기": "",
+  "성장 경험": "",
+  "직무 역량": "",
+  "입사 후 포부": "",
+});
 
-const sidebarItems = [
-  { label: "📄 이력서", path: "/resume" },
-  { label: "📝 자기소개서", path: "/resume/coverletter" },
-  { label: "💼 포트폴리오", path: "/resume/portfolio" },
-];
-
-const tabs = ["지원 동기", "성장 경험", "직무 역량", "입사 후 포부"];
-const activeTab = ref("지원 동기");
-
+// AI 결과
 const tabContent = reactive({
   "지원 동기": [
-    "귀사의 클라우드 플랫폼 서비스가 국내를 넘어 글로벌 시장에서 인정받는 것을 보며 큰 감명을 받았습니다.",
+    "귀사의 클라우드 플랫폼 서비스가 글로벌 시장에서 인정받는 것을 보며 큰 감명을 받았습니다.",
     "특히 최근 출시한 서버리스 컴퓨팅 서비스는 개발자 경험을 혁신적으로 개선했다고 평가받고 있습니다.",
     "귀사에 입사하여 클라우드 네이티브 기술을 활용한 혁신적인 서비스 개발에 기여하고 싶습니다.",
   ],
@@ -219,20 +231,14 @@ const tabContent = reactive({
   ],
 });
 
-const isEditing = ref(false);
-const editedText = ref("");
+const isCoachingStarted = ref(false);
 
-const enableEdit = () => {
-  isEditing.value = true;
-  editedText.value = tabContent[activeTab.value].join("\n\n");
+const startCoaching = () => {
+  // 실제 AI 분석 API 호출 자리
+  isCoachingStarted.value = true;
 };
 
-const saveEdit = () => {
-  if (editedText.value.trim() === "") return;
-  tabContent[activeTab.value] = editedText.value.split("\n\n");
-  isEditing.value = false;
-};
-
+// 문체 버전
 const versions = [
   {
     id: 1,
@@ -266,10 +272,53 @@ const copyVersion = async (text) => {
   }
 };
 
+// ✅ 전체 항목에 문체 버전 적용
 const applyVersion = (text) => {
-  tabContent[activeTab.value] = text.split("\n");
-  alert(`"${activeTab.value}" 문항이 선택한 버전으로 적용되었습니다 ✨`);
+  const lines = text.split("\n");
+  Object.keys(tabContent).forEach((key) => {
+    tabContent[key] = lines;
+  });
+  alert("선택한 문체 버전이 전체 항목에 적용되었습니다 ✨");
 };
+
+// 수정 관련 상태
+const isEditing = ref(false);
+const editingSection = ref(null);
+const editedText = ref("");
+
+// ✏️ 수정 시작
+const enableEdit = (section) => {
+  isEditing.value = true;
+  editingSection.value = section;
+  editedText.value = tabContent[section].join("\n\n");
+};
+
+// 💾 저장
+const saveEdit = (section) => {
+  if (!editedText.value.trim()) return;
+  tabContent[section] = editedText.value.split("\n\n");
+  isEditing.value = false;
+  editingSection.value = null;
+  alert(`"${section}" 수정이 저장되었습니다 ✅`);
+};
+
+// ❌ 취소
+const cancelEdit = () => {
+  isEditing.value = false;
+  editingSection.value = null;
+  editedText.value = "";
+};
+
+// 실시간 수정 (문장 단위 → 전체 박스 통합)
+const handleFullEdit = (e, section) => {
+  if (isEditing.value && editingSection.value === section) {
+    // 줄바꿈 포함해서 그대로 반영
+    const updated = e.target.innerText.split('\n').filter(line => line.trim() !== '');
+    tabContent[section] = updated;
+  }
+};
+
+
 </script>
 
 <style scoped>
@@ -278,13 +327,7 @@ const applyVersion = (text) => {
   color: #000 !important;
   border: none !important;
 }
-.bg-mint {
-  background-color: #71ebbe !important;
-}
 .bg-light-mint {
   background-color: #eafff5 !important;
-}
-.hover-light:hover {
-  background-color: #f7f7f7 !important;
 }
 </style>
