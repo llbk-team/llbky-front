@@ -1,132 +1,149 @@
 <template>
   <div class="insight-page">
-    <h2 class="page-title">AI 직무 인사이트</h2>
-    <p class="page-subtitle">
-      뉴스 트렌드와 커리어 관심사를 분석해 AI가 추천하는 맞춤 직무
-    </p>
+    <!-- 헤더 -->
+    <div class="header">
+      <div class="title-section">
+        <h2>AI 직무 인사이트</h2>
+        <p>뉴스 트렌드와 개인의 관심사를 분석해 추천하는 맞춤 직무</p>
+      </div>
+      <router-link to="/trend/saved" class="saved-btn">
+        📑 저장한 키워드 ({{ savedCount }})
+      </router-link>
+    </div>
 
-    <div class="summary-box">
-      <h4>맞춤 분석 결과</h4>
+    <!-- 알림 섹션 -->
+    <div class="notice-box">
       <p>
-        최근 2개월간 뉴스 트렌드와 커리어 데이터를 기반으로 분석한 결과입니다.<br />
-        AI 직무 인사이트는 관련 뉴스 요약, 트렌드 상승률, 키워드 패턴을 종합하여 추천 직무를 제안합니다.
+        ✅ <strong>분석 완료</strong><br />
+        최근 뉴스 트렌드를 기반으로 직무별 연관 키워드를 도출했습니다.
+        관심 있는 키워드를 클릭하면 저장소에 추가됩니다.
       </p>
-      <div class="summary-stats">
-        <span>분석 뉴스: 1,234건</span>
-        <span>직무 키워드: 156개</span>
+    </div>
+
+    <!-- 직무 카드 -->
+    <div class="job-grid">
+      <div v-for="(job, i) in jobs" :key="i" class="job-card">
+        <div class="card-header">
+          <h3>{{ job.title }}</h3>
+          <span class="score">{{ job.score }}%</span>
+        </div>
+        <p class="desc">{{ job.desc }}</p>
+        <div class="progress">
+          <div class="bar" :style="{ width: job.score + '%' }"></div>
+        </div>
+        <div class="tags">
+          <button
+            v-for="tag in job.tags"
+            :key="tag"
+            @click="saveKeyword(tag)"
+            class="tag-btn"
+          >
+            {{ tag }}
+          </button>
+        </div>
       </div>
     </div>
 
-    <div class="job-grid">
-      <div v-for="(job, i) in jobs" :key="i" class="job-card">
-        <div class="job-header">
-          <router-link
-            :to="`/trend?keyword=${encodeURIComponent(job.title)}`"
-            class="job-link"
-          >
-            {{ job.title }}
-          </router-link>
-          <span class="confidence">{{ job.match }}%</span>
-        </div>
-        <div class="progress-bar">
-          <div class="fill" :style="{ width: job.match + '%' }"></div>
-        </div>
-        <p class="desc">{{ job.desc }}</p>
-
-        <div class="tags">
-          <span v-for="(tag, t) in job.tags" :key="t">{{ tag }}</span>
-        </div>
-      </div>
+    <div class="hint-box">
+      💡 클릭한 키워드는 저장소에서 확인할 수 있습니다.
     </div>
   </div>
 </template>
 
 <script setup>
-const jobs = [
+import { ref, onMounted } from "vue";
+
+const jobs = ref([
   {
     title: "AI 엔지니어",
-    match: 92,
-    desc: "AI 모델 설계부터 데이터 분석까지 담당하며, 산업별 AI 적용 전략을 수립합니다.",
+    score: 92,
+    desc: "AI 모델 설계부터 배포까지 전반적인 영역을 담당합니다.",
     tags: ["Python", "TensorFlow", "LLM", "MLOps"],
   },
   {
     title: "클라우드 엔지니어",
-    match: 88,
-    desc: "클라우드 기반 인프라 설계와 서비스 운영을 담당합니다. DevOps 및 보안 역량이 요구됩니다.",
-    tags: ["AWS", "Kubernetes", "DevOps", "Docker"],
+    score: 88,
+    desc: "클라우드 인프라 및 DevOps 환경을 관리합니다.",
+    tags: ["AWS", "Kubernetes", "Docker", "DevOps"],
   },
   {
     title: "데이터 사이언티스트",
-    match: 85,
-    desc: "데이터 분석 및 머신러닝을 통해 인사이트를 도출하며, 모델 성능을 최적화합니다.",
-    tags: ["Python", "Pandas", "Machine Learning"],
+    score: 85,
+    desc: "데이터 분석 및 머신러닝 모델 설계를 담당합니다.",
+    tags: ["Pandas", "SQL", "Machine Learning"],
   },
   {
     title: "보안 전문가",
-    match: 78,
-    desc: "기업 시스템 및 네트워크 보안을 유지하고, 취약점 분석 및 대응 전략을 수립합니다.",
-    tags: ["Security", "Network", "Forensic"],
+    score: 78,
+    desc: "시스템 보안 및 네트워크 방어를 수행합니다.",
+    tags: ["Security", "Network", "Forensic", "Encryption"],
   },
-];
+]);
+
+const savedCount = ref(0);
+
+onMounted(() => {
+  const saved = JSON.parse(localStorage.getItem("user_keywords") || "[]");
+  savedCount.value = saved.length;
+});
+
+const saveKeyword = (tag) => {
+  const saved = JSON.parse(localStorage.getItem("user_keywords") || "[]");
+  if (!saved.includes(tag)) {
+    saved.push(tag);
+    localStorage.setItem("user_keywords", JSON.stringify(saved));
+    savedCount.value = saved.length;
+    alert(`'${tag}' 키워드가 저장되었습니다 ✅`);
+  } else {
+    alert(`이미 저장된 키워드입니다.`);
+  }
+};
 </script>
 
 <style scoped>
 .insight-page {
-  background: #ffffff;
-  padding: 40px 80px 100px;
-  font-family: "Pretendard", sans-serif;
-  color: #111111;
-}
-
-/* 공통 카드 효과 */
-.summary-box,
-.job-card {
-  background: #ffffff;
-  border: 1px solid #e5e5e5;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
-  border-radius: 14px;
-  transition: 0.25s ease;
-}
-.summary-box:hover,
-.job-card:hover {
-  border-color: #d0d0d0;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  background: #f9faf9;
+  padding: 40px 80px;
+  color: #111;
+  /* font-family: "Pretendard", sans-serif; */
 }
 
 /* 헤더 */
-.page-title {
-  font-size: 22px;
-  font-weight: 700;
-  color: #000000;
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 28px;
 }
-.page-subtitle {
+.title-section h2 {
+  font-size: 24px;
+  font-weight: 700;
+}
+.title-section p {
   font-size: 14px;
-  color: #555555;
-  margin-bottom: 30px;
+  color: #555;
+}
+.saved-btn {
+  background: #00c896;
+  color: #fff;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: 0.2s;
+}
+.saved-btn:hover {
+  background: #00b487;
 }
 
-/* 분석 요약 */
-.summary-box {
-  padding: 20px 28px;
-  margin-bottom: 36px;
-}
-.summary-box h4 {
-  font-size: 16px;
-  font-weight: 700;
-  color: #000000;
-  margin-bottom: 6px;
-}
-.summary-box p {
+/* 알림 */
+.notice-box {
+  background: #e9f8f2;
+  border: 1px solid #a2f1d6;
+  border-radius: 12px;
+  padding: 18px 22px;
   font-size: 14px;
-  color: #333333;
-  line-height: 1.7;
-}
-.summary-stats {
-  display: flex;
-  gap: 20px;
-  margin-top: 10px;
-  font-size: 13px;
-  color: #555555;
+  margin-bottom: 24px;
 }
 
 /* 직무 카드 */
@@ -136,64 +153,66 @@ const jobs = [
   gap: 24px;
 }
 .job-card {
-  padding: 22px 26px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border: 1px solid #eee;
+  padding: 20px 24px;
 }
-.job-header {
+.card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
-.job-link {
-  font-size: 17px;
+.card-header h3 {
   font-weight: 700;
-  color: #111;
-  text-decoration: none;
+  font-size: 16px;
 }
-.job-link:hover {
+.card-header .score {
+  font-weight: 700;
   color: #00c896;
 }
-.confidence {
-  font-weight: 600;
-  font-size: 14px;
-  color: #71ebbe;
-}
-
-/* 진행바 */
-.progress-bar {
-  background: #f1f2f3;
-  height: 7px;
-  border-radius: 10px;
-  margin: 10px 0 14px;
-  overflow: hidden;
-}
-.progress-bar .fill {
-  background: linear-gradient(90deg, #a2f1d6 0%, #71ebbe 100%);
-  height: 100%;
-  border-radius: 10px;
-  transition: width 0.6s ease;
-}
-
-/* 설명 */
 .desc {
-  font-size: 13.5px;
-  color: #333333;
-  line-height: 1.6;
-  margin-bottom: 12px;
+  font-size: 13px;
+  color: #444;
+  margin: 6px 0 10px;
 }
-
-/* 태그 */
+.progress {
+  height: 6px;
+  background: #eee;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+.bar {
+  height: 100%;
+  border-radius: 8px;
+  background: #00c896;
+}
 .tags {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
-.tags span {
+.tag-btn {
+  border: 1px solid #a2f1d6;
   background: #ddf3eb;
-  color: #111111;
-  font-size: 12px;
   padding: 4px 10px;
   border-radius: 8px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.tag-btn:hover {
+  background: #a2f1d6;
+}
+
+/* 힌트 */
+.hint-box {
+  background: #e9f8f2;
   border: 1px solid #a2f1d6;
-  font-weight: 500;
+  border-radius: 10px;
+  padding: 10px 16px;
+  font-size: 13px;
+  margin-top: 28px;
 }
 </style>

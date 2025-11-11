@@ -8,22 +8,17 @@
       <h2 class="fw-semibold mb-4 text-dark">AI 자기소개서 코칭</h2>
 
       <div class="row g-4">
-        <!-- 왼쪽: 작성 영역 -->
+        <!-- 왼쪽: 작성 / 코칭 영역 -->
         <div class="col-lg-7">
 
-          <!-- 자기소개서 입력 -->
+          <!-- 작성 모드 -->
           <div v-if="!isCoachingStarted">
             <h5 class="fw-bold text-dark mb-3">✏️ 자기소개서 작성</h5>
             <p class="text-muted small mb-4">
               각 항목에 맞게 자기소개서를 입력한 후 “AI 코칭 받기” 버튼을 눌러보세요.
             </p>
 
-            <!-- 항목별 작성칸 -->
-            <div
-              v-for="(content, section) in introFields"
-              :key="section"
-              class="mb-4"
-            >
+            <div v-for="(value, section) in introFields" :key="section" class="mb-4">
               <h6 class="fw-bold text-dark mb-2">{{ section }}</h6>
               <textarea
                 v-model="introFields[section]"
@@ -40,7 +35,7 @@
             </div>
           </div>
 
-          <!-- AI 코칭 결과 & 문체 버전 (AI 시작 후 표시) -->
+          <!-- 코칭 결과 모드 -->
           <div v-else>
             <!-- 문체 버전 선택 -->
             <div class="card border-0 shadow-sm mb-4" style="max-width: 95%;">
@@ -65,20 +60,13 @@
             </div>
 
             <!-- 작성 내용 카드 -->
-            <div
-              v-for="(content, section) in tabContent"
-              :key="section"
-              class="mb-4"
-            >
+            <div v-for="(content, section) in tabContent" :key="section" class="mb-4">
               <h5 class="fw-bold text-dark mb-2">📌 {{ section }}</h5>
               <div class="card border-0 shadow-sm">
                 <div class="card-body">
-                  <!-- 통으로 수정 가능한 영역 -->
                   <div
-                    ref="editableRefs"
                     class="small text-secondary"
                     :class="{ 'border rounded p-3': isEditing && editingSection === section }"
-                    :data-section="section"
                     @input="handleFullEdit($event, section)"
                     :contenteditable="isEditing && editingSection === section"
                     style="white-space: pre-line; outline: none; min-height: 120px;"
@@ -86,40 +74,29 @@
                     {{ content.join('\n') }}
                   </div>
 
-                  <!-- 버튼 영역 -->
                   <div class="text-end mt-2 d-flex justify-content-end gap-2">
                     <template v-if="isEditing && editingSection === section">
-                      <button class="btn btn-mint btn-sm fw-medium" @click="saveEdit(section)">
-                        💾 저장
-                      </button>
-                      <button class="btn btn-outline-secondary btn-sm fw-medium" @click="cancelEdit">
-                        ❌ 취소
-                      </button>
+                      <button class="btn btn-mint btn-sm fw-medium" @click="saveEdit(section)">💾 저장</button>
+                      <button class="btn btn-outline-secondary btn-sm fw-medium" @click="cancelEdit">❌ 취소</button>
                     </template>
                     <template v-else>
-                      <button
-                        class="btn btn-outline-secondary btn-sm fw-medium"
-                        @click="enableEdit(section)"
-                      >
-                        ✏️ 수정
-                      </button>
+                      <button class="btn btn-outline-secondary btn-sm fw-medium" @click="enableEdit(section)">✏️ 수정</button>
                     </template>
                   </div>
                 </div>
               </div>
             </div>
 
-            <!-- 리포트 생성 버튼 (전체 카드 하단, 오른쪽 정렬) -->
+            <!-- 리포트 버튼 -->
             <div class="text-end mt-4">
-              <button class="btn btn-outline-secondary fw-medium btn-sm px-4 py-2">
+              <button class="btn btn-outline-secondary fw-medium btn-sm px-4 py-2" @click="$router.push('/resume/list')">
                 📄 리포트 생성하기
               </button>
             </div>
-
           </div>
         </div>
 
-        <!-- 오른쪽: 코칭 결과 -->
+        <!-- 오른쪽: AI 코칭 결과 -->
         <div class="col-lg-5" v-if="isCoachingStarted">
           <div class="card border-0 shadow-sm">
             <div class="card-body">
@@ -176,18 +153,10 @@
               <p class="mb-0" style="white-space: pre-line;">{{ version.text }}</p>
             </div>
             <div class="modal-footer">
-              <button
-                type="button"
-                class="btn btn-outline-secondary flex-fill fw-medium btn-sm"
-                @click="copyVersion(version.text)"
-              >
+              <button type="button" class="btn btn-outline-secondary flex-fill fw-medium btn-sm" @click="copyVersion(version.text)">
                 📋 복사하기
               </button>
-              <button
-                class="btn btn-mint flex-fill fw-medium btn-sm"
-                data-bs-dismiss="modal"
-                @click="applyVersion(version.text)"
-              >
+              <button class="btn btn-mint flex-fill fw-medium btn-sm" data-bs-dismiss="modal" @click="applyVersion(version.text)">
                 ✅ 이 버전 선택
               </button>
             </div>
@@ -199,10 +168,13 @@
 </template>
 
 <script setup>
-import { ref, reactive } from "vue";
 import SideBar from "@/components/sidebar/SideBar.vue";
+import { ref, reactive, onMounted } from "vue";
+import { useRoute } from "vue-router";
 
-// 입력
+const route = useRoute();
+
+// 작성용 초기 데이터
 const introFields = reactive({
   "지원 동기": "",
   "성장 경험": "",
@@ -210,115 +182,121 @@ const introFields = reactive({
   "입사 후 포부": "",
 });
 
-// AI 결과
-const tabContent = reactive({
-  "지원 동기": [
-    "귀사의 클라우드 플랫폼 서비스가 글로벌 시장에서 인정받는 것을 보며 큰 감명을 받았습니다.",
-    "특히 최근 출시한 서버리스 컴퓨팅 서비스는 개발자 경험을 혁신적으로 개선했다고 평가받고 있습니다.",
-    "귀사에 입사하여 클라우드 네이티브 기술을 활용한 혁신적인 서비스 개발에 기여하고 싶습니다.",
-  ],
-  "성장 경험": [
-    "저는 어려서부터 문제 해결에 몰입하는 습관이 있었습니다.",
-    "대학교 시절, 팀 프로젝트 중 발생한 서버 다운 문제를 해결하며 백엔드 개발에 흥미를 느꼈습니다.",
-  ],
-  "직무 역량": [
-    "3년간 백엔드 개발자로 일하며 MSA 기반의 안정적인 서버 구조를 설계했습니다.",
-    "Java, Spring Boot, PostgreSQL을 활용한 프로젝트 경험이 풍부합니다.",
-  ],
-  "입사 후 포부": [
-    "입사 후 빠르게 팀에 적응하고 클라우드 서비스의 효율을 개선하겠습니다.",
-    "장기적으로는 서비스 아키텍처 고도화를 주도하는 엔지니어로 성장하겠습니다.",
-  ],
-});
-
 const isCoachingStarted = ref(false);
 
+// 기존 자소서일 경우 자동 로드
+onMounted(() => {
+  const id = route.query.id;
+  if (id) {
+    // 정적 데이터 기반
+    loadCoverLetterData(Number(id));
+  }
+});
+
+// 더미 데이터
+const dummyCoverLetters = [
+  {
+    id: 1,
+    "지원 동기": "카카오의 기술 문화와 서비스 철학에 매력을 느껴 지원했습니다.",
+    "성장 경험": "AI 해커톤에 참여해 백엔드 개발과 팀 리딩을 맡았습니다.",
+    "직무 역량": "Spring Boot, MyBatis, PostgreSQL 활용 경험이 있습니다.",
+    "입사 후 포부": "카카오 클라우드 서비스 확장에 기여하고 싶습니다.",
+  },
+];
+
+// 정적 데이터 로드
+const loadCoverLetterData = (id) => {
+  const found = dummyCoverLetters.find((item) => item.id === id);
+  if (found) {
+    Object.keys(introFields).forEach((key) => {
+      introFields[key] = found[key];
+    });
+    isCoachingStarted.value = true;
+  }
+};
+
+// AI 결과용 (시작 후 표시될 기본 데이터)
+const tabContent = reactive({
+  "지원 동기": [],
+  "성장 경험": [],
+  "직무 역량": [],
+  "입사 후 포부": [],
+});
+
+// 작성 완료 후 코칭 시작
 const startCoaching = () => {
-  // 실제 AI 분석 API 호출 자리
+  Object.keys(tabContent).forEach((key) => {
+    tabContent[key] = introFields[key]
+      ? introFields[key].split("\n")
+      : ["내용이 없습니다."];
+  });
   isCoachingStarted.value = true;
 };
 
-// 문체 버전
+// 문체 버전들
 const versions = [
   {
     id: 1,
     name: "간결한 버전",
-    text: `IT 업계에서 3년간 백엔드 개발 경험을 쌓았습니다.
-Spring Boot와 MSA 아키텍처를 활용한 대규모 시스템 구축 경험이 있으며,
-귀사의 클라우드 플랫폼 서비스 개선에 기여하고 싶습니다.`,
+    text: `3년간 백엔드 개발 경험을 쌓았습니다.
+Spring Boot와 MSA 구조를 활용하여 안정적인 서버를 구축했습니다.
+귀사의 기술 발전에 기여하고 싶습니다.`,
   },
   {
     id: 2,
     name: "사례 중심 버전",
-    text: `대학교 시절, 팀 프로젝트 중 발생한 서버 다운 문제를 해결하며
-시스템 설계와 성능 최적화의 중요성을 배웠습니다.
-이 경험을 바탕으로 현재 안정적이고 효율적인 백엔드 구조를 설계하고 있습니다.`,
+    text: `팀 프로젝트 중 서버 장애를 해결하며 문제 해결력과 협업 능력을 길렀습니다.
+이 경험을 기반으로 안정적인 백엔드 시스템을 설계하고 있습니다.`,
   },
   {
     id: 3,
     name: "비전 제시형 버전",
-    text: `저는 클라우드 인프라와 백엔드 기술을 결합하여
-확장 가능한 서비스를 구축하는 것을 목표로 합니다.
-귀사의 혁신적인 기술 환경 속에서 성장하고 싶습니다.`,
+    text: `클라우드 인프라와 백엔드 기술을 결합해
+확장 가능한 서비스를 구축하는 엔지니어로 성장하고 싶습니다.`,
   },
 ];
 
+// 복사 / 적용 기능
 const copyVersion = async (text) => {
-  try {
-    await navigator.clipboard.writeText(text);
-    alert("복사되었습니다 ✅");
-  } catch {
-    alert("복사 중 오류가 발생했습니다 ❌");
-  }
+  await navigator.clipboard.writeText(text);
+  alert("복사되었습니다 ✅");
 };
 
-// ✅ 전체 항목에 문체 버전 적용
 const applyVersion = (text) => {
   const lines = text.split("\n");
-  Object.keys(tabContent).forEach((key) => {
-    tabContent[key] = lines;
-  });
+  Object.keys(tabContent).forEach((key) => (tabContent[key] = lines));
   alert("선택한 문체 버전이 전체 항목에 적용되었습니다 ✨");
 };
 
-// 수정 관련 상태
+// 수정 기능
 const isEditing = ref(false);
 const editingSection = ref(null);
 const editedText = ref("");
 
-// ✏️ 수정 시작
 const enableEdit = (section) => {
   isEditing.value = true;
   editingSection.value = section;
   editedText.value = tabContent[section].join("\n\n");
 };
 
-// 💾 저장
 const saveEdit = (section) => {
-  if (!editedText.value.trim()) return;
   tabContent[section] = editedText.value.split("\n\n");
   isEditing.value = false;
   editingSection.value = null;
   alert(`"${section}" 수정이 저장되었습니다 ✅`);
 };
 
-// ❌ 취소
 const cancelEdit = () => {
   isEditing.value = false;
   editingSection.value = null;
   editedText.value = "";
 };
 
-// 실시간 수정 (문장 단위 → 전체 박스 통합)
 const handleFullEdit = (e, section) => {
   if (isEditing.value && editingSection.value === section) {
-    // 줄바꿈 포함해서 그대로 반영
-    const updated = e.target.innerText.split('\n').filter(line => line.trim() !== '');
-    tabContent[section] = updated;
+    tabContent[section] = e.target.innerText.split("\n").filter((l) => l.trim());
   }
 };
-
-
 </script>
 
 <style scoped>

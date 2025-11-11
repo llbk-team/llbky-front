@@ -2,9 +2,6 @@
   <div class="resume-main">
     <!-- 컨테이너 -->
     <div class="main-container">
-      <!-- 사이드바 -->
-      <SideBar />
-      
 
       <!-- 메인 콘텐츠 -->
       <div class="main-content">
@@ -67,31 +64,97 @@
             </div>
           </div>
         </div>
+
+        <!-- 내 자기소개서 리스트 -->
+        <div class="resume-section">
+          <div class="section-header">
+            <h2>내 자기소개서 리스트</h2>
+            <div class="header-actions">
+              <span class="ai-suggestion">✨ AI 자기소개서 작성</span>
+            </div>
+          </div>
+
+          <div class="resume-grid">
+            <!-- 새 자소서 카드 -->
+            <div class="resume-card add-card" @click="$router.push('/resume/coverletter')">
+              <div class="card-content">
+                <div class="add-icon">+</div>
+                <div class="add-text">새 자기소개서 작성</div>
+              </div>
+            </div>
+
+            <!-- 자소서 리스트 -->
+            <div
+              v-for="cover in coverLetterList"
+              :key="cover.id"
+              class="resume-card"
+              @click="goToCoverDetail(cover.id)"
+            >
+              <div class="card-content">
+                <div class="resume-icon">🖋️</div>
+                <div class="resume-info">
+                  <h3 class="resume-title">{{ cover.title }}</h3>
+                  <p class="resume-description">{{ cover.description }}</p>
+                  <div class="resume-meta">
+                    <span class="update-date">📅 최종 수정: {{ cover.updatedAt }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 내 포트폴리오 리스트 -->
+        <div class="resume-section">
+          <div class="section-header">
+            <h2>내 포트폴리오 리스트</h2>
+            <div class="header-actions">
+              <span class="ai-suggestion">✨ AI 포트폴리오 코칭</span>
+            </div>
+          </div>
+
+          <div class="resume-grid">
+            <!-- 새 포트폴리오 등록 카드 -->
+            <div class="resume-card add-card" @click="$router.push('/resume/portfolio/write')">
+              <div class="card-content">
+                <div class="add-icon">+</div>
+                <div class="add-text">새 포트폴리오 등록</div>
+              </div>
+            </div>
+
+            <!-- 기존 포트폴리오 카드들 -->
+            <div 
+              v-for="resume in resumeList" 
+              :key="resume.id" 
+              class="resume-card"
+              @click="goToResumeDetail(resume.id)"
+            >
+              <div class="card-content">
+                <div class="resume-icon">📄</div>
+                <div class="resume-info">
+                  <h3 class="resume-title">{{ resume.title }}</h3>
+                  <p class="resume-description">{{ resume.description }}</p>
+                  <div class="resume-meta">
+                    <span class="update-date">📅 최종 수정: {{ resume.updatedAt }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import SideBar from '@/components/sidebar/SideBar.vue'
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
 
 // 사용자 정보
-const userName = ref('임정훈')
-
-//사이드바
-const sidebarMenus = ref([
-  { id: 'menu', label: '메뉴', active: true },
-  {id:'resume',label:'이력서',active:false},
-  { id: 'coverletter', label: '자기소개서', active: false },
-  { id: 'portfolio', label: '포트폴리오', active: false },
- 
-])
-
-
+const userName = ref('김병현')
 
 // 이력서 리스트 데이터
 const resumeList = ref([
@@ -140,6 +203,27 @@ const fetchResumeList = async () => {
   } catch (error) {
     console.error('이력서 리스트 조회 실패:', error)
   }
+}
+
+// 자기소개서 리스트 (정적 데이터)
+const coverLetterList = ref([
+  {
+    id: 1,
+    title: '카카오 자기소개서',
+    description: '백엔드 개발 직무 지원',
+    updatedAt: '2024.03.12'
+  },
+  {
+    id: 2,
+    title: '네이버 자기소개서',
+    description: 'AI 플랫폼 개발 지원',
+    updatedAt: '2024.03.09'
+  }
+]);
+
+// 자소서 상세로 이동
+const goToCoverDetail = (coverId) => {
+  router.push(`/resume/coverletter?id=${coverId}`)
 }
 
 // 사용자 정보 조회
@@ -330,7 +414,7 @@ onMounted(() => {
 /* 이력서 그리드 */
 .resume-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
   gap: 20px;
 }
 
