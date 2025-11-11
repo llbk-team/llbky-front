@@ -30,11 +30,11 @@ import HeatmapSection from "./HeatmapSection.vue";
   grid-template-areas:
     "profile radar mentoring"
     "profile heatmap heatmap";
-  grid-template-columns: 400px 0.8fr 460px;
-  gap: 24px;
-  padding: 40px;
+  grid-template-columns: 400px 1fr 600px;
+  gap: 20px;
+  padding: 20px;
   width: 100%;
-  max-width: 1600px; /* ✅ 반응형 + 가운데 유지 */
+  max-width: 1700px; /* ✅ 반응형 + 가운데 유지 */
   box-sizing: border-box;
 }
 </style>

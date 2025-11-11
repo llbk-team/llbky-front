@@ -70,7 +70,6 @@ const goSignup = () => {
   align-items: center;
   min-height: calc(100vh - 100px);
   background: #fff;
-  font-family: "Pretendard", sans-serif;
 }
 
 .login-container {

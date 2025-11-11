@@ -2,9 +2,12 @@
   <aside class="profile-card">
     <!-- 상단 프로필 영역 -->
     <div class="profile-header">
-      <div class="avatar"></div>
       <div class="profile-info">
-        <h2>김병현</h2>
+        <div class="name-row">
+          <h2>김병현</h2>
+          <!-- <i class="ri-settings-3-line"></i> -->
+           <i class="ri-settings-3-line" @click="$router.push('/my/edit')"></i>
+        </div>
         <p class="email">wsee2307@gmail.com</p>
       </div>
     </div>
@@ -20,7 +23,7 @@
 
       <!-- 기술 스택 -->
       <section class="stack">
-        <h3>보유 기술 스택</h3>
+        <h3>관심 키워드</h3>
         <div class="tags">
           <span class="tag tag-border">Java</span>
           <span class="tag tag-fill">Spring</span>
@@ -34,10 +37,7 @@
       <!-- AI 성격 분석 -->
       <section class="ai-personality">
         <h3>AI 성격 기반 분석</h3>
-        <p class="desc">
-          명확한 목표 설정과 체계적 사고를 바탕으로 빠르게 성장합니다.<br />
-          감정 표현과 협업 커뮤니케이션을 함께 확장해보세요.
-        </p>
+        <p class="desc">명확한 목표 설정과 체계적 사고를 바탕으로 빠르게 성장합니다. 감정 표현과 협업 커뮤니케이션을 함께 확장해보세요.</p>
 
         <!-- ✅ 최신 MBTI 컴포넌트 -->
         <MbtiTest />
@@ -66,37 +66,58 @@ const infoList = ref([
   padding: 28px 26px 32px;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
   width: 100%;
-  max-width: 360px;
+  max-width: 380px;
   box-sizing: border-box;
 }
 
-/* 헤더 */
 .profile-header {
   display: flex;
   align-items: center;
   margin-bottom: 22px;
 }
 
-.avatar {
-  width: 64px;
-  height: 64px;
-  border-radius: 18px;
-  background: linear-gradient(145deg, #a2f1d6, #71ebbe);
-  box-shadow: 0 0 10px rgba(113, 235, 190, 0.4);
-  margin-right: 16px;
+/* 프로필 정보 전체 */
+.profile-info {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
 }
 
-.profile-info h2 {
-  font-size: 22px;
-  font-weight: 800;
-  margin: 0 0 4px 0;
+/* 이름과 아이콘을 좌우로 정렬 */
+.name-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.email {
-  font-size: 13px;
-  color: #a7a7a7;
+/* 이름 */
+.name-row h2 {
+  font-size: 20px;
+  font-weight: 600;
   margin: 0;
+  color: #ffffff;
 }
+
+/* 아이콘 */
+.name-row i {
+  font-size: 22px;
+  color: #555;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.name-row i:hover {
+  color: #71EBBE; /* color.txt에서 강조색 */
+}
+
+/* 이메일 */
+.email {
+  margin-top: 4px;
+  font-size: 14px;
+  color: #777;
+  text-align: left;
+}
+
 
 /* 정보 행 */
 .profile-row {
