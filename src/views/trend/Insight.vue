@@ -105,10 +105,10 @@ const saveKeyword = (tag) => {
   background: #f9faf9;
   padding: 40px 80px;
   color: #111;
-  /* font-family: "Pretendard", sans-serif; */
+  font-family: "NexonLv1Gothic", sans-serif;
 }
 
-/* 헤더 */
+/* Header */
 .header {
   display: flex;
   justify-content: space-between;
@@ -127,16 +127,16 @@ const saveKeyword = (tag) => {
   background: #00c896;
   color: #fff;
   font-weight: 600;
+  font-size: 13px;
   padding: 8px 16px;
   border-radius: 8px;
   text-decoration: none;
-  transition: 0.2s;
 }
 .saved-btn:hover {
   background: #00b487;
 }
 
-/* 알림 */
+/* Notice */
 .notice-box {
   background: #e9f8f2;
   border: 1px solid #a2f1d6;
@@ -146,7 +146,7 @@ const saveKeyword = (tag) => {
   margin-bottom: 24px;
 }
 
-/* 직무 카드 */
+/* Job Cards */
 .job-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -200,13 +200,12 @@ const saveKeyword = (tag) => {
   border-radius: 8px;
   font-size: 12px;
   cursor: pointer;
-  transition: 0.2s;
 }
 .tag-btn:hover {
   background: #a2f1d6;
 }
 
-/* 힌트 */
+/* Hint */
 .hint-box {
   background: #e9f8f2;
   border: 1px solid #a2f1d6;

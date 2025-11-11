@@ -6,12 +6,7 @@
 
       <!-- 검색창 -->
       <div class="search-bar">
-        <input
-          type="text"
-          placeholder="키워드를 입력하세요 (예: 인공지능, 백엔드, AI 개발자)"
-          v-model="keyword"
-          @keyup.enter="searchNews"
-        />
+        <input type="text" placeholder="키워드를 입력하세요 (예: 인공지능, 백엔드, AI 개발자)" v-model="keyword" @keyup.enter="searchNews" />
         <button @click="searchNews">검색</button>
       </div>
 
@@ -23,18 +18,9 @@
         </div>
 
         <div class="tags">
-          <div
-            v-for="(k, i) in recentKeywords"
-            :key="i"
-            class="tag"
-            @click="clickKeyword(k)"
-          >
+          <div v-for="(k, i) in recentKeywords" :key="i" class="tag" @click="clickKeyword(k)">
             <span>#{{ k }}</span>
-            <i
-              class="ri-close-circle-fill"
-              @click.stop="deleteKeyword(k)"
-              title="삭제"
-            ></i>
+            <i class="ri-close-circle-fill" @click.stop="deleteKeyword(k)" title="삭제"></i>
           </div>
         </div>
       </div>
@@ -47,16 +33,15 @@
     <section class="news-section">
       <h3>AI 뉴스 요약</h3>
       <p class="desc">
-        팩트체크·편향감지까지 적용된 신뢰할 수 있는 채용 시장 뉴스 인사이트
+        AI가 사용자의 직무와 관심 키워드를 기반으로,
+        관련성이 높은 채용·기술 뉴스를 자동 추천합니다.<br />
+        각 뉴스는 신뢰도·감정·편향 여부까지 함께 분석되어
+        객관적인 시장 인사이트를 제공합니다.
       </p>
 
+
       <div class="news-grid">
-        <div
-          v-for="(item, i) in visibleNews"
-          :key="i"
-          class="news-card"
-          @click="openDetail(item)"
-        >
+        <div v-for="(item, i) in visibleNews" :key="i" class="news-card" @click="openDetail(item)">
           <!-- 상단 태그 -->
           <div class="tag-row">
             <span class="tag category">채용 시장</span>
@@ -79,10 +64,7 @@
           <!-- 편향 감지 -->
           <div class="bias">
             <span class="bias-label">편향 감지</span>
-            <span
-              class="bias-status"
-              :class="{ biasYes: item.bias_detected, biasNo: !item.bias_detected }"
-            >
+            <span class="bias-status" :class="{ biasYes: item.bias_detected, biasNo: !item.bias_detected }">
               {{ item.bias_detected ? item.bias_type : "없음" }}
             </span>
           </div>
@@ -105,11 +87,7 @@
     </section>
 
     <!-- 상세보기 -->
-    <NewsDetailModal
-      v-if="selectedNews"
-      :news="selectedNews"
-      @close="selectedNews = null"
-    />
+    <NewsDetailModal v-if="selectedNews" :news="selectedNews" @close="selectedNews = null" />
   </div>
 </template>
 
@@ -307,7 +285,7 @@ const openDetail = (item) => (selectedNews.value = item);
 <style scoped>
 .trend-news {
   background: #fff;
-  color: #000;
+  color: #111;
   font-family: "NexonLv1Gothic", sans-serif;
 }
 
@@ -321,10 +299,12 @@ const openDetail = (item) => (selectedNews.value = item);
   margin-left: calc(50% - 50vw);
 }
 .hero h2 {
-  font-size: 22px;
+  font-size: 26px;
   font-weight: 700;
   margin-bottom: 28px;
+  letter-spacing: -0.3px;
 }
+
 .search-bar {
   display: flex;
   justify-content: center;
@@ -343,6 +323,7 @@ const openDetail = (item) => (selectedNews.value = item);
   border: none;
   color: #000;
   font-weight: 600;
+  font-size: 14px;
   padding: 10px 22px;
   border-radius: 25px;
   cursor: pointer;
@@ -400,10 +381,22 @@ const openDetail = (item) => (selectedNews.value = item);
   color: #ff6666;
 }
 
-/* 뉴스 섹션 이하 동일 */
+/* 뉴스 섹션 */
 .news-section {
   padding: 40px 80px 100px;
 }
+.news-section h3 {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.news-section .desc {
+  font-size: 14px;
+  color: #444;
+  line-height: 1.7;
+  margin-bottom: 24px;
+}
+
 .news-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -424,44 +417,7 @@ const openDetail = (item) => (selectedNews.value = item);
   border-color: #d0d0d0;
 }
 
-/* 제목/요약/태그/편향/신뢰도 동일 */
-.title {
-  font-size: 16px;
-  font-weight: 700;
-  color: #111;
-  margin: 8px 0 12px;
-}
-.summary-box {
-  background: #f9fdfb;
-  border: 1px solid #e4f7ee;
-  border-radius: 10px;
-  padding: 14px 16px;
-  font-size: 13px;
-  color: #333;
-  line-height: 1.6;
-  margin-bottom: 12px;
-}
-.summary-box ul {
-  margin: 0;
-  padding-left: 18px;
-}
-.summary-box li {
-  list-style-type: disc;
-  margin-bottom: 4px;
-}
-.keywords {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-bottom: 8px;
-}
-.keywords span {
-  background: #f3f3f3;
-  border-radius: 8px;
-  padding: 3px 8px;
-  font-size: 12px;
-  color: #444;
-}
+/* 카드 내부 */
 .tag-row {
   display: flex;
   gap: 6px;
@@ -488,6 +444,47 @@ const openDetail = (item) => (selectedNews.value = item);
   background: #ffecec;
   color: #e85b5b;
 }
+
+.title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #111;
+  margin: 8px 0 12px;
+}
+
+.summary-box {
+  background: #f9fdfb;
+  border: 1px solid #e4f7ee;
+  border-radius: 10px;
+  padding: 14px 16px;
+  font-size: 13px;
+  color: #333;
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+.summary-box ul {
+  margin: 0;
+  padding-left: 18px;
+}
+.summary-box li {
+  list-style-type: disc;
+  margin-bottom: 4px;
+}
+
+.keywords {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.keywords span {
+  background: #f3f3f3;
+  border-radius: 8px;
+  padding: 3px 8px;
+  font-size: 12px;
+  color: #444;
+}
+
 .bias {
   display: flex;
   align-items: center;
@@ -512,6 +509,7 @@ const openDetail = (item) => (selectedNews.value = item);
   background: #f3f3f3;
   color: #555;
 }
+
 .trust {
   display: flex;
   align-items: center;
@@ -537,8 +535,8 @@ const openDetail = (item) => (selectedNews.value = item);
   font-size: 12px;
 }
 .source {
-  font-size: 11px;
-  color: #999;
+  font-size: 11.5px;
+  color: #888;
   text-align: right;
 }
 </style>

@@ -145,67 +145,71 @@ const resetFilter = () => {
   background: #f9faf9;
   padding: 40px 80px;
   color: #111;
+  font-family: "NexonLv1Gothic", sans-serif;
 }
 
-/* 상단 */
+/* Header */
 .header {
   display: flex;
   flex-direction: column;
-  /* 🔥 세로 정렬 */
   align-items: flex-start;
-  /* 왼쪽 정렬 */
   gap: 4px;
-  /* 두 줄 간 간격 */
   margin-bottom: 16px;
 }
-
 .back {
   color: #00c896;
   text-decoration: none;
   font-weight: 600;
   font-size: 14px;
 }
-
 .header h2 {
   font-size: 22px;
   font-weight: 700;
-  margin: 0;
 }
 
-/* 검색 */
+/* Search */
 .search-area {
   display: flex;
   gap: 8px;
   margin: 24px 0;
 }
-
 .search-input {
   flex: 1;
   border: 1px solid #ccc;
   border-radius: 8px;
   padding: 8px 12px;
+  font-size: 13px;
 }
-
 .filter-btn {
   background: #00c896;
   color: white;
   border: none;
   border-radius: 8px;
   padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 600;
   cursor: pointer;
 }
 
-/* 키워드 카드 */
+/* Keyword Cards */
 .keyword-container {
   display: flex;
   flex-direction: column;
   gap: 22px;
 }
-
 .category-header {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   margin-bottom: 8px;
+}
+.category-header h3 {
+  font-size: 15px;
+  font-weight: 700;
+}
+.category-header span {
+  font-size: 12px;
+  color: #666;
 }
 
 .keyword-list {
@@ -213,7 +217,6 @@ const resetFilter = () => {
   flex-wrap: wrap;
   gap: 10px;
 }
-
 .keyword-card {
   background: #fff;
   border: 1px solid #a2f1d6;
@@ -221,17 +224,20 @@ const resetFilter = () => {
   padding: 10px 14px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
   font-size: 13px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  transition: 0.2s;
 }
-
+.keyword-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+}
 .keyword-card .top {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
-
+.word {
+  font-weight: 600;
+}
 .delete-btn {
   background: none;
   border: none;
@@ -239,13 +245,12 @@ const resetFilter = () => {
   opacity: 0.6;
   transition: 0.2s;
 }
-
 .delete-btn:hover {
   opacity: 1;
   color: #ff5b5b;
 }
 
-/* 통계 */
+/* Stats */
 .stats-box {
   display: flex;
   justify-content: space-around;
@@ -255,39 +260,37 @@ const resetFilter = () => {
   padding: 20px;
   margin-top: 36px;
 }
-
 .stat p {
   font-size: 13px;
   color: #555;
 }
-
 .stat h3 {
-  font-size: 18px;
-  color: #00c896;
+  font-size: 17px;
   font-weight: 700;
+  color: #00c896;
 }
 
-/* 전체 삭제 */
+/* Actions */
 .actions {
   text-align: right;
   margin-top: 18px;
 }
-
 .clear-all-btn {
   background: #ff5b5b;
   color: white;
   border: none;
   padding: 8px 16px;
   border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
   cursor: pointer;
   transition: 0.2s;
 }
-
 .clear-all-btn:hover {
   background: #e64e4e;
 }
 
-/* 추천 */
+/* Recommend */
 .recommend-box {
   background: #e9f8f2;
   border: 1px solid #a2f1d6;
@@ -295,32 +298,51 @@ const resetFilter = () => {
   padding: 24px;
   margin-top: 40px;
 }
-
+.recommend-box h3 {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
 .recommend-grid {
   display: flex;
   gap: 20px;
 }
-
 .recommend-card {
   flex: 1;
   background: #fff;
   border-radius: 10px;
   padding: 18px;
   border: 1px solid #dff7ed;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+.recommend-card h4 {
+  font-size: 15px;
+  font-weight: 700;
+  color: #111;
+  margin-bottom: 6px;
+}
+.recommend-card p {
+  font-size: 13px;
+  color: #555;
+  line-height: 1.6;
 }
 
+/* Empty */
 .empty {
   text-align: center;
   margin-top: 40px;
   color: #666;
+  font-size: 14px;
+  font-weight: 500;
 }
 
+/* Delete Icon */
 .close-icon {
-  font-size: 28px;
+  font-size: 22px;
   color: #ff4d4f;
   cursor: pointer;
+  transition: 0.2s;
 }
-
 .close-icon:hover {
   color: #ff7875;
 }
