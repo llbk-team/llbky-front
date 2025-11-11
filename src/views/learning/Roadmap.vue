@@ -27,7 +27,7 @@
       </div>
     </div>
 
-    <!-- ✅ AI 질문 모달 -->
+    <!-- AI 질문 모달 -->
     <div v-if="showAiModal" class="ai-modal-overlay" @click.self="closeAiModal">
       <div class="ai-modal-content shadow-lg">
         <div class="d-flex justify-content-between align-items-center mb-3">
@@ -68,10 +68,9 @@
       </div>
     </footer>
 
-    <!-- ✅ 저장 완료 모달 -->
+    <!-- 저장 완료 모달 -->
     <div v-if="showSaveModal" class="save-modal-overlay" @click.self="closeSaveModal">
       <div class="save-modal-content shadow-lg text-center">
-        <div class="check-icon mb-3">✅</div>
         <h4 class="fw-bold mb-3">플랜이 저장되었습니다!</h4>
 
         <div class="alert alert-mint-light mb-4">
@@ -82,7 +81,6 @@
         <p class="fw-semibold mb-3">👉 다음 단계로 이동할까요?</p>
 
         <div class="d-flex justify-content-center gap-3 mb-4">
-
           <router-link :to="`/learning/start`" class="btn btn-green" @click="startLearning">
             ▶ 학습 시작하기
           </router-link>
@@ -194,9 +192,6 @@ function goToMyLearning() {
 </script>
 
 <style scoped>
-/* scoped: 이 스타일은 roadmap.vue 컴포넌트 안에서만 적용됩니다.
-  부트스트랩을 기반으로 하되, 커스텀 디자인을 덮어씌웁니다.
-*/
 
 .roadmap-container {
   max-width: 1100px;
@@ -348,10 +343,11 @@ function goToMyLearning() {
 .ai-input {
   display: flex;
   align-items: center;
-  width: 95%;
+  width: 100%;
 }
 
 .ai-input input {
+  flex: 1;
   height: 44px;
   /* 입력창 높이 고정 */
   border: 1px solid #d1d5db;
@@ -363,7 +359,7 @@ function goToMyLearning() {
 .save-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(0, 0, 0, 0.45); /* 조금 더 진한 블랙 투명도 */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -371,18 +367,20 @@ function goToMyLearning() {
 }
 
 .save-modal-content {
-  background: #f0fdf4;
-  /* 민트 톤 베이스 */
+  background: #FFFFFF; /* 화이트 베이스 */
+  border: 1px solid #EAEBEC; /* 은은한 회색 라인 */
   border-radius: 1rem;
   padding: 2rem;
   width: 90%;
   max-width: 500px;
   animation: fadeIn 0.3s ease-in-out;
-  color: #111;
+  color: #111111; /* 진한 텍스트 */
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
 }
 
 .check-icon {
   font-size: 3rem;
+  color: #71EBBE; /* 메인 민트 포인트 */
 }
 
 .alert-mint-light {
@@ -394,7 +392,7 @@ function goToMyLearning() {
 }
 
 .btn-green {
-  background-color: #10b981;
+  background-color: #000000;
   color: #fff;
   font-weight: 600;
   border-radius: 10px;
@@ -402,31 +400,24 @@ function goToMyLearning() {
   border: none;
 }
 
-.btn-green:hover {
-  background-color: #059669;
-}
-
 .btn-outline-mint {
-  background-color: #ffffff;
-  color: #166534;
-  border: 2px solid #a7f3d0;
+  background-color: #FFFFFF;
+  color: #111111;
+  border: 1.5px solid #000000;
   font-weight: 600;
   border-radius: 10px;
   padding: 0.6rem 1.2rem;
-}
-
-.btn-outline-mint:hover {
-  background-color: #dcfce7;
+  transition: 0.2s;
 }
 
 .ai-tip {
-  background-color: #ecfdf5;
-  color: #065f46;
+  background-color: #F1F2F3;
+  color: #111111;
   border-radius: 10px;
   padding: 0.8rem;
   font-size: 0.9rem;
-  border: 1px solid #bbf7d0;
-  line-height: 1.5;
+  border: 1px solid #EAEBEC;
+  line-height: 1.6;
 }
 
 @keyframes fadeIn {
