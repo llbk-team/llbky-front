@@ -3,9 +3,10 @@
     <div class="filter-item">
       <label>기간</label>
       <select v-model="period">
+        <option value="">전체</option> <!-- ✅ 기본값 -->
+        <option value="day">오늘</option>
         <option value="week">최근 1주</option>
         <option value="month">최근 1개월</option>
-        <option value="day">오늘</option>
       </select>
     </div>
 
@@ -37,7 +38,7 @@
 import { ref, watch, defineEmits } from "vue";
 const emit = defineEmits(["filter-change"]);
 
-const period = ref("week");
+const period = ref(""); // ✅ 전체(default)
 const sentiment = ref("");
 const biasOnly = ref(false);
 const trustMin = ref(70);
@@ -63,7 +64,6 @@ watch([period, sentiment, biasOnly, trustMin], () => {
   border-radius: 14px;
   padding: 14px 26px;
   margin: 30px 80px 20px;
-  font-family: "Pretendard", sans-serif;
 }
 
 /* 공통 항목 */
@@ -74,7 +74,6 @@ watch([period, sentiment, biasOnly, trustMin], () => {
   font-size: 13px;
   color: #333;
 }
-
 .filter-item label {
   font-weight: 600;
   color: #222;

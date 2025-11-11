@@ -4,9 +4,39 @@
     <section class="hero">
       <h2>AI가 분석해주는 채용 트렌드</h2>
 
+      <!-- 검색창 -->
       <div class="search-bar">
-        <input type="text" placeholder="키워드를 입력하세요 (예: 인공지능, 백엔드, AI 개발자)" v-model="keyword" @keyup.enter="searchNews" />
+        <input
+          type="text"
+          placeholder="키워드를 입력하세요 (예: 인공지능, 백엔드, AI 개발자)"
+          v-model="keyword"
+          @keyup.enter="searchNews"
+        />
         <button @click="searchNews">검색</button>
+      </div>
+
+      <!-- 🔹 최근 검색어 표시 -->
+      <div class="recent-keywords" v-if="recentKeywords.length">
+        <div class="recent-header">
+          <span class="label">최근 검색:</span>
+          <button class="clear-all" @click="clearAll">전체삭제</button>
+        </div>
+
+        <div class="tags">
+          <div
+            v-for="(k, i) in recentKeywords"
+            :key="i"
+            class="tag"
+            @click="clickKeyword(k)"
+          >
+            <span>#{{ k }}</span>
+            <i
+              class="ri-close-circle-fill"
+              @click.stop="deleteKeyword(k)"
+              title="삭제"
+            ></i>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -21,11 +51,18 @@
       </p>
 
       <div class="news-grid">
-        <div v-for="(item, i) in visibleNews" :key="i" class="news-card" @click="openDetail(item)">
+        <div
+          v-for="(item, i) in visibleNews"
+          :key="i"
+          class="news-card"
+          @click="openDetail(item)"
+        >
           <!-- 상단 태그 -->
           <div class="tag-row">
             <span class="tag category">채용 시장</span>
-            <span class="tag" :class="item.sentiment">{{ item.sentimentLabel }}</span>
+            <span class="tag" :class="item.sentiment">{{
+              item.sentimentLabel
+            }}</span>
           </div>
 
           <!-- 제목 -->
@@ -42,7 +79,10 @@
           <!-- 편향 감지 -->
           <div class="bias">
             <span class="bias-label">편향 감지</span>
-            <span class="bias-status" :class="{ biasYes: item.bias_detected, biasNo: !item.bias_detected }">
+            <span
+              class="bias-status"
+              :class="{ biasYes: item.bias_detected, biasNo: !item.bias_detected }"
+            >
               {{ item.bias_detected ? item.bias_type : "없음" }}
             </span>
           </div>
@@ -56,23 +96,30 @@
               </div>
               <span class="score">{{ item.trust }}%</span>
             </div>
-            <div class="source">출처: {{ item.source }} · {{ item.date }}</div>
+            <div class="source">
+              출처: {{ item.source }} · {{ item.date }}
+            </div>
           </div>
         </div>
       </div>
     </section>
 
     <!-- 상세보기 -->
-    <NewsDetailModal v-if="selectedNews" :news="selectedNews" @close="selectedNews = null" />
+    <NewsDetailModal
+      v-if="selectedNews"
+      :news="selectedNews"
+      @close="selectedNews = null"
+    />
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import FilterBar from "@/components/bar/FilterBar.vue";
 import NewsDetailModal from "@/components/modal/NewsDetailModal.vue";
 
 const keyword = ref("");
+const recentKeywords = ref([]);
 const selectedNews = ref(null);
 const filters = ref({
   period: "week",
@@ -82,7 +129,7 @@ const filters = ref({
 });
 
 /* ------------------------------
-   뉴스 데이터 (예시 8개)
+   뉴스 데이터 (6개 고정)
 ------------------------------ */
 const newsList = ref([
   {
@@ -100,7 +147,6 @@ LLM, RAG, MLOps 등 신기술 직군 수요가 꾸준히 확대 중입니다.
     bias_type: "기술 과도 홍보 경향",
     date: "2025.11.09",
     source: "ZDNet Korea",
-    source_url: "https://zdnet.co.kr/news/ai-hiring"
   },
   {
     title: "백엔드 개발자 채용 시장 안정세, 경력직 선호",
@@ -118,7 +164,6 @@ MSA·쿠버네티스 등 인프라 지식 보유자 우대 경향이 나타납�
     date: "2025.11.01",
     source: "커리어 인사이트",
   },
-
   {
     title: "클라우드 및 DevOps 직군 채용 32% 증가",
     summary_short: `
@@ -186,7 +231,7 @@ UI/UX 복합 역량 보유자의 수요가 증가하고 있습니다.
 ]);
 
 /* ------------------------------
-   필터 및 검색 적용
+   필터 및 검색
 ------------------------------ */
 const filteredNews = computed(() =>
   newsList.value.filter((n) => {
@@ -207,35 +252,62 @@ const filteredNews = computed(() =>
   })
 );
 
-// 6개만 표시
 const visibleNews = computed(() => filteredNews.value.slice(0, 6));
 
 /* ------------------------------
-   함수
+   검색 및 키워드 관련
 ------------------------------ */
+const searchNews = () => {
+  if (!keyword.value.trim()) return;
+  const term = keyword.value.trim();
+  const saved = JSON.parse(localStorage.getItem("search_keywords") || "[]");
+  const updated = [term, ...saved.filter((k) => k !== term)].slice(0, 5);
+  localStorage.setItem("search_keywords", JSON.stringify(updated));
+  recentKeywords.value = updated;
+};
+
+const clickKeyword = (k) => {
+  keyword.value = k;
+  searchNews();
+};
+
+const deleteKeyword = (k) => {
+  const updated = recentKeywords.value.filter((item) => item !== k);
+  recentKeywords.value = updated;
+  localStorage.setItem("search_keywords", JSON.stringify(updated));
+};
+
+const clearAll = () => {
+  recentKeywords.value = [];
+  localStorage.removeItem("search_keywords");
+};
+
+onMounted(() => {
+  recentKeywords.value = JSON.parse(localStorage.getItem("search_keywords") || "[]");
+});
+
 const formatSummary = (summary) => {
   if (!summary) return "";
   return (
-    `<ul>` +
+    "<ul>" +
     summary
       .trim()
       .split("\n")
       .map((line) => `<li>${line.trim()}</li>`)
       .join("") +
-    `</ul>`
+    "</ul>"
   );
 };
+
 const applyFilter = (newFilters) => (filters.value = newFilters);
 const openDetail = (item) => (selectedNews.value = item);
-const searchNews = () => { };
 </script>
 
 <style scoped>
 .trend-news {
   background: #fff;
-  /* ✅ 페이지 전체 배경을 흰색으로 */
   color: #000;
-  font-family: "Pretendard", sans-serif;
+  font-family: "NexonLv1Gothic", sans-serif;
 }
 
 /* Hero */
@@ -247,19 +319,16 @@ const searchNews = () => { };
   width: 100vw;
   margin-left: calc(50% - 50vw);
 }
-
 .hero h2 {
   font-size: 22px;
-  font-weight: 600;
+  font-weight: 700;
   margin-bottom: 28px;
 }
-
 .search-bar {
   display: flex;
   justify-content: center;
   gap: 10px;
 }
-
 .search-bar input {
   width: 440px;
   padding: 12px 18px;
@@ -268,7 +337,6 @@ const searchNews = () => { };
   outline: none;
   font-size: 14px;
 }
-
 .search-bar button {
   background: #71ebbe;
   border: none;
@@ -279,50 +347,89 @@ const searchNews = () => { };
   cursor: pointer;
 }
 
-/* 뉴스 섹션 */
+/* 최근 검색어 */
+.recent-keywords {
+  margin-top: 18px;
+  text-align: center;
+}
+.recent-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+.clear-all {
+  background: none;
+  border: none;
+  color: #ccc;
+  font-size: 12px;
+  cursor: pointer;
+}
+.clear-all:hover {
+  color: #fff;
+}
+.recent-keywords .tags {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+.recent-keywords .tag {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: #f3f3f3;
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-size: 12px;
+  color: #333;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.recent-keywords .tag:hover {
+  background: #ddf3eb;
+  color: #00c896;
+}
+.recent-keywords .tag i {
+  font-size: 14px;
+  color: #aaa;
+  cursor: pointer;
+}
+.recent-keywords .tag i:hover {
+  color: #ff6666;
+}
+
+/* 뉴스 섹션 이하 동일 */
 .news-section {
   padding: 40px 80px 100px;
 }
-
 .news-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 28px;
 }
-
-/* 카드 */
 .news-card {
   background: #ffffff;
   border-radius: 16px;
   padding: 24px;
-  /* ✅ 카드 경계선 + 부드러운 그림자 */
   border: 1px solid #e5e5e5;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
   transition: 0.2s;
   cursor: pointer;
 }
-
 .news-card:hover {
   transform: translateY(-3px);
-  /* ✅ hover 시 조금 더 강조 */
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
   border-color: #d0d0d0;
 }
 
-
-/* 제목 */
+/* 제목/요약/태그/편향/신뢰도 동일 */
 .title {
   font-size: 16px;
-  /* ✅ 살짝 줄임 */
   font-weight: 700;
   color: #111;
-  margin: 8px 0 12px 0;
-  /* ✅ 상하 여백으로 띄움 */
-  line-height: 1.4;
-  /* ✅ 줄 간격 조정 */
+  margin: 8px 0 12px;
 }
-
-/* 요약 */
 .summary-box {
   background: #f9fdfb;
   border: 1px solid #e4f7ee;
@@ -332,27 +439,21 @@ const searchNews = () => { };
   color: #333;
   line-height: 1.6;
   margin-bottom: 12px;
-  /* ✅ 키워드와 간격 추가 */
 }
-
 .summary-box ul {
   margin: 0;
   padding-left: 18px;
 }
-
 .summary-box li {
   list-style-type: disc;
   margin-bottom: 4px;
 }
-
-/* 키워드 */
 .keywords {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
   margin-bottom: 8px;
 }
-
 .keywords span {
   background: #f3f3f3;
   border-radius: 8px;
@@ -360,88 +461,65 @@ const searchNews = () => { };
   font-size: 12px;
   color: #444;
 }
-
-/* 태그 */
 .tag-row {
   display: flex;
   gap: 6px;
 }
-
 .tag {
   font-size: 11px;
   font-weight: 600;
   border-radius: 10px;
   padding: 3px 8px;
 }
-
 .tag.category {
   background: #eafff5;
   color: #00a877;
 }
-
 .tag.positive {
   background: #eafff5;
   color: #00c896;
 }
-
 .tag.neutral {
   background: #f5f5f5;
   color: #555;
 }
-
 .tag.negative {
   background: #ffecec;
   color: #e85b5b;
 }
-
-/* 편향 */
 .bias {
   display: flex;
   align-items: center;
   gap: 10px;
   margin-bottom: 8px;
 }
-
 .bias-label {
   font-size: 12px;
   color: #666;
 }
-
 .bias-status {
   font-size: 12px;
   font-weight: 600;
   border-radius: 8px;
   padding: 3px 8px;
 }
-
 .biasYes {
   background: #ffecec;
   color: #e85b5b;
 }
-
 .biasNo {
   background: #f3f3f3;
   color: #555;
 }
-
-/* 신뢰도 + 출처 */
-.card-footer {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
 .trust {
   display: flex;
   align-items: center;
   gap: 8px;
 }
-
 .trust .label {
   font-size: 12px;
   color: #777;
 }
-
 .trust .bar {
   flex: 1;
   height: 6px;
@@ -449,17 +527,14 @@ const searchNews = () => { };
   border-radius: 4px;
   overflow: hidden;
 }
-
 .trust .fill {
   height: 100%;
   background: #71ebbe;
 }
-
 .trust .score {
   font-weight: 700;
   font-size: 12px;
 }
-
 .source {
   font-size: 11px;
   color: #999;

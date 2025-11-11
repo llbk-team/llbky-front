@@ -219,7 +219,7 @@ onMounted(async () => {
   background: #ffffff;
   /* ✅ 페이지 전체 흰색 */
   padding: 40px 80px 100px;
-  font-family: "Pretendard", sans-serif;
+  /* font-family: "Pretendard", sans-serif; */
   color: #111;
 }
 

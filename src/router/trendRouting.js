@@ -11,8 +11,11 @@ const routes = [
   {
     path: '/trend/insight',
     component: () => import('@/views/trend/Insight.vue')
+  },
+  {
+    path: '/trend/saved',
+    component: () => import('@/views/trend/SavedKeyword.vue')
   }
-
 ]
 
 
