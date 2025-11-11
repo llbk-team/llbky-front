@@ -73,7 +73,7 @@ const subMenus = {
   resume: [
     { label: "서류", path: "/resume/list" },
     { label: "서류작성", path: "/resume/write" },
-    { label: "서류코칭", path: "/resume/coach" },
+   
 
   ],
   interview: [
