@@ -3,13 +3,8 @@
     <!-- 상단 -->
     <div class="header">
       <router-link to="/trend/insight" class="back">← 돌아가기</router-link>
-      <h2>저장한 키워드</h2>
-    </div>
-
-    <!-- 검색 -->
-    <div class="search-area">
-      <input v-model="searchQuery" placeholder="키워드 검색..." class="search-input" />
-      <button class="filter-btn" @click="resetFilter">전체</button>
+      <h2>내 키워드 저장소</h2>
+      <p class="subtitle">AI 인사이트에서 저장한 키워드를 한눈에 확인하세요.</p>
     </div>
 
     <!-- 키워드 리스트 -->
@@ -23,7 +18,9 @@
           <div class="keyword-card" v-for="(k, i) in group" :key="i">
             <div class="top">
               <span class="word">{{ k }}</span>
-              <button class="delete-btn" @click="deleteKeyword(k)"><i class="ri-close-circle-fill close-icon"></i></button>
+              <button class="delete-btn" @click="deleteKeyword(k)">
+                <i class="ri-close-circle-fill close-icon"></i>
+              </button>
             </div>
             <small>{{ today }}</small>
           </div>
@@ -34,8 +31,8 @@
     <!-- 비어있을 때 -->
     <div v-else class="empty">
       <p>저장된 키워드가 없습니다 😢</p>
+      <p class="empty-hint">AI 인사이트 페이지에서 관심 키워드를 추가해보세요!</p>
     </div>
-
 
     <!-- 통계 -->
     <div class="stats-box" v-if="keywords.length > 0">
@@ -57,21 +54,6 @@
     <div class="actions" v-if="keywords.length > 0">
       <button class="clear-all-btn" @click="clearAll">전체 삭제</button>
     </div>
-
-    <!-- 추천 -->
-    <div class="recommend-box" v-if="keywords.length > 0">
-      <h3>💡 저장한 키워드 기반 추천</h3>
-      <div class="recommend-grid">
-        <div class="recommend-card">
-          <h4>🎓 학습 추천</h4>
-          <p>저장된 키워드를 기반으로 학습 경로를 제안합니다.</p>
-        </div>
-        <div class="recommend-card">
-          <h4>📈 트렌드 알림</h4>
-          <p>관심 키워드의 최신 뉴스와 채용 동향을 제공합니다.</p>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -79,14 +61,13 @@
 import { ref, computed, onMounted } from "vue";
 
 const keywords = ref([]);
-const searchQuery = ref("");
 const today = new Date().toISOString().split("T")[0];
 
 onMounted(() => {
   keywords.value = JSON.parse(localStorage.getItem("user_keywords") || "[]");
 });
 
-// 1️⃣ 기본 카테고리별 분류
+// ✅ 기본 카테고리별 분류
 const groupedKeywords = computed(() => {
   const groups = {
     "AI 엔지니어": [],
@@ -99,25 +80,23 @@ const groupedKeywords = computed(() => {
       groups["AI 엔지니어"].push(k);
     else if (["AWS", "Kubernetes", "Docker", "DevOps"].includes(k))
       groups["클라우드 엔지니어"].push(k);
-    else if (["Pandas", "SQL", "Machine Learning"].includes(k))
+    else if (["Pandas", "SQL", "Machine Learning", "Visualization"].includes(k))
       groups["데이터 사이언티스트"].push(k);
     else groups["보안 전문가"].push(k);
   });
   return groups;
 });
 
-// 2️⃣ 빈 카테고리 제외 & 검색 필터 반영
+// ✅ 빈 카테고리 제외
 const filteredKeywords = computed(() => {
   const filtered = {};
   for (const [category, group] of Object.entries(groupedKeywords.value)) {
-    const filteredGroup = group.filter((k) =>
-      k.toLowerCase().includes(searchQuery.value.toLowerCase())
-    );
-    if (filteredGroup.length > 0) filtered[category] = filteredGroup;
+    if (group.length > 0) filtered[category] = group;
   }
   return filtered;
 });
 
+// ✅ 키워드 삭제
 const deleteKeyword = (word) => {
   if (confirm(`'${word}' 키워드를 삭제하시겠습니까?`)) {
     const saved = JSON.parse(localStorage.getItem("user_keywords") || "[]");
@@ -127,18 +106,14 @@ const deleteKeyword = (word) => {
   }
 };
 
+// ✅ 전체 삭제
 const clearAll = () => {
   if (confirm("저장된 모든 키워드를 삭제하시겠습니까?")) {
     localStorage.removeItem("user_keywords");
     keywords.value = [];
   }
 };
-
-const resetFilter = () => {
-  searchQuery.value = "";
-};
 </script>
-
 
 <style scoped>
 .saved-page {
@@ -153,7 +128,7 @@ const resetFilter = () => {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 4px;
+  gap: 6px;
   margin-bottom: 16px;
 }
 .back {
@@ -166,29 +141,9 @@ const resetFilter = () => {
   font-size: 22px;
   font-weight: 700;
 }
-
-/* Search */
-.search-area {
-  display: flex;
-  gap: 8px;
-  margin: 24px 0;
-}
-.search-input {
-  flex: 1;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  padding: 8px 12px;
+.subtitle {
   font-size: 13px;
-}
-.filter-btn {
-  background: #00c896;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 8px 14px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
+  color: #666;
 }
 
 /* Keyword Cards */
@@ -290,43 +245,6 @@ const resetFilter = () => {
   background: #e64e4e;
 }
 
-/* Recommend */
-.recommend-box {
-  background: #e9f8f2;
-  border: 1px solid #a2f1d6;
-  border-radius: 12px;
-  padding: 24px;
-  margin-top: 40px;
-}
-.recommend-box h3 {
-  font-size: 16px;
-  font-weight: 700;
-  margin-bottom: 16px;
-}
-.recommend-grid {
-  display: flex;
-  gap: 20px;
-}
-.recommend-card {
-  flex: 1;
-  background: #fff;
-  border-radius: 10px;
-  padding: 18px;
-  border: 1px solid #dff7ed;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-}
-.recommend-card h4 {
-  font-size: 15px;
-  font-weight: 700;
-  color: #111;
-  margin-bottom: 6px;
-}
-.recommend-card p {
-  font-size: 13px;
-  color: #555;
-  line-height: 1.6;
-}
-
 /* Empty */
 .empty {
   text-align: center;
@@ -334,6 +252,11 @@ const resetFilter = () => {
   color: #666;
   font-size: 14px;
   font-weight: 500;
+}
+.empty-hint {
+  font-size: 13px;
+  color: #888;
+  margin-top: 6px;
 }
 
 /* Delete Icon */
