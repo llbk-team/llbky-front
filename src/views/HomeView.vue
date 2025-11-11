@@ -12,12 +12,12 @@
           이력서 작성부터 면접 준비, 학습 트렌드 분석까지<br />
           당신만을 위한 맞춤 커리어 코칭으로 목표를 실현하세요.
         </p>
-        <button class="btn-main">시작하기</button>
+        <button class="btn-main" @click="router.push('/login')">시작하기</button>
       </div>
     </section>
 
     <!-- 기능 카드 -->
-    <section class="features">
+    <section class="features" id="features">
       <h2>핵심 기능</h2>
       <p class="subtitle">AI 기술로 당신의 취업을 완벽하게 준비하세요</p>
 
@@ -58,8 +58,8 @@
       <p>AI 커리어 코칭의 완성형과 함께 당신의 꿈을 실현해보세요</p>
 
       <div class="btn-group">
-        <button class="btn-main">시작하기</button>
-        <button class="btn-sub">더 알아보기</button>
+        <button class="btn-main" @click="router.push('/login')">시작하기</button>
+         <button class="btn-sub" @click="scrollToFeatures">더 알아보기</button>
       </div>
 
       <p class="footer">© 2025 Career Coach | Let AI guide your next career move.</p>
@@ -68,6 +68,17 @@
 </template>
 
 <script setup>
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+
+const scrollToFeatures = () => {
+  const el = document.getElementById('features')
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth' }) // 부드럽게 스크롤
+  }
+}
+
 const features = [
   { icon: "ri-file-text-line", title: "이력서 코칭", desc: "AI 기반 이력서 분석 및 피드백 제공" },
   { icon: "ri-user-voice-line", title: "면접 코칭", desc: "AI 기반 면접 답변 분석 및 피드백 제공" },
