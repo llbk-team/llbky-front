@@ -565,7 +565,7 @@ onMounted(() => {
   display: flex;
   min-height: 100vh;
   background-color: #EFF0F1;
-  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+  
 }
 
 /* 사이드바 */

@@ -265,7 +265,7 @@ onMounted(() => {
 .resume-main {
   min-height: 100vh;
   background: #f8f9fa;
-  font-family: 'Pretendard', sans-serif;
+ 
 }
 
 .main-container {
