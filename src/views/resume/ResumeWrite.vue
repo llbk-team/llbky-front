@@ -5,9 +5,12 @@
 
     <!-- 메인 컨테이너 -->
     <div class="main-container">
-
+      
       <!-- 이력서 작성 폼 -->
       <div class="resume-form-container">
+        <div class="breadcrumb">
+          <span>my > 서류작성 > 이력서</span>
+        </div>
         <div class="form-header">
           <h1>이력서 작성하기</h1>
           <p>단순한 정보를 입력하여보면 자동으로 양식에 맞게 내용까지 추천받을 수 있습니다.<br>
@@ -534,27 +537,29 @@ const previewResume = () => {
 
 // 이력서 저장
 const submitResume = async () => {
-  try {
-    const response = await fetch('http://localhost:8081/api/resume', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(resumeData)
-    })
+  // try {
+  //   const response = await fetch('http://localhost:8081/api/resume', {
+  //     method: 'POST',
+  //     headers: {
+  //       'Content-Type': 'application/json'
+  //     },
+  //     body: JSON.stringify(resumeData)
+  //   })
     
-    if (response.ok) {
-      const result = await response.json()
-      console.log('이력서 저장 성공:', result)
-      alert('이력서가 성공적으로 저장되었습니다!')
-      router.push('/resume')
-    } else {
-      alert('이력서 저장에 실패했습니다.')
-    }
-  } catch (error) {
-    console.error('이력서 저장 실패:', error)
-    alert('이력서 저장 중 오류가 발생했습니다.')
-  }
+  //   if (response.ok) {
+  //     const result = await response.json()
+  //     console.log('이력서 저장 성공:', result)
+  //     alert('이력서가 성공적으로 저장되었습니다!')
+  //     router.push('/resume')
+  //   } else {
+  //     alert('이력서 저장에 실패했습니다.')
+  //   }
+  // } catch (error) {
+  //   console.error('이력서 저장 실패:', error)
+  //   alert('이력서 저장 중 오류가 발생했습니다.')
+  // }
+  alert('작성완료되었습니다.');
+  router.push(`/resume/list`);
 }
 
 onMounted(() => {
@@ -892,6 +897,15 @@ onMounted(() => {
   color: #ccc;
   display: block;
 }
+
+.breadcrumb {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 1rem;
+}
+
+
+
 
 .close-btn {
   background: none;

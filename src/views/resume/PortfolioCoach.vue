@@ -201,6 +201,7 @@ function editPortfolio() {
 function saveResult() {
   console.log('분석 결과 저장')
   alert('분석 결과가 저장되었습니다!')
+  router.push(`/resume/list`);
 }
 </script>
 
