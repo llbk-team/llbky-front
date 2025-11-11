@@ -134,14 +134,7 @@
 
     <!-- Action Buttons -->
     <div class="action-buttons d-flex justify-content-center">
-      <button class="btn btn-secondary me-3" @click="downloadReport">
-        <span class="btn-icon">📊</span>
-        리포트 다운로드
-      </button>
-      <button class="btn btn-primary me-3" @click="editPortfolio">
-        <span class="btn-icon">✏️</span>
-        포트폴리오 수정하기
-      </button>
+      
       <button class="btn btn-tertiary" @click="saveResult">
         <span class="btn-icon">💾</span>
         저장하기
@@ -213,7 +206,7 @@ function saveResult() {
 
 <style scoped>
 .portfolio-analysis-page {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  
   background: #F5F5F5;
   min-height: 100vh;
   /* display: flex; → d-flex 클래스로 대체됨 */
@@ -450,16 +443,15 @@ function saveResult() {
 
 /* Action Buttons - 하단 고정 */
 .action-buttons {
-  /* display: flex; → d-flex 클래스로 대체됨 */
-  gap: 1rem;
-  padding: 2rem;
-  background: #F5F5F5;
-  border-top: 1px solid #E5E5E5;
   position: fixed;
   bottom: 0;
-  left: 250px; /* 사이드바 너비만큼 오른쪽으로 이동 */
+  left: 250px;
   right: 0;
-  z-index: 10;
+  display: flex;
+  justify-content: center;
+  padding: 1.5rem 0;
+  background: #F5F5F5;
+  border-top: 1px solid #E5E5E5;
 }
 
 .btn {
