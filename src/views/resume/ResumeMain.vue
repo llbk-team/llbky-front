@@ -3,7 +3,7 @@
     <!-- 컨테이너 -->
     <div class="main-container">
       <!-- 사이드바 -->
-      <SideBar />
+     
       
 
       <!-- 메인 콘텐츠 -->

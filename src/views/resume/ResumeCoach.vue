@@ -1,7 +1,7 @@
 <template>
   <div class="page-wrapper">
     <div class="main-layout">
-      <SideBar />
+      
 
       <!-- ✅ 컨텐츠 영역 -->
       <section class="content">
