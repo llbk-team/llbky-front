@@ -50,7 +50,7 @@
             <!-- ✅ 원문 보기 버튼 -->
             <div class="source-btn-box" v-if="news.source_url">
               <button class="source-btn" @click="openSource(news.source_url)">
-                🔗 원문 보기
+                <i class="ri-news-line"></i> 원문 보기
               </button>
             </div>
           </div>
