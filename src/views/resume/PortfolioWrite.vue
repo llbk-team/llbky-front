@@ -7,11 +7,6 @@
 
       <!-- Main Content -->
       <main class="content">
-        <!-- Breadcrumb -->
-        <div class="breadcrumb">
-          <span>my > 서류작성 > 포트폴리오</span>
-        </div>
-
         <!-- Page Title -->
         <h1 class="page-title">서류 AI 코칭</h1>
 

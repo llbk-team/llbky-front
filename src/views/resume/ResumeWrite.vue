@@ -8,9 +8,6 @@
       
       <!-- 이력서 작성 폼 -->
       <div class="resume-form-container">
-        <div class="breadcrumb">
-          <span>my > 서류작성 > 이력서</span>
-        </div>
         <div class="form-header">
           <h1>이력서 작성하기</h1>
           <p>단순한 정보를 입력하여보면 자동으로 양식에 맞게 내용까지 추천받을 수 있습니다.<br>

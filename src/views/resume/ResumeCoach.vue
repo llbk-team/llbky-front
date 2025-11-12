@@ -5,13 +5,7 @@
 
       <!-- ✅ 컨텐츠 영역 -->
       <section class="content">
-        <div class="breadcrumb">my &gt; 서류관리 &gt; 이력서</div>
         <h1 class="page-title">서류 AI 코칭</h1>
-        <div class="resume-header">
-          <button class="button-item" :class="{ active: $route.path === '/resume/coverletter' }" @click="$router.push('/resume/coverletter')">
-            자기소개서 첨삭받기
-          </button>
-        </div>
         <div class="resume-layout">
 
           <!-- ✅ 상단: 이력서 상세(2) + AI 첨삭 제안(1) - 2:1 비율 -->
@@ -391,16 +385,12 @@
               <!-- 하단 버튼 -->
               <div class="d-flex gap-3 justify-content-center">
                 <button class="btn btn-outline-secondary fw-medium btn-lg btn-fixed-width" @click="$router.push('/resume/list')">
-                  📄 리포트 다운로드
+                  📄 리포트 생성
                 </button>
 
                 <!-- 수정 모드 전환 버튼 -->
                 <button class="btn btn-mint fw-medium btn-lg btn-fixed-width" @click="toggleEditMode">
                   {{ isEditing ? '💾 수정완료' : '✏️ 서류 수정하기' }}
-                </button>
-
-                <button class="btn btn-outline-secondary fw-medium btn-lg btn-fixed-width" @click="$router.push('/resume/list')">
-                  💾 저장하기
                 </button>
               </div>
             </div>
