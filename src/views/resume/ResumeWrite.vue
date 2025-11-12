@@ -191,33 +191,6 @@
           </div>
         </div>
 
-        <!-- 자기 소개 -->
-        <div class="form-section" :class="{ 'expanded': sections.introduction, 'active': sections.introduction }">
-          <div class="section-header" @click="toggleSection('introduction')">
-            <div class="section-info">
-              <h3>자기 소개</h3>
-              <span class="section-desc">지원 동기, 성장 경험, 직무 역량, 입사 후 포부를 작성하세요</span>
-            </div>
-            <button class="toggle-btn" :class="{ 'active': sections.introduction }">
-              {{ sections.introduction ? '×' : '+' }}
-            </button>
-          </div>
-
-          <div class="section-content" v-show="sections.introduction">
-            <div v-for="(intro, key) in resumeData.introductions" :key="key" class="intro-item">
-              <div class="form-group">
-                <label class="fw-semibold">{{ intro.title }}</label>
-                <textarea
-                  v-model="intro.content"
-                  class="form-control"
-                  :placeholder="`${intro.title}에 대한 내용을 작성하세요`"
-                  rows="5"
-                ></textarea>
-              </div>
-            </div>
-          </div>
-        </div>
-
         <!-- 버튼 그룹 -->
         <div class="action-buttons">
           <button class="preview-btn" @click="previewResume">미리보기</button>
