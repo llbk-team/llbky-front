@@ -33,17 +33,22 @@
         <!-- [추가2] 진행 중/완료 분리 -->
         <!-- 진행 중 -->
         <div v-if="currentTab === 'ongoing'" class="card shadow-sm p-4 mb-3 card-clean">
-          <h5 class="fw-bold mb-3" style="color:#111111;">내 학습 이어하기</h5>
-
-          <div v-for="(plan, i) in ongoingPlans" :key="i" class="card border-light mb-3 sub-card">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold mb-0" style="color:#111111;">내 학습 이어하기</h5>
+            <!-- 오른쪽 위에 페이지 네비게이션 -->
+            <div>
+              <button class="page-btn" :disabled="ongoingPage === 1" @click="prevPage('ongoing')">‹</button>
+              <span class="mx-1 small text-muted">{{ ongoingPage }} / {{ totalOngoingPages }}</span>
+              <button class="page-btn" :disabled="ongoingPage === totalOngoingPages" @click="nextPage('ongoing')">›</button>
+            </div>
+          </div>
+          <div v-for="(plan, i) in pagedOngoingPlans" :key="i" class="card border-light mb-3 sub-card">
             <div class="card-body">
               <h6 class="fw-semibold">{{ plan.title }}</h6>
               <p class="text-secondary small">{{ plan.period }}</p>
-
               <div class="progress mb-2" style="height: 6px;">
                 <div class="progress-bar" role="progressbar" :style="{ width: plan.progress + '%', backgroundColor: '#71EBBE' }"></div>
               </div>
-
               <p class="text-secondary small mb-2">진행률 {{ plan.progress }}%</p>
               <router-link :to="`/learning/start`" class="btn btn-outline-green btn-sm">
                 학습 이어하기 →
@@ -55,8 +60,16 @@
 
         <!-- 완료된 학습 -->
         <div v-else class="card shadow-sm p-4 mb-3 card-clean">
-          <h5 class="fw-bold mb-3" style="color:#111111;">완료된 학습 플랜</h5>
-          <div v-for="(plan, i) in completedPlans" :key="i" class="card border-light mb-3 sub-card clickable" @click="goToReport(plan)">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold mb-0" style="color:#111111;">완료된 학습 플랜</h5>
+            <!-- 오른쪽 위에 페이지 네비게이션 -->
+            <div>
+              <button class="page-btn" :disabled="completedPage === 1" @click="prevPage('completed')">‹</button>
+              <span class="mx-1 small text-muted">{{ completedPage }} / {{ totalCompletedPages }}</span>
+              <button class="page-btn" :disabled="completedPage === totalCompletedPages" @click="nextPage('completed')">›</button>
+            </div>
+          </div>
+          <div v-for="(plan, i) in pagedCompletedPlans" :key="i" class="card border-light mb-3 sub-card clickable" @click="goToReport(plan)">
             <div class="card-body">
               <h6 class="fw-semibold">{{ plan.title }}</h6>
               <p class="text-secondary small mb-1">{{ plan.period }}</p>
@@ -96,7 +109,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from "vue";
+import { ref, computed, watch } from "vue";
 import { useRouter, useRoute } from "vue-router";
 
 const router = useRouter();
@@ -104,6 +117,11 @@ const route = useRoute();
 
 // 기본 탭 상태 (진행 중)
 const currentTab = ref(route.query.tab || "ongoing");
+
+// 페이지 상태
+const ongoingPage = ref(1);
+const completedPage = ref(1);
+const itemsPerPage = 3;
 
 watch(
   () => route.query.tab,
@@ -122,14 +140,53 @@ function goToReport(plan) {
   // router.push(`/learning/report/${plan.id || 1}`);
 }
 
+// 진행 중 / 완료 플랜 (임시 데이터)
 const ongoingPlans = [
-  { title: '백엔드 취업 준비', period: '4주 플랜', progress: 40 },
-  { title: '백엔드 취업 준비', period: '4주 플랜', progress: 40 }
-]
+  { title: "백엔드 취업 준비 1", period: "4주 플랜", progress: 40 },
+  { title: "Spring Boot 실전", period: "3주 플랜", progress: 60 },
+  { title: "SQL 완전정복", period: "2주 플랜", progress: 80 },
+  { title: "JPA 마스터", period: "3주 플랜", progress: 20 },
+];
 
 const completedPlans = [
-  { title: '백엔드 취업 준비', period: '4주 플랜', completedDate: '2025-10-01' }
-]
+  { title: "백엔드 취업 준비 1", period: "4주 플랜", completedDate: "2025-10-01" },
+  { title: "Spring Security", period: "3주 플랜", completedDate: "2025-11-01" },
+  { title: "REST API 설계", period: "2주 플랜", completedDate: "2025-11-05" },
+  { title: "JPA 학습", period: "3주 플랜", completedDate: "2025-11-10" },
+];
+
+// 페이지 계산
+const totalOngoingPages = computed(() => Math.ceil(ongoingPlans.length / itemsPerPage));
+const totalCompletedPages = computed(() => Math.ceil(completedPlans.length / itemsPerPage));
+
+// 페이지별 데이터
+const pagedOngoingPlans = computed(() => {
+  const start = (ongoingPage.value - 1) * itemsPerPage;
+  return ongoingPlans.slice(start, start + itemsPerPage);
+});
+
+const pagedCompletedPlans = computed(() => {
+  const start = (completedPage.value - 1) * itemsPerPage;
+  return completedPlans.slice(start, start + itemsPerPage);
+});
+
+// 페이지 이동 함수
+function nextPage(type) {
+  if (type === "ongoing" && ongoingPage.value < totalOngoingPages.value) ongoingPage.value++;
+  if (type === "completed" && completedPage.value < totalCompletedPages.value) completedPage.value++;
+}
+
+function prevPage(type) {
+  if (type === "ongoing" && ongoingPage.value > 1) ongoingPage.value--;
+  if (type === "completed" && completedPage.value > 1) completedPage.value--;
+}
+
+watch(
+  () => route.query.tab,
+  (newVal) => {
+    currentTab.value = newVal || "ongoing";
+  }
+);
 
 const stats = { ongoing: 2, completed: 1 }
 
@@ -205,5 +262,24 @@ body {
 
 .clickable:hover {
   background-color: #e9faf5;
+}
+
+.page-btn {
+  border: none;
+  background: transparent;
+  font-size: 1.4rem;
+  color: #444;
+  cursor: pointer;
+  padding: 0 8px;
+  transition: color 0.2s;
+}
+
+.page-btn:hover:not(:disabled) {
+  color: #00c896;
+}
+
+.page-btn:disabled {
+  color: #ccc;
+  cursor: default;
 }
 </style>

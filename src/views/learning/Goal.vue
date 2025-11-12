@@ -116,7 +116,7 @@ const goalSections = [
     items: [
       { id: 'proj-portfolio', label: '포트폴리오', value: 'portfolio' },
       { id: 'proj-side', label: '사이드 프로젝트', value: 'side-project' },
-      { id: 'proj-study', label: '학습 주인', value: 'study-main' },
+      { id: 'proj-study', label: '학습 루틴', value: 'study-main' },
       { id: 'proj-explore', label: '진로 탐색', value: 'explore' }
     ]
   }
