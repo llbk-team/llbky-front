@@ -1,9 +1,6 @@
 <template>
   <div class="resume-main">
-    <!-- 컨테이너 -->
     <div class="main-container">
-
-      <!-- 메인 콘텐츠 -->
       <div class="main-content">
         <!-- 인사말 -->
         <div class="greeting">
@@ -28,15 +25,21 @@
 
         <!-- 내 이력서 리스트 -->
         <div class="resume-section">
+          
           <div class="section-header">
             <h2>내 이력서 리스트</h2>
+            <div style="margin-left: 650px;">
+              <button class="select-toggle-btn" @click="toggleSelectMode">
+              {{ isSelecting ? '선택 완료' : '선택하기' }}
+              </button>
+            </div>
             <div class="header-actions">
               <span class="ai-suggestion">✨ AI 이력서 작성</span>
             </div>
           </div>
 
           <div class="resume-grid">
-            <!-- 새 이력서 작성 카드 -->
+            <!-- 새 이력서 작성 -->
             <div class="resume-card add-card" @click="$router.push('/resume/write')">
               <div class="card-content">
                 <div class="add-icon">+</div>
@@ -44,14 +47,22 @@
               </div>
             </div>
 
-            <!-- 기존 이력서 카드들 -->
+            <!-- 기존 이력서 카드 -->
             <div 
               v-for="resume in resumeList" 
               :key="resume.id" 
               class="resume-card"
-              @click="goToResumeDetail(resume.id)"
+              :class="{ selecting: isSelecting }"
             >
-              <div class="card-content">
+              <!-- 체크박스 -->
+              <input 
+                v-if="isSelecting"
+                type="checkbox" 
+                class="select-checkbox"
+                :checked="selectedResume === resume.id"
+                @change="selectResume(resume.id)"
+              />
+              <div class="card-content" @click="goToResumeDetail(resume.id)">
                 <div class="resume-icon">📄</div>
                 <div class="resume-info">
                   <h3 class="resume-title">{{ resume.title }}</h3>
@@ -65,7 +76,7 @@
           </div>
         </div>
 
-        <!-- 내 자기소개서 리스트 -->
+        <!-- 자기소개서 리스트 -->
         <div class="resume-section">
           <div class="section-header">
             <h2>내 자기소개서 리스트</h2>
@@ -83,14 +94,20 @@
               </div>
             </div>
 
-            <!-- 자소서 리스트 -->
             <div
               v-for="cover in coverLetterList"
               :key="cover.id"
               class="resume-card"
-              @click="goToCoverDetail(cover.id)"
+              :class="{ selecting: isSelecting }"
             >
-              <div class="card-content">
+               <input 
+                  v-if="isSelecting"
+                  type="checkbox" 
+                  class="select-checkbox"
+                  :checked="selectedCover === cover.id"
+                  @change="selectCover(cover.id)"
+                />
+              <div class="card-content" @click="goToCoverDetail(cover.id)">
                 <div class="resume-icon">🖋️</div>
                 <div class="resume-info">
                   <h3 class="resume-title">{{ cover.title }}</h3>
@@ -104,7 +121,7 @@
           </div>
         </div>
 
-        <!-- 내 포트폴리오 리스트 -->
+        <!-- 포트폴리오 리스트 -->
         <div class="resume-section">
           <div class="section-header">
             <h2>내 포트폴리오 리스트</h2>
@@ -114,7 +131,6 @@
           </div>
 
           <div class="resume-grid">
-            <!-- 새 포트폴리오 등록 카드 -->
             <div class="resume-card add-card" @click="$router.push('/resume/portfolio/write')">
               <div class="card-content">
                 <div class="add-icon">+</div>
@@ -122,36 +138,60 @@
               </div>
             </div>
 
-            <!-- 기존 포트폴리오 카드들 -->
             <div 
-              v-for="resume in resumeList" 
-              :key="resume.id" 
+              v-for="portfolio in resumeList" 
+              :key="portfolio.id" 
               class="resume-card"
-              @click="goToPortfolioDetail(resume.id)"
+              :class="{ selecting: isSelecting }"
             >
-              <div class="card-content">
+              <input 
+                v-if="isSelecting"
+                type="checkbox" 
+                class="select-checkbox"
+                :checked="selectedPortfolio === portfolio.id"
+                @change="selectPortfolio(portfolio.id)"
+              />
+              <div class="card-content" @click="goToPortfolioDetail(portfolio.id)">
                 <div class="resume-icon">🎨</div>
                 <div class="resume-info">
-                  <h3 class="resume-title">{{ resume.title }}</h3>
-                  <p class="resume-description">{{ resume.description }}</p>
+                  <h3 class="resume-title">{{ portfolio.title }}</h3>
+                  <p class="resume-description">{{ portfolio.description }}</p>
                   <div class="resume-meta">
-                    <span class="update-date">📅 최종 수정: {{ resume.updatedAt }}</span>
+                    <span class="update-date">📅 최종 수정: {{ portfolio.updatedAt }}</span>
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
+
+        <!-- 통합 문서 만들기 버튼 -->
+        <div class="integrate-section">
+          <button 
+            class="integrate-button"
+            
+            @click="createIntegratedDocument"
+          >
+            📚 통합 문서 만들기
+          </button>
+        </div>
       </div>
     </div>
   </div>
 </template>
+
 
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
+
+// 선택 모드 on/off
+const isSelecting = ref(false)
+const toggleSelectMode = () => {
+  isSelecting.value = !isSelecting.value
+}
 
 // 사용자 정보
 const userName = ref('김병현')
@@ -187,8 +227,44 @@ const goToPortfolioDetail = () => {
   router.push(`/resume/portfolio/coach`)
 }
 
+const selectedResume = ref(null)
+const selectedCover = ref(null)
+const selectedPortfolio = ref(null)
 
+const selectResume = (id) => {
+  selectedResume.value = selectedResume.value === id ? null : id
+}
 
+const selectCover = (id) => {
+  selectedCover.value = selectedCover.value === id ? null : id
+}
+
+const selectPortfolio = (id) => {
+  selectedPortfolio.value = selectedPortfolio.value === id ? null : id
+}
+
+const createIntegratedDocument = () => {
+  if (!selectedResume.value || !selectedCover.value ) {
+    alert('이력서, 자기소개서 중 최소 1개를 선택해주세요!')
+    return
+  }
+
+  // 통합 문서 생성 로직 (API 호출 or 페이지 이동)
+  console.log('통합 문서 생성:', {
+    resumeId: selectedResume.value,
+    coverId: selectedCover.value,
+    portfolioId: selectedPortfolio.value
+  })
+
+  router.push({
+    path: '/resume/integrated',
+    query: {
+      resumeId: selectedResume.value,
+      coverId: selectedCover.value,
+      portfolioId: selectedPortfolio.value
+    }
+  })
+}
 
 
 // API 호출로 이력서 리스트 조회
@@ -309,6 +385,26 @@ onMounted(() => {
   flex: 1;
   padding: 40px;
 }
+
+.select-toggle-btn {
+  background: #71EBBE; /* 동일한 녹색 */
+  color: white;
+  border: none;
+  padding: 14px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+
+  /* 위치 조정 */
+  margin-left: 200px; /* 왼쪽으로 이동 */
+}
+
+
+
+
 
 /* 인사말 */
 .greeting {
@@ -442,6 +538,11 @@ onMounted(() => {
   overflow: hidden;
 }
 
+.resume-card.selecting {
+  border-color: #71EBBE;
+  box-shadow: 0 0 0 2px rgba(113, 235, 190, 0.3);
+}
+
 .resume-card:hover {
   border-color: #71EBBE;
   transform: translateY(-4px);
@@ -517,6 +618,52 @@ onMounted(() => {
   gap: 4px;
 }
 
+.select-checkbox {
+  
+  position: relative;
+  top: 2px;
+  left: 220px;
+  width: 35px;
+  height: 35px;
+  cursor: pointer;
+  accent-color: #71EBBE;
+}
+
+.integrate-section {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px; /* 기존 40px에서 30px로 수정 */
+
+}
+
+.integrate-button {
+  background: #71EBBE; /* background-color에서 background로 변경 */
+  color: white;
+  border: none;
+  padding: 14px 24px; /* banner-button과 동일한 패딩 */
+  border-radius: 8px;  /* banner-button과 동일한 radius */
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 14px;     /* banner-button과 동일한 크기 */
+  transition: all 0.3s;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1); /* banner-button과 동일한 그림자 */
+
+}
+
+.integrate-button:hover {
+   transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+
+}
+
+.integrate-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+
+
 /* 반응형 */
 @media (max-width: 768px) {
   .main-container {
@@ -591,5 +738,9 @@ onMounted(() => {
     gap: 12px;
     align-items: stretch;
   }
+
+
+
+
 }
 </style>
