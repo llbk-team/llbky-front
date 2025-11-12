@@ -65,7 +65,7 @@ const resumeRouting = [
   },
   {
     path: '/resume/portfolio/stepbystep',
-    name: 'portfolio-coach',
+    name: 'portfolio-stepbystep',
     component: () => import('../views/resume/PortfolioStepbystep.vue'),
     meta: { 
       title: '서류코칭',
