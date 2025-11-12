@@ -4,7 +4,19 @@
     <div class="header">
       <router-link to="/trend/insight" class="back">← 돌아가기</router-link>
       <h2>내 키워드 저장소</h2>
-      <p class="subtitle">AI 인사이트에서 저장한 키워드를 한눈에 확인하세요.</p>
+      <p class="subtitle">AI 인사이트에서 저장한 키워드 또는 직접 추가한 키워드를 확인하세요.</p>
+    </div>
+
+    <!-- 🔹 키워드 수동 추가 입력창 -->
+    <div class="add-keyword-box">
+      <input
+        v-model="newKeyword"
+        @keyup.enter="addKeyword"
+        type="text"
+        class="add-input"
+        placeholder="새 키워드를 입력하세요 (예: PyTorch, LangChain 등)"
+      />
+      <button class="add-btn" @click="addKeyword">추가</button>
     </div>
 
     <!-- 키워드 리스트 -->
@@ -31,7 +43,7 @@
     <!-- 비어있을 때 -->
     <div v-else class="empty">
       <p>저장된 키워드가 없습니다 😢</p>
-      <p class="empty-hint">AI 인사이트 페이지에서 관심 키워드를 추가해보세요!</p>
+      <p class="empty-hint">AI 인사이트 페이지나 직접 입력으로 관심 키워드를 추가해보세요!</p>
     </div>
 
     <!-- 통계 -->
@@ -61,11 +73,24 @@
 import { ref, computed, onMounted } from "vue";
 
 const keywords = ref([]);
+const newKeyword = ref("");
 const today = new Date().toISOString().split("T")[0];
 
 onMounted(() => {
   keywords.value = JSON.parse(localStorage.getItem("user_keywords") || "[]");
 });
+
+// ✅ 키워드 추가
+const addKeyword = () => {
+  const kw = newKeyword.value.trim();
+  if (!kw) return alert("키워드를 입력해주세요.");
+  if (keywords.value.includes(kw)) return alert("이미 추가된 키워드입니다.");
+
+  keywords.value.push(kw);
+  localStorage.setItem("user_keywords", JSON.stringify(keywords.value));
+  newKeyword.value = "";
+  alert(`'${kw}' 키워드가 추가되었습니다 ✅`);
+};
 
 // ✅ 기본 카테고리별 분류
 const groupedKeywords = computed(() => {
@@ -74,6 +99,7 @@ const groupedKeywords = computed(() => {
     "클라우드 엔지니어": [],
     "데이터 사이언티스트": [],
     "보안 전문가": [],
+    "내가 추가한 키워드": [],
   };
   keywords.value.forEach((k) => {
     if (["Python", "TensorFlow", "LLM", "MLOps"].includes(k))
@@ -82,25 +108,40 @@ const groupedKeywords = computed(() => {
       groups["클라우드 엔지니어"].push(k);
     else if (["Pandas", "SQL", "Machine Learning", "Visualization"].includes(k))
       groups["데이터 사이언티스트"].push(k);
-    else groups["보안 전문가"].push(k);
+    else if (["Security", "Encryption", "Firewall"].includes(k))
+      groups["보안 전문가"].push(k);
+    else groups["내가 추가한 키워드"].push(k);
   });
   return groups;
 });
 
-// ✅ 빈 카테고리 제외
+// ✅ 빈 카테고리 제외 + 내가 추가한 키워드를 맨 위로 배치
 const filteredKeywords = computed(() => {
   const filtered = {};
-  for (const [category, group] of Object.entries(groupedKeywords.value)) {
-    if (group.length > 0) filtered[category] = group;
-  }
+  const groups = groupedKeywords.value;
+
+  // 표시 순서 정의
+  const orderedCategories = [
+    "내가 추가한 키워드",
+    "AI 엔지니어",
+    "클라우드 엔지니어",
+    "데이터 사이언티스트",
+    "보안 전문가",
+  ];
+
+  orderedCategories.forEach((category) => {
+    if (groups[category] && groups[category].length > 0) {
+      filtered[category] = groups[category];
+    }
+  });
+
   return filtered;
 });
 
 // ✅ 키워드 삭제
 const deleteKeyword = (word) => {
   if (confirm(`'${word}' 키워드를 삭제하시겠습니까?`)) {
-    const saved = JSON.parse(localStorage.getItem("user_keywords") || "[]");
-    const updated = saved.filter((k) => k !== word);
+    const updated = keywords.value.filter((k) => k !== word);
     localStorage.setItem("user_keywords", JSON.stringify(updated));
     keywords.value = updated;
   }
@@ -146,6 +187,35 @@ const clearAll = () => {
   color: #666;
 }
 
+/* Add Keyword */
+.add-keyword-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+.add-input {
+  flex: 1;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 13px;
+}
+.add-btn {
+  background: #00c896;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.add-btn:hover {
+  background: #00b487;
+}
+
 /* Keyword Cards */
 .keyword-container {
   display: flex;
@@ -166,7 +236,6 @@ const clearAll = () => {
   font-size: 12px;
   color: #666;
 }
-
 .keyword-list {
   display: flex;
   flex-wrap: wrap;

@@ -79,7 +79,6 @@ const subMenus = {
   interview: [
     { label: "면접 리포트", path: "/interview/report" },
     { label: "모의 면접", path: "/interview/mock" },
-    { label: "면접 진행", path: "/interview/progress" },
   ],
   learning: [
     { label: "학습 코치", path: "/learning/coach" },
