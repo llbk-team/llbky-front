@@ -101,15 +101,13 @@
 
 <script setup>
 import { ref } from 'vue';
-// import { useRouter } from 'vue-router';
-// const router = useRouter();
 
 const selectedWeek = ref(null);
 const showAiModal = ref(false);
 const aiInput = ref("");
 const showSaveModal = ref(false);
 
-// 로드맵 데이터를 동적으로 관리합니다.
+// 로드맵 데이터를 동적으로 관리
 const roadmapData = ref([
   {
     week: 1,
@@ -154,13 +152,6 @@ const roadmapData = ref([
   }
 ]);
 
-function openModal(week) {
-  selectedWeek.value = week;
-}
-function closeModal() {
-  selectedWeek.value = null;
-}
-
 function openAiModal() {
   showAiModal.value = true;
 }
@@ -168,10 +159,6 @@ function closeAiModal() {
   showAiModal.value = false;
 }
 
-function savePlan() {
-  console.log('플랜 저장 API 호출');
-  // API로 로드맵 데이터 전송
-}
 
 function openSaveModal() {
   showSaveModal.value = true;
@@ -192,7 +179,6 @@ function goToMyLearning() {
 </script>
 
 <style scoped>
-
 .roadmap-container {
   max-width: 1100px;
 }
@@ -202,21 +188,16 @@ function goToMyLearning() {
   margin-bottom: 1.5rem;
 }
 
-/* 1. 커스텀 민트색 알림창 (부트스트랩 .alert 오버라이드) */
 .alert-mint {
   background-color: #f0fdf4;
-  /* 연한 민트 배경 */
   color: #166534;
-  /* 진한 녹색 글씨 */
   border: 1px solid #bbf7d0;
-  /* 연한 녹색 테두리 */
 }
 
 .alert-mint strong {
   color: #15803d;
 }
 
-/* 2. 요약 태그 스타일 */
 .summary-tag {
   display: inline-block;
   padding: 0.5rem 1rem;
@@ -228,16 +209,12 @@ function goToMyLearning() {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-/* 3. 주차별 카드 스타일 (부트스트랩 .card와 유사하게) */
 .week-card {
   border: 1px solid #e5e7eb;
   border-radius: 0.5rem;
-  /* 8px */
   padding: 1.5rem;
-  /* 24px */
   background-color: #ffffff;
   height: 100%;
-  /* 카드의 높이를 맞춤 */
 }
 
 .week-card h4 {
@@ -246,7 +223,6 @@ function goToMyLearning() {
   margin-bottom: 1rem;
 }
 
-/* 4. 학습 항목 리스트 */
 .topic-list {
   padding-left: 0;
   margin-bottom: 1rem;
@@ -255,7 +231,6 @@ function goToMyLearning() {
 .topic-list li {
   position: relative;
   padding-left: 1.2rem;
-  /* '-' 기호가 들어갈 자리 */
   font-size: 0.95rem;
   color: #333;
   margin-bottom: 0.5rem;
@@ -268,19 +243,15 @@ function goToMyLearning() {
   top: 0;
   font-weight: 600;
   color: #10b981;
-  /* 민트색 포인트 */
 }
 
-/* 5. 카드 안의 작은 알림창 */
 .week-note {
   font-size: 0.875rem;
   background-color: #f8fcfb;
-  /* 기본 알림창보다 더 연하게 */
   border-color: #e0f3eb;
   color: #333;
 }
 
-/* 6. 커스텀 "AI 질문" 버튼 */
 .btn-mint {
   background-color: #f0fdf4;
   color: #166534;
@@ -293,7 +264,6 @@ function goToMyLearning() {
   border-color: #bbf7d0;
 }
 
-/* 모달 */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -313,7 +283,6 @@ function goToMyLearning() {
   text-align: left;
 }
 
-/* AI 질문 모달 */
 .ai-modal-overlay {
   position: fixed;
   inset: 0;
@@ -349,17 +318,15 @@ function goToMyLearning() {
 .ai-input input {
   flex: 1;
   height: 44px;
-  /* 입력창 높이 고정 */
   border: 1px solid #d1d5db;
   border-radius: 8px;
   padding: 0 12px;
 }
 
-/* 민트 베이스 저장 완료 모달 */
 .save-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.45); /* 조금 더 진한 블랙 투명도 */
+  background: rgba(0, 0, 0, 0.45);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -367,20 +334,20 @@ function goToMyLearning() {
 }
 
 .save-modal-content {
-  background: #FFFFFF; /* 화이트 베이스 */
-  border: 1px solid #EAEBEC; /* 은은한 회색 라인 */
+  background: #FFFFFF;
+  border: 1px solid #EAEBEC;
   border-radius: 1rem;
   padding: 2rem;
   width: 90%;
   max-width: 500px;
   animation: fadeIn 0.3s ease-in-out;
-  color: #111111; /* 진한 텍스트 */
+  color: #111111;
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
 }
 
 .check-icon {
   font-size: 3rem;
-  color: #71EBBE; /* 메인 민트 포인트 */
+  color: #71EBBE;
 }
 
 .alert-mint-light {

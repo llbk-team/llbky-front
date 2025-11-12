@@ -217,8 +217,8 @@ function prevPage() {
 }
 
 
-const showWeekModal = ref(false); // 모달 표시 여부
-const selectedWeek = ref(null);   // 선택된 주차 데이터
+const showWeekModal = ref(false); 
+const selectedWeek = ref(null); 
 
 function openWeekModal(week) {
   selectedWeek.value = week;
@@ -267,7 +267,6 @@ function submitMemo() {
   resize: none;
 }
 
-/* ===== 주차별 카드 ===== */
 .week-card {
   border: 1px solid #e5e7eb;
   border-radius: 12px;
@@ -281,7 +280,6 @@ function submitMemo() {
   background-color: #f0fdf4;
 }
 
-/* 아이콘 상태 */
 .week-icon {
   font-size: 1.2rem;
   color: #9ca3af;
@@ -291,8 +289,6 @@ function submitMemo() {
   color: #4cd3a3;
 }
 
-
-/* 프로그레스바 */
 .custom-progress {
   height: 8px;
   border-radius: 4px;
@@ -304,7 +300,6 @@ function submitMemo() {
   transition: width 0.3s ease;
 }
 
-/* ===== 이번 주 학습 내용 ===== */
 .week-detail {
   background: linear-gradient(135deg, #f0fdf4 0%, #f5f7ff 100%);
   border: 1px solid #e0e7ff;
@@ -328,7 +323,6 @@ function submitMemo() {
   box-shadow: 0 0 0 3px rgba(113, 235, 190, 0.3);
 }
 
-/* 상태 배지 */
 .status-badge {
   font-size: 0.85rem;
   font-weight: 600;
@@ -356,22 +350,21 @@ function submitMemo() {
 }
 
 .page-btn {
-  border: none;      
-  background: transparent;  
-  font-size: 1.4rem;     
-  color: #444;          
+  border: none;
+  background: transparent;
+  font-size: 1.4rem;
+  color: #444;
   cursor: pointer;
-  padding: 0 6px;       
+  padding: 0 6px;
   transition: color 0.2s;
 }
 
 .page-btn:hover:not(:disabled) {
-  color: #00c896;       
+  color: #00c896;
 }
 
 .page-btn:disabled {
-  color: #ccc;            
+  color: #ccc;
   cursor: default;
 }
-
 </style>

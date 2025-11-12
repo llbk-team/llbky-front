@@ -12,15 +12,12 @@
         </div>
       </div>
 
-      <!-- <LearningHeader :current-step="2" /> -->
-
       <section class="info-section">
         <div class="info-box green-info">
           좋아요! '백엔드 개발자'를 목표로 하고 있군요.
           <br>
           이제 강화하고 싶은 기술이나 부족한 역량을 선택해볼까요?
         </div>
-
         <div class="info-box yellow-info" @click="openResumeModal">
           <span>📄</span>
           <strong>이력서 분석 결과 불러오기</strong>
@@ -29,7 +26,6 @@
       </section>
 
       <section class="main-content">
-
         <div class="content-column">
           <h3>부족 역량 선택</h3>
           <div class="info-box green-info-light">
@@ -49,14 +45,12 @@
           <div class="info-box green-info-light">
             새롭게 배우고 싶은 기술이 있다면 추가하세요
           </div>
-
           <div class="add-skill-form">
             <input type="text" v-model="newSkill" placeholder="새 기술 입력..." @keydown.enter.prevent="addSkill" class="skill-input">
             <button type="button" @click="addSkill" class="add-button">
               + 추가
             </button>
           </div>
-
           <ul class="added-skills-list">
             <li v-for="(skill, index) in formData.interestedSkills" :key="index">
               <span>{{ skill }}</span>
@@ -66,7 +60,6 @@
             </li>
           </ul>
         </div>
-
       </section>
 
 
@@ -125,31 +118,28 @@ watch(selectedSkills, (newVal) => {
 
 
 
-// 폼 전체 데이터를 관리하는 ref
 const formData = ref({
-  lackingSkills: [],     // "부족 역량" 체크박스 (배열)
-  interestedSkills: [],  // "관심 기술" (사용자 추가 목록)
+  lackingSkills: [],
+  interestedSkills: [],
 });
 
-// "부족 역량" 목록 (v-for 렌더링용)
-// (이미지보다 많게 추가하여 스크롤이 생기도록 했습니다)
+
 const recommendedSkills = ref([
   'SQL', 'Spring Security', 'REST API', 'JPA', 'AWS', 'Docker', 'Kubernetes', 'CI/CD', 'Linux'
 ]);
 
-// "관심 기술" 추가용 임시 ref
+
 const newSkill = ref('');
 
-// "관심 기술"에 새 기술을 추가하는 함수
+
 function addSkill() {
   const skillToAdd = newSkill.value.trim();
   if (skillToAdd !== '' && !formData.value.interestedSkills.includes(skillToAdd)) {
     formData.value.interestedSkills.push(skillToAdd);
-    newSkill.value = ''; // 입력창 비우기
+    newSkill.value = '';
   }
 }
 
-// "관심 기술"에서 기술을 제거하는 함수
 function removeSkill(index) {
   formData.value.interestedSkills.splice(index, 1);
 }
@@ -182,34 +172,23 @@ function closeModal() {
   showModal.value = false
 }
 function selectResume(item) {
-  // 선택 시 모달 닫고 부족 역량 자동 반영
   formData.value.lackingSkills = [...new Set(item.weaknesses)]
   showModal.value = false
   alert(`✅ "${item.title}" 결과를 불러왔습니다!`)
 }
 
 
-
-
-
-// "플랜 생성하기" (폼 제출) 함수
 function generatePlan() {
   console.log('플랜 생성 데이터:', formData.value);
   alert('플랜을 생성합니다!\n' + JSON.stringify(formData.value, null, 2));
-  // 여기서 emit을 하거나 API를 호출합니다.
-  // emit('generate-plan', formData.value);
 }
 
-// "이전" 버튼 함수
 function goToPrevious() {
   console.log('이전 단계로 이동');
-  // 여기서 emit을 하거나 라우터 로직을 수행합니다.
-  // emit('prev-step');
 }
 </script>
 
 <style scoped>
-/* 전체 컨테이너 (이전 요청대로 테두리 없음) */
 .ai-coaching-container {
   max-width: 1000px;
   margin: 20px auto;
@@ -220,7 +199,6 @@ function goToPrevious() {
 
 .main-title {
   font-size: 1.8rem;
-  /* 28px */
   font-weight: 700;
   margin-bottom: 24px;
 }
@@ -229,7 +207,6 @@ function goToPrevious() {
   margin-bottom: 24px;
 }
 
-/* 정보 박스 공통 스타일 */
 .info-box {
   padding: 16px;
   border-radius: 8px;
@@ -237,7 +214,6 @@ function goToPrevious() {
   font-size: 0.95rem;
 }
 
-/* 상단 메인 녹색 박스 */
 .green-info {
   background-color: #f0fdf4;
   color: #166534;
@@ -245,7 +221,6 @@ function goToPrevious() {
   line-height: 1.6;
 }
 
-/* 서브 녹색 박스 (연한 버전) */
 .green-info-light {
   background-color: #f8fcfb;
   color: #333;
@@ -254,7 +229,6 @@ function goToPrevious() {
   font-size: 0.875rem;
 }
 
-/* 이력서 노란색 박스 */
 .yellow-info {
   background-color: #fffbeb;
   color: #b45309;
@@ -278,7 +252,6 @@ function goToPrevious() {
   font-size: 0.875rem;
 }
 
-/* 메인 컨텐츠 2단 레이아웃 */
 .main-content {
   display: flex;
   gap: 24px;
@@ -287,28 +260,23 @@ function goToPrevious() {
 
 .content-column {
   flex: 1;
-  /* 두 컬럼이 1:1 비율을 가짐 */
 }
 
 .content-column h3 {
   font-size: 1.25rem;
-  /* 20px */
   font-weight: 600;
   margin-bottom: 12px;
 }
 
-/* 왼쪽: 기술 목록 스크롤 래퍼 */
 .skill-list-wrapper {
   border: 1px solid #e5e7eb;
   border-radius: 8px;
   padding: 12px;
   max-height: 250px;
-  /* 스크롤 높이 지정 */
   overflow-y: auto;
   margin-top: 12px;
 }
 
-/* ★★★ 이전 컴포넌트의 체크박스 스타일 재사용 ★★★ */
 .checkbox-item {
   display: flex;
   align-items: center;
@@ -346,10 +314,6 @@ function goToPrevious() {
   flex-grow: 1;
 }
 
-/* ★★★ 여기까지 ★★★ */
-
-
-/* 오른쪽: 기술 추가 폼 */
 .add-skill-form {
   display: flex;
   gap: 8px;
@@ -379,7 +343,6 @@ function goToPrevious() {
   background-color: #71EBBE;
 }
 
-/* 추가된 기술 목록 (UX 향상) */
 .added-skills-list {
   list-style: none;
   padding: 0;
@@ -408,20 +371,16 @@ function goToPrevious() {
 
 .remove-button:hover {
   color: #ef4444;
-  /* 빨간색 */
 }
 
-/* 하단 네비게이션 버튼 */
 .navigation-buttons {
   display: flex;
   justify-content: space-between;
   margin-top: 48px;
   padding-top: 24px;
   border-top: 1px solid #e5e7eb;
-  /* 상단 섹션과 구분선 */
 }
 
-/* 버튼 공통 스타일 */
 .btn-primary,
 .btn-secondary {
   padding: 12px 24px;
@@ -433,7 +392,6 @@ function goToPrevious() {
   transition: background-color 0.2s, border-color 0.2s, color 0.2s;
 }
 
-/* "플랜 생성하기" 버튼 (이전 컴포넌트의 submit과 동일) */
 .btn-primary {
   background-color: #111827;
   color: #ffffff;
@@ -443,7 +401,6 @@ function goToPrevious() {
   background-color: #374151;
 }
 
-/* "이전" 버튼 */
 .btn-secondary {
   background-color: #ffffff;
   color: #374151;
@@ -454,7 +411,6 @@ function goToPrevious() {
   background-color: #f9fafb;
 }
 
-/* 반응형: 모바일에서 1단 레이아웃으로 변경 */
 @media (max-width: 768px) {
   .main-content {
     flex-direction: column;
@@ -466,7 +422,6 @@ function goToPrevious() {
   }
 }
 
-/* ✅ 모달 배경 (지금 너무 어두워서 투명도 조정) */
 .modal-backdrop {
   position: fixed;
   top: 0;
@@ -474,26 +429,21 @@ function goToPrevious() {
   width: 100%;
   height: 100%;
   background: rgba(0, 0, 0, 0.35);
-  /* ← 진한 검정 대신 35% 투명도 */
   backdrop-filter: blur(2px);
-  /* 살짝 블러 효과 */
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 2000;
 }
 
-/* ✅ 모달 박스 */
 .modal-content {
   background: #ffffff;
-  /* 완전 흰색 배경 */
   padding: 24px;
   border-radius: 12px;
   width: 90%;
   max-width: 500px;
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15);
   color: #111111;
-  /* 검정 텍스트 보이게 */
   pointer-events: auto;
   z-index: 2100;
 }
@@ -505,6 +455,5 @@ function goToPrevious() {
 
 .yellow-info:hover {
   background-color: #fef3c7;
-  /* 살짝 더 진한 노랑 */
 }
 </style>
