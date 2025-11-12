@@ -209,12 +209,14 @@ Chart.register(
 const chartOpt = { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: "top" } } };
 
 const barData = ref({
-    labels: ["January", "February", "March", "April", "May", "June"],
+    labels: ["이력서", "자기소개서", "포트폴리오"],
     datasets: [
-        { label: "Series 1", data: [40, 60, 70, 55, 80, 90], backgroundColor: "#FFB1C1" },
-        { label: "Series 2", data: [50, 65, 75, 60, 85, 95], backgroundColor: "#9AD0F5" },
+        { label: "항목 1", data: [85, 75, 88], backgroundColor: "#FFB1C1" },
+        { label: "항목 2", data: [88, 82, 90], backgroundColor: "#9AD0F5" },
+        { label: "항목 3", data: [92, 78, 93], backgroundColor: "#71EBBE" },
     ],
 });
+
 const stackedData = ref({
     labels: ["January", "February", "March", "April", "May", "June"],
     datasets: [
