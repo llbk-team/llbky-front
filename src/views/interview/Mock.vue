@@ -14,42 +14,38 @@
             <div class="mb-4">
               <label class="fw-semibold mb-2 text-dark">어떤 유형의 면접을 연습하실 건가요?</label>
               <div class="d-flex gap-3">
-                <button
-                  class="btn type-btn flex-fill py-3 d-flex flex-column align-items-center border rounded-3"
-                  :class="type === 'comprehensive' ? 'btn-mint' : 'btn-outline-dark'"
-                  @click="type = 'comprehensive'"
-                >
-                  <span class="fw-bold">종합 면접</span>
-                  <small class="text-muted">직무+인성 질문을 함께 준비</small>
-                </button>
-                <button
-                  class="btn type-btn flex-fill py-3 d-flex flex-column align-items-center border rounded-3"
-                  :class="type === 'technical' ? 'btn-mint' : 'btn-outline-dark'"
-                  @click="type = 'technical'"
-                >
-                  <span class="fw-bold">직무 면접</span>
-                  <small class="text-muted">기술 중심 평가</small>
-                </button>
-              </div>
+              <button
+                class="btn type-btn flex-fill py-3 d-flex flex-column align-items-center border rounded-3 w-50"
+                :class="type === 'comprehensive' ? 'btn-mint' : 'btn-outline-dark'"
+                @click="type = 'comprehensive'"
+              >
+                <span class="fw-bold">종합 면접</span>
+                <small class="text-muted">직무+인성 질문을 함께 준비</small>
+              </button>
+              <button
+                class="btn type-btn flex-fill py-3 d-flex flex-column align-items-center border rounded-3 w-50"
+                :class="type === 'technical' ? 'btn-mint' : 'btn-outline-dark'"
+                @click="type = 'technical'"
+              >
+                <span class="fw-bold">직무 면접</span>
+                <small class="text-muted">기술 중심 평가</small>
+              </button>
+            </div>
+
             </div>
 
             <!-- 기업 선택 -->
             <div class="mb-4">
               <label class="fw-semibold mb-2 text-dark">희망하시는 기업이 어디인가요?</label>
-              <div class="bg-light p-3 rounded-3">
-                <div class="input-group mb-2">
-                  <span class="input-group-text bg-white border-end-0">
-                    <i class="bi bi-search"></i>
-                  </span>
-                  <input
-                    type="text"
-                    class="form-control border-start-0"
-                    placeholder="기업명을 검색하세요 (예: 네이버)"
-                    v-model="companySearch"
-                  />
-                </div>
-                <small class="text-muted">선택된 기업: {{ selectedCompany || "없음" }}</small>
-              </div>
+              <input
+                type="text"
+                class="form-control p-3 rounded-3"
+                v-model="selectedCompany"
+                placeholder="예: 네이버, 삼성전자, 카카오 등"
+              />
+              <small class="text-muted d-block mt-2">
+                AI가 입력된 기업명을 기반으로 질문을 생성합니다.
+              </small>
             </div>
 
             <!-- 서류 선택 -->
@@ -71,7 +67,6 @@
                 <button
                   class="btn btn-deep-mint w-100 mt-2 fw-medium py-2"
                   :disabled="!selectedFiles.length"
-                  @click="applyFiles"
                 >
                   선택한 서류 적용하기
                 </button>
@@ -89,7 +84,7 @@
         </div>
 
         <!-- 오른쪽 AI 질문 영역 -->
-        <div class="col-lg-6">
+        <div v-show="showQuestions" class="col-lg-6">
           <div class="border rounded-4 shadow-sm">
             <div class="bg-dark text-white rounded-top-4 px-4 py-3 fw-bold">
               AI 생성 면접 예상 질문
@@ -139,6 +134,7 @@
             </div>
           </div>
         </div>
+
       </div>
     </div>
   </div>
@@ -148,19 +144,14 @@
 import { ref } from "vue";
 
 const type = ref("comprehensive");
-const companySearch = ref("");
-const selectedCompany = ref("한국인공지능소프트웨어산업협회");
+const selectedCompany = ref("");
 
 const files = ref([
-  "구글_김병현_이력서.pdf",
-  "구글_김병현_포트폴리오.pdf",
-  "구글_김병현_자기소개서.pdf",
+  "구글_김병현_이력서",
+  "구글_김병현_포트폴리오",
+  "구글_김병현_자기소개서",
 ]);
 const selectedFiles = ref([]);
-
-const applyFiles = () => {
-  alert(`적용된 서류: ${selectedFiles.value.join(", ")}`);
-};
 
 const questions = ref([
   "1분 동안 자기소개를 해주세요.",
@@ -172,6 +163,7 @@ const questions = ref([
 
 const isAdding = ref(false);
 const newQuestion = ref("");
+const showQuestions = ref(false);
 
 const addQuestion = () => {
   if (newQuestion.value.trim()) {
@@ -182,7 +174,7 @@ const addQuestion = () => {
 };
 
 const generateQuestions = () => {
-  alert("AI가 예상 질문을 생성했습니다!");
+  showQuestions.value = true;
 };
 </script>
 
@@ -234,5 +226,11 @@ const generateQuestions = () => {
 
 /* 버튼이 줄바꿈되지 않도록(안전장치) */
 .add-question-box .btn { white-space: nowrap; }
+
+/* 입력 필드 placeholder 색상 연하게 */
+input::placeholder {
+  color: #bcbcbc !important; /* 좀 더 연한 회색 */
+  opacity: 1; /* Safari용 (기본 투명도 제거) */
+}
 
 </style>

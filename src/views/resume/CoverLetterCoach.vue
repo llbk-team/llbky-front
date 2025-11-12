@@ -4,7 +4,7 @@
 
     <!-- 메인 -->
     <section class="flex-grow-1 p-4">
-      <div class="text-muted small mb-2">my &gt; 서류관리 &gt; 자기소개서</div>
+      <div class="text-muted small mb-2">my &gt; 서류작성 &gt; 자기소개서</div>
       <h2 class="fw-semibold mb-4 text-dark">AI 자기소개서 코칭</h2>
 
       <div class="row g-4">

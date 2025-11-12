@@ -47,18 +47,31 @@
           </button>
         </div>
 
-        <div
-          v-for="(q, i) in displayedJobQuestions"
-          :key="i"
-          class="d-flex justify-content-between align-items-center border rounded-3 p-3 mb-2 bg-white shadow-sm-sm"
-        >
-          <div class="d-flex align-items-center gap-3">
-            <span class="badge bg-mint text-dark rounded-pill">{{ i + 1 }}</span>
-            <span>{{ q.text }}</span>
-          </div>
-          <div class="d-flex gap-2">
-            <button class="btn btn-sm text-muted" title="음성 듣기">🎤</button>
-            <button class="btn btn-sm text-muted" title="답변 보기">🎞️</button>
+        <!-- 목록 없을 때 -->
+        <div v-if="jobQuestions.length === 0" class="text-center text-muted py-3">
+          등록된 직무 질문이 없습니다.
+        </div>
+
+        <!-- 목록 있을 때 -->
+        <div v-else>
+          <div
+            v-for="(q, i) in displayedJobQuestions"
+            :key="i"
+            class="d-flex justify-content-between align-items-center border rounded-3 p-3 mb-2 bg-white shadow-sm-sm"
+          >
+            <div class="d-flex align-items-center gap-3">
+              <span class="badge bg-mint text-dark rounded-pill">{{ i + 1 }}</span>
+              <span>{{ q.text }}</span>
+            </div>
+            <div class="d-flex gap-2">
+              <button
+                class="btn btn-sm text-muted"
+                title="답변 보기"
+                @click="openAnswerModal(q)"
+              >
+                🎞️ 답변 보기
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -78,18 +91,29 @@
           </button>
         </div>
 
-        <div
-          v-for="(q, i) in displayedGeneralQuestions"
-          :key="i"
-          class="d-flex justify-content-between align-items-center border rounded-3 p-3 mb-2 bg-white shadow-sm-sm"
-        >
-          <div class="d-flex align-items-center gap-3">
-            <span class="badge bg-mint text-dark rounded-pill">{{ i + 1 }}</span>
-            <span>{{ q.text }}</span>
-          </div>
-          <div class="d-flex gap-2">
-            <button class="btn btn-sm text-muted" title="음성 듣기">🎤</button>
-            <button class="btn btn-sm text-muted" title="답변 보기">🎞️</button>
+        <div v-if="generalQuestions.length === 0" class="text-center text-muted py-3">
+          등록된 종합 질문이 없습니다.
+        </div>
+
+        <div v-else>
+          <div
+            v-for="(q, i) in displayedGeneralQuestions"
+            :key="i"
+            class="d-flex justify-content-between align-items-center border rounded-3 p-3 mb-2 bg-white shadow-sm-sm"
+          >
+            <div class="d-flex align-items-center gap-3">
+              <span class="badge bg-mint text-dark rounded-pill">{{ i + 1 }}</span>
+              <span>{{ q.text }}</span>
+            </div>
+            <div class="d-flex gap-2">
+              <button
+                class="btn btn-sm text-muted"
+                title="답변 보기"
+                @click="openAnswerModal(q)"
+              >
+                🎞️ 답변 보기
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -97,61 +121,105 @@
 
     <!-- 면접 이력 탭 -->
     <div v-else>
-      <div
+      <div v-if="histories.length === 0" class="text-center text-muted py-3">
+        면접 이력이 없습니다.
+      </div>
+      <div v-else>
+        <div
         v-for="(h, i) in histories"
         :key="i"
         class="border rounded-3 bg-white p-3 mb-3 shadow-sm"
-      >
-        <div class="d-flex justify-content-between align-items-center mb-2">
-          <div class="d-flex align-items-center gap-2">
-            <span class="badge bg-mint text-dark">완료</span>
-            <small class="text-muted">{{ h.date }}</small>
-            <small class="text-muted">{{ h.questionCount }}개 질문</small>
-          </div>
-          <button
+        >
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <div class="d-flex align-items-center gap-2">
+              <span class="badge bg-mint text-dark">완료</span>
+              <small class="text-muted">{{ h.date }}</small>
+              <small class="text-muted">{{ h.questionCount }}개 질문</small>
+            </div>
+            <button
             class="btn btn-outline-secondary btn-sm rounded-pill fw-medium px-3 py-1"
-            @click="$router.push(`/interview/report/${i}`)"
-          >
-            📄 리포트 보기
-          </button>
-        </div>
-        <p class="fw-semibold mb-1">{{ h.scoreSummary }}</p>
-        <p class="text-muted small mb-2">{{ h.feedback }}</p>
-        <div class="progress" style="height: 6px;">
-          <div
-            class="progress-bar bg-mint"
-            role="progressbar"
-            :style="{ width: h.progress + '%' }"
-          ></div>
+              @click="$router.push(`/interview/report/${i}`)"
+            >
+              📄 리포트 보기
+            </button>
+          </div>
+          <p class="fw-semibold mb-1">{{ h.scoreSummary }}</p>
+          <p class="text-muted small mb-2">{{ h.feedback }}</p>
+          <div class="progress" style="height: 6px;">
+            <div
+              class="progress-bar bg-mint"
+              role="progressbar"
+              :style="{ width: h.progress + '%' }"
+            ></div>
+          </div>
         </div>
       </div>
     </div>
+
+    <!-- 답변 보기 모달 -->
+    <div v-if="showModal" class="modal-backdrop d-flex justify-content-center align-items-center">
+      <div class="modal-content-custom p-4 rounded-4 shadow-lg bg-white text-center">
+        <h5 class="fw-bold mb-3">{{ selectedQuestion?.text }}</h5>
+        <!-- 오디오 -->
+        <div v-if="selectedQuestion?.type === 'audio'">
+          <audio controls class="w-100 mb-3">
+            <source :src="selectedQuestion.answerUrl || ''" type="audio/mp3" />
+            브라우저가 오디오 재생을 지원하지 않습니다.
+          </audio>
+        </div>
+
+        <!-- 비디오 -->
+        <div v-else-if="selectedQuestion?.type === 'video'">
+          <video controls class="w-100 mb-3 rounded-3">
+            <source :src="selectedQuestion.answerUrl || ''" type="video/mp4" />
+            브라우저가 비디오 재생을 지원하지 않습니다.
+          </video>
+        </div>
+
+        <div class="d-flex justify-content-center gap-3">
+          <button class="btn btn-outline-secondary rounded-pill px-4" @click="showModal = false">
+            닫기
+          </button>
+         <!-- 리포트로 이동 버튼 -->
+          <button
+            class="btn btn-mint rounded-pill px-4"
+            @click="goToReport(selectedQuestion)"
+          >
+            📄 리포트로 이동
+          </button>
+
+        </div>
+      </div>
+    </div>
+
   </div>
 </template>
 
 <script setup>
+import router from "@/router";
 import { ref, computed } from "vue";
 
 const tab = ref("question");
 const showAllJob = ref(false);
 const showAllGeneral = ref(false);
+const showModal = ref(false);
+const selectedQuestion = ref(null);
 
 const jobQuestions = ref([
-  { text: "Spring Boot와 Spring Framework의 차이점을 설명해주세요." },
-  { text: "RESTful API 설계 원칙에 대해 설명해주세요." },
-  { text: "JPA N+1 문제의 해결 방법을 설명해주세요." },
-  { text: "서비스 계층의 역할은 무엇인가요?" },
-  { text: "DI(Dependency Injection)에 대해 설명해주세요." },
-  { text: "트랜잭션의 ACID 특성은 무엇인가요?" },
+  { text: "Spring Boot와 Spring Framework의 차이점을 설명해주세요.", type: "audio" },
+  { text: "RESTful API 설계 원칙에 대해 설명해주세요.", type: "video" },
+  { text: "JPA N+1 문제의 해결 방법을 설명해주세요.", type: "audio" },
+  { text: "서비스 계층의 역할은 무엇인가요?", type: "video" },
+  { text: "DI(Dependency Injection)에 대해 설명해주세요.", type: "audio" },
 ]);
 
 const generalQuestions = ref([
-  { text: "1분 자기소개를 해주세요." },
-  { text: "본인의 강점과 약점을 말해주세요." },
-  { text: "팀 내 의견 충돌이 있었을 때 어떻게 해결하셨나요?" },
-  { text: "성공적인 협업 경험을 말해주세요." },
-  { text: "가장 도전적이었던 프로젝트는 무엇인가요?" },
-  { text: "실패 경험이 있다면 어떻게 극복했나요?" },
+  { text: "1분 자기소개를 해주세요.", type: "video" },
+  { text: "본인의 강점과 약점을 말해주세요.", type: "audio" },
+  { text: "팀 내 의견 충돌이 있었을 때 어떻게 해결하셨나요?", type: "audio" },
+  { text: "성공적인 협업 경험을 말해주세요.", type: "video" },
+  { text: "가장 도전적이었던 프로젝트는 무엇인가요?", type: "audio" },
+  { text: "실패 경험이 있다면 어떻게 극복했나요?", type: "video" },
 ]);
 
 const displayedJobQuestions = computed(() =>
@@ -162,6 +230,25 @@ const displayedGeneralQuestions = computed(() =>
     ? generalQuestions.value
     : generalQuestions.value.slice(0, 5)
 );
+
+const openAnswerModal = (question) => {
+  selectedQuestion.value = question;
+  showModal.value = true;
+};
+
+const goToReport = (question) => {
+  showModal.value = false;
+
+  // ⚙️ 정적 예시 (실제론 question.id 나 sessionId 로 매핑될 예정)
+  // 여기서는 그냥 질문 타입에 따라 임시 리포트 페이지 다르게 이동시킴
+  if (question.type === "audio") {
+    // 오디오형 질문 -> 리포트 1번 페이지
+    router.push("/interview/report/1");
+  } else {
+    // 비디오형 질문 -> 리포트 2번 페이지
+    router.push("/interview/report/2");
+  }
+};
 
 const histories = ref([
   {
@@ -205,4 +292,15 @@ const histories = ref([
 .bg-mint {
   background-color: #71ebbe !important;
 }
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 1050;
+}
+.modal-content-custom {
+  width: 90%;
+  max-width: 600px;
+}
+
 </style>

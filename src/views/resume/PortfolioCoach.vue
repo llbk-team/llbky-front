@@ -201,6 +201,7 @@ function editPortfolio() {
 function saveResult() {
   console.log('분석 결과 저장')
   alert('분석 결과가 저장되었습니다!')
+  router.push(`/resume/list`);
 }
 </script>
 
@@ -212,14 +213,6 @@ function saveResult() {
   /* display: flex; → d-flex 클래스로 대체됨 */
 }
 
-/* Sidebar Container - 고정 너비 250px */
-.sidebar-container {
-  width: 250px;
-  background: #FFFFFF;
-  border-right: 1px solid #E5E5E5;
-  min-height: 100vh;
-  flex-shrink: 0; /* 사이드바 크기 고정 */
-}
 
 /* Analysis Container - 나머지 공간 차지 */
 .analysis-container {

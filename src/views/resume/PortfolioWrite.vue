@@ -9,7 +9,7 @@
       <main class="content">
         <!-- Breadcrumb -->
         <div class="breadcrumb">
-          <span>my > 서류관리 > 이력서</span>
+          <span>my > 서류작성 > 포트폴리오</span>
         </div>
 
         <!-- Page Title -->

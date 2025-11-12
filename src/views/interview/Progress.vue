@@ -66,14 +66,20 @@
 
         <!-- 녹음/녹화 컨트롤 -->
         <div class="bg-light rounded-4 p-4 mt-3 shadow-sm">
-          <div class="d-flex justify-content-between align-items-center mb-4">
-            <h6 class="fw-bold text-dark mb-0">답변 녹음/녹화</h6>
+          <!-- 상단 영역 -->
+          <div class="position-relative mb-4">
+            <!-- 왼쪽: 이전 질문 -->
             <button
-              class="btn btn-mint rounded-pill px-3 py-1 fw-medium"
-              @click="handleSubmit"
+              class="btn btn-link p-0 text-muted small position-absolute start-0 top-50 translate-middle-y"
+              :disabled="current <= 1"
+              @click="goPrevQuestion"
+              style="text-decoration: none; font-size: 0.85rem;"
             >
-              {{ current < total ? "답변 제출 >" : "면접 완료 >" }}
+              <span class="me-1">&lt;</span> 이전 질문으로 돌아가기
             </button>
+
+            <!-- 가운데: 제목 (절대 중앙 고정) -->
+            <h6 class="fw-bold text-dark mb-0 text-center">답변 녹음/녹화</h6>
           </div>
 
           <!-- 모드 선택 -->
@@ -106,18 +112,36 @@
             </div>
           </div>
 
-          <!-- 녹음/녹화 시작/중지 -->
+          <!-- 녹음/녹화 버튼 -->
           <div class="d-flex justify-content-center mt-3">
             <button
               class="btn fw-medium px-4 py-2"
               :class="isRecording ? 'btn-danger text-white' : 'btn-mint text-dark'"
-              @click="isRecording ? stopRecording() : startRecording()"
+              @click="toggleRecording"
             >
               <i :class="isRecording ? 'ri-stop-fill me-1' : 'ri-record-circle-fill me-1'"></i>
-              {{ isRecording ? (mode === 'video' ? '녹화 중지' : '녹음 중지') : (mode === 'video' ? '녹화 시작' : '녹음 시작') }}
+              {{ isRecording
+                ? (mode === 'video' ? '녹화 중지' : '녹음 중지')
+                : (
+                    current <= lastAnswered
+                      ? (mode === 'video' ? '재녹화 시작' : '재녹음 시작')
+                      : (mode === 'video' ? '녹화 시작' : '녹음 시작')
+                  )
+              }}
+            </button>
+          </div>
+
+          <!-- 답변 제출 버튼 (검정 테두리 & 작게) -->
+          <div class="text-center mt-3">
+            <button
+              class="btn btn-outline-dark rounded-pill px-4 py-1 fw-medium small-text"
+              @click="handleSubmit"
+            >
+              {{ current < total ? "답변 제출" : "면접 완료" }}
             </button>
           </div>
         </div>
+
       </div>
 
       <!-- 오른쪽 AI 피드백 -->
@@ -171,6 +195,7 @@
           </div>
         </div>
       </div>
+
     </div>
   </div>
 </template>
@@ -209,9 +234,39 @@ const setMode = (newMode) => {
   mode.value = newMode;
   stopRecording();
 };
+const restartRecording = () => {
+  if (!isRecording.value) return;
+  stopRecording();
+  startRecording();
+};
+
+const lastAnswered = ref(0); // 마지막으로 완료된 질문 번호
+
+const toggleRecording = () => {
+  if (isRecording.value) {
+    // 녹음 중지
+    stopRecording();
+  } else {
+    // 새로 시작 or 재녹음
+    startRecording();
+    const action =
+      current.value <= lastAnswered.value
+        ? (mode.value === "video" ? "재녹화" : "재녹음")
+        : (mode.value === "video" ? "녹화" : "녹음");
+  }
+};
+
+const goPrevQuestion = () => {
+  if (current.value > 1) {
+    stopRecording(); // 혹시 녹음 중이면 중단
+    current.value--; // 이전 질문로 이동
+  }
+};
+
 const handleSubmit = () => {
   if (current.value < total) {
     alert(`질문 ${current.value}의 답변이 제출되었습니다.`);
+    lastAnswered.value = Math.max(lastAnswered.value, current.value);
     current.value++;
     stopRecording();
   } else {
@@ -220,6 +275,7 @@ const handleSubmit = () => {
     router.push("/interview/report");
   }
 };
+
 const formatTime = (seconds) => {
   const min = Math.floor(seconds / 60);
   const sec = seconds % 60;

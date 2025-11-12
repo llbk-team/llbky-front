@@ -77,9 +77,6 @@
                   style="height: 32px; width: 100%;"
                   controls
                 ></audio>
-                <button class="btn btn-link text-mint fs-3 ms-2" @click="togglePlay">
-                  <i :class="isPlaying ? 'bi bi-pause-fill' : 'bi bi-play-fill'"></i>
-                </button>
               </div>
             </div>
           </div>
@@ -92,22 +89,14 @@
       <section class="right-panel rounded-4 p-4 shadow-sm">
         <!-- 보기 모드 -->
         <div class="d-flex justify-content-end mb-3">
-          <div class="btn-group">
-            <button
-              class="btn btn-sm"
-              :class="mode === 'all' ? 'btn-mint text-dark fw-bold' : 'btn-outline-secondary text-dark'"
-              @click="mode = 'all'"
-            >
-              전체 보기
-            </button>
-            <button
-              class="btn btn-sm"
-              :class="mode === 'single' ? 'btn-mint text-dark fw-bold' : 'btn-outline-secondary text-dark'"
-              @click="mode = 'single'"
-            >
-              선택 질문 보기
-            </button>
-          </div>
+          <!-- 선택 질문 보기일 때 -->
+          <button
+            v-show="mode !== 'all'"
+            class="btn btn-sm btn-outline-secondary text-dark"
+            @click="mode = 'all'"
+          >
+            전체 보기
+          </button>
         </div>
 
         <!-- 종합 평가 -->
@@ -171,7 +160,7 @@ const questions = ref([
 ]);
 
 const selectedQuestion = ref(null);
-const selectQuestion = (q) => { selectedQuestion.value = q; };
+const selectQuestion = (q) => { selectedQuestion.value = q; mode.value = "single"; };
 
 const mode = ref("all");
 
@@ -195,7 +184,6 @@ const filteredFeedback = computed(() => {
 .report-detail {
   background-color: #0b0b0b;
   min-height: 100vh;
-  font-family: "Pretendard", sans-serif;
   color: #fff;
 }
 

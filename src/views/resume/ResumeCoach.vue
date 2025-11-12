@@ -8,9 +8,7 @@
         <div class="breadcrumb">my &gt; 서류관리 &gt; 이력서</div>
         <h1 class="page-title">서류 AI 코칭</h1>
         <div class="resume-header">
-          <button class="button-item" 
-          :class="{ active: $route.path === '/resume/coverletter' }" 
-          @click="$router.push('/resume/coverletter')">
+          <button class="button-item" :class="{ active: $route.path === '/resume/coverletter' }" @click="$router.push('/resume/coverletter')">
             자기소개서 첨삭받기
           </button>
         </div>
@@ -27,121 +25,298 @@
 
               <!-- ✅ 기본 형식 (default) -->
               <div v-if="resumeFormat === 'default'">
-                <div class="section">
-                  <h3>기본 정보</h3>
-                  <p><strong>이름:</strong> {{ resumeData.name }}</p>
-                  <p><strong>이메일:</strong> {{ resumeData.email }}</p>
-                  <p><strong>전화:</strong> {{ resumeData.phone }}</p>
-                </div>
+                <!-- 수정 모드가 아닌 경우: 일반 표시 -->
+                <div v-if="!isEditing">
+                  <div class="section">
+                    <h3>기본 정보</h3>
+                    <p><strong>이름:</strong> {{ resumeData.name }}</p>
+                    <p><strong>이메일:</strong> {{ resumeData.email }}</p>
+                    <p><strong>전화:</strong> {{ resumeData.phone }}</p>
+                  </div>
 
-                <div class="section">
-                  <h3>경력 사항</h3>
-                  <p><strong>{{ resumeData.career.company }} | {{ resumeData.career.position }}</strong><br>
-                    {{ resumeData.career.period }}</p>
-                  <ul>
-                    <li v-for="(achievement, index) in resumeData.career.achievements" :key="index">
-                      {{ achievement }}
-                    </li>
-                  </ul>
-                </div>
+                  <div class="section">
+                    <h3>경력 사항</h3>
+                    <p><strong>{{ resumeData.career.company }} | {{ resumeData.career.position }}</strong><br>
+                      {{ resumeData.career.period }}</p>
+                    <ul>
+                      <li v-for="(achievement, index) in resumeData.career.achievements" :key="index">
+                        {{ achievement }}
+                      </li>
+                    </ul>
+                  </div>
 
-                <div class="section">
-                  <h3>기술 스택</h3>
-                  {{ resumeData.skills }}
+                  <div class="section">
+                    <h3>기술 스택</h3>
+                    {{ resumeData.skills }}
+                  </div>
+                </div>
+                
+                <!-- 수정 모드인 경우: 입력 폼 -->
+                <div v-else>
+                  <div class="section">
+                    <h3>기본 정보</h3>
+                    <div class="form-group mb-3">
+                      <label class="form-label">이름</label>
+                      <input type="text" class="form-control" v-model="editData.name">
+                    </div>
+                    <div class="form-group mb-3">
+                      <label class="form-label">이메일</label>
+                      <input type="email" class="form-control" v-model="editData.email">
+                    </div>
+                    <div class="form-group mb-3">
+                      <label class="form-label">전화</label>
+                      <input type="text" class="form-control" v-model="editData.phone">
+                    </div>
+                  </div>
+
+                  <div class="section">
+                    <h3>경력 사항</h3>
+                    <div class="form-group mb-3">
+                      <label class="form-label">회사명</label>
+                      <input type="text" class="form-control" v-model="editData.career.company">
+                    </div>
+                    <div class="form-group mb-3">
+                      <label class="form-label">직위</label>
+                      <input type="text" class="form-control" v-model="editData.career.position">
+                    </div>
+                    <div class="form-group mb-3">
+                      <label class="form-label">근무기간</label>
+                      <input type="text" class="form-control" v-model="editData.career.period">
+                    </div>
+                    <div class="form-group mb-3">
+                      <label class="form-label">주요 업무 및 성과</label>
+                      <div v-for="(achievement, index) in editData.career.achievements" :key="index" class="mb-2">
+                        <div class="d-flex gap-2">
+                          <textarea class="form-control" rows="2" v-model="editData.career.achievements[index]"></textarea>
+                          <button class="btn btn-sm btn-outline-danger" @click="removeAchievement(index)">
+                            <i class="bi bi-trash"></i>
+                          </button>
+                        </div>
+                      </div>
+                      <button class="btn btn-sm btn-outline-primary mt-2" @click="addAchievement">
+                        + 항목 추가
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="section">
+                    <h3>기술 스택</h3>
+                    <textarea class="form-control" rows="3" v-model="editData.skills"></textarea>
+                  </div>
                 </div>
               </div>
 
               <!-- ✅ 줄글 형식 (text) -->
               <div v-else-if="resumeFormat === 'text'" class="text-format">
-                <div class="section">
-                  <h3>기본 정보</h3>
-                  <p class="text-paragraph">
-                    저는 <strong>{{ resumeData.name }}</strong>이며,
-                    <strong>{{ resumeData.email }}</strong>으로 연락 가능합니다.
-                    전화번호는 <strong>{{ resumeData.phone }}</strong>입니다.
-                  </p>
-                </div>
+                <!-- 수정 모드가 아닌 경우: 일반 표시 -->
+                <div v-if="!isEditing">
+                  <div class="section">
+                    <h3>기본 정보</h3>
+                    <p class="text-paragraph">
+                      저는 <strong>{{ resumeData.name }}</strong>이며,
+                      <strong>{{ resumeData.email }}</strong>으로 연락 가능합니다.
+                      전화번호는 <strong>{{ resumeData.phone }}</strong>입니다.
+                    </p>
+                  </div>
 
-                <div class="section">
-                  <h3>경력 및 성과</h3>
-                  <p class="text-paragraph">
-                    <strong>{{ resumeData.career.company }}</strong>에서
-                    <strong>{{ resumeData.career.position }}</strong>으로
-                    {{ resumeData.career.period }} 근무하였습니다.
-                  </p>
-                  <p class="text-paragraph">
-                    주요 업무로는 Spring Boot 기반 전자상거래 플랫폼을 개발하고 운영하였으며,
-                    MSA 아키텍처 전환 프로젝트를 리드하여 응답속도를 50% 개선하는 성과를 달성했습니다.
+                  <div class="section">
+                    <h3>경력 및 성과</h3>
+                    <p class="text-paragraph">
+                      <strong>{{ resumeData.career.company }}</strong>에서
+                      <strong>{{ resumeData.career.position }}</strong>으로
+                      {{ resumeData.career.period }} 근무하였습니다.
+                    </p>
+                    <p class="text-paragraph">
+                      주요 업무로는 Spring Boot 기반 전자상거래 플랫폼을 개발하고 운영하였으며,
+                      MSA 아키텍처 전환 프로젝트를 리드하여 응답속도를 50% 개선하는 성과를 달성했습니다.
+                      또한 Redis 캐싱을 도입하여 DB 부하를 40% 감소시켰습니다.
+                    </p>
+                  </div>
+
+                  <div class="section">
+                    <h3>보유 기술</h3>
+                    <p class="text-paragraph">
+                      {{ resumeData.skills }}에 대한 실무 경험을 보유하고 있으며,
+                      이를 활용하여 다양한 프로젝트를 성공적으로 수행하였습니다.
+                    </p>
+                  </div>
+                </div>
+                
+                <!-- 수정 모드인 경우: 텍스트 영역 -->
+                <div v-else>
+                  <div class="section">
+                    <h3>기본 정보</h3>
+                    <textarea class="form-control" rows="4" v-model="editData.basicInfoText"
+                    >
+
+                    </textarea>
+                  </div>
+
+                  <div class="section">
+                    <h3>경력 및 성과</h3>
+                    <textarea class="form-control" rows="4" v-model="editData.careerText"
+                    placeholder="(주)테크컴퍼니에서 백엔드 개발자 2021.03 - 2023.06 (2년 3개월)근무했습니다.">
+
+                    </textarea>
+                    <textarea class="form-control mt-3" rows="6" v-model="editData.achievementsText">
+                    주요 업무로는 Spring Boot 기반 전자상거래 플랫폼을 개발하고 운영하였으며, 
+                    MSA 아키텍처 전환 프로젝트를 리드하여 응답속도를 50% 개선하는 성과를 달성했습니다. 
                     또한 Redis 캐싱을 도입하여 DB 부하를 40% 감소시켰습니다.
-                  </p>
-                </div>
+                    </textarea>
+                  </div>
 
-                <div class="section">
-                  <h3>보유 기술</h3>
-                  <p class="text-paragraph">
-                    {{ resumeData.skills }}에 대한 실무 경험을 보유하고 있으며,
-                    이를 활용하여 다양한 프로젝트를 성공적으로 수행하였습니다.
-                  </p>
+                  <div class="section">
+                    <h3>보유 기술</h3>
+                    <textarea class="form-control" rows="4" v-model="editData.skillsText" >
+                        Java, Spring Boot, MySQL, Redis, AWS, Docker, Kubernetes
+                    </textarea>
+                  </div>
                 </div>
               </div>
 
               <!-- ✅ 규격화된 형식 (standard) -->
               <div v-else-if="resumeFormat === 'standard'" class="standard-format">
-                <table class="table table-bordered resume-table">
-                  <tbody>
-                    <tr>
-                      <th class="table-header" width="20%">성명</th>
-                      <td width="30%">{{ resumeData.name }}</td>
-                      <th class="table-header" width="20%">생년월일</th>
-                      <td width="30%">1990.01.01</td>
-                    </tr>
-                    <tr>
-                      <th class="table-header">연락처</th>
-                      <td>{{ resumeData.phone }}</td>
-                      <th class="table-header">이메일</th>
-                      <td>{{ resumeData.email }}</td>
-                    </tr>
-                    <tr>
-                      <th class="table-header">주소</th>
-                      <td colspan="3">서울특별시 강남구</td>
-                    </tr>
-                  </tbody>
-                </table>
+                <!-- 수정 모드가 아닌 경우: 일반 표시 -->
+                <div v-if="!isEditing">
+                  <table class="table table-bordered resume-table">
+                    <tbody>
+                      <tr>
+                        <th class="table-header" width="20%">성명</th>
+                        <td width="30%">{{ resumeData.name }}</td>
+                        <th class="table-header" width="20%">생년월일</th>
+                        <td width="30%">1990.01.01</td>
+                      </tr>
+                      <tr>
+                        <th class="table-header">연락처</th>
+                        <td>{{ resumeData.phone }}</td>
+                        <th class="table-header">이메일</th>
+                        <td>{{ resumeData.email }}</td>
+                      </tr>
+                      <tr>
+                        <th class="table-header">주소</th>
+                        <td colspan="3">서울특별시 강남구</td>
+                      </tr>
+                    </tbody>
+                  </table>
 
-                <h3 class="mt-4 mb-3">경력사항</h3>
-                <table class="table table-bordered resume-table">
-                  <thead>
-                    <tr>
-                      <th class="table-header">회사명</th>
-                      <th class="table-header">직위</th>
-                      <th class="table-header">근무기간</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>{{ resumeData.career.company }}</td>
-                      <td>{{ resumeData.career.position }}</td>
-                      <td>{{ resumeData.career.period }}</td>
-                    </tr>
-                  </tbody>
-                </table>
+                  <h3 class="mt-4 mb-3">경력사항</h3>
+                  <table class="table table-bordered resume-table">
+                    <thead>
+                      <tr>
+                        <th class="table-header">회사명</th>
+                        <th class="table-header">직위</th>
+                        <th class="table-header">근무기간</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>{{ resumeData.career.company }}</td>
+                        <td>{{ resumeData.career.position }}</td>
+                        <td>{{ resumeData.career.period }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
 
-                <h4 class="mt-3 mb-2">주요 업무 및 성과</h4>
-                <ul class="standard-list">
-                  <li v-for="(achievement, index) in resumeData.career.achievements" :key="index">
-                    {{ achievement }}
-                  </li>
-                </ul>
+                  <h4 class="mt-3 mb-2">주요 업무 및 성과</h4>
+                  <ul class="standard-list">
+                    <li v-for="(achievement, index) in resumeData.career.achievements" :key="index">
+                      {{ achievement }}
+                    </li>
+                  </ul>
 
-                <h3 class="mt-4 mb-3">보유 기술</h3>
-                <table class="table table-bordered resume-table">
-                  <tbody>
-                    <tr>
-                      <th class="table-header" width="20%">기술 스택</th>
-                      <td>{{ resumeData.skills }}</td>
-                    </tr>
-                  </tbody>
-                </table>
+                  <h3 class="mt-4 mb-3">보유 기술</h3>
+                  <table class="table table-bordered resume-table">
+                    <tbody>
+                      <tr>
+                        <th class="table-header" width="20%">기술 스택</th>
+                        <td>{{ resumeData.skills }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                
+                <!-- 수정 모드인 경우: 편집 가능한 테이블 -->
+                <div v-else>
+                  <table class="table table-bordered resume-table">
+                    <tbody>
+                      <tr>
+                        <th class="table-header" width="20%">성명</th>
+                        <td width="30%">
+                          <input type="text" class="form-control" v-model="editData.name">
+                        </td>
+                        <th class="table-header" width="20%">생년월일</th>
+                        <td width="30%">
+                          <input type="text" class="form-control" v-model="editData.birthdate" placeholder="1990.01.01">
+                        </td>
+                      </tr>
+                      <tr>
+                        <th class="table-header">연락처</th>
+                        <td>
+                          <input type="text" class="form-control" v-model="editData.phone">
+                        </td>
+                        <th class="table-header">이메일</th>
+                        <td>
+                          <input type="email" class="form-control" v-model="editData.email">
+                        </td>
+                      </tr>
+                      <tr>
+                        <th class="table-header">주소</th>
+                        <td colspan="3">
+                          <input type="text" class="form-control" v-model="editData.address" placeholder="서울특별시 강남구">
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+
+                  <h3 class="mt-4 mb-3">경력사항</h3>
+                  <table class="table table-bordered resume-table">
+                    <thead>
+                      <tr>
+                        <th class="table-header">회사명</th>
+                        <th class="table-header">직위</th>
+                        <th class="table-header">근무기간</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>
+                          <input type="text" class="form-control" v-model="editData.career.company">
+                        </td>
+                        <td>
+                          <input type="text" class="form-control" v-model="editData.career.position">
+                        </td>
+                        <td>
+                          <input type="text" class="form-control" v-model="editData.career.period">
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+
+                  <h4 class="mt-3 mb-2">주요 업무 및 성과</h4>
+                  <div v-for="(achievement, index) in editData.career.achievements" :key="index" class="mb-2">
+                    <div class="d-flex gap-2">
+                      <input type="text" class="form-control" v-model="editData.career.achievements[index]">
+                      <button class="btn btn-sm btn-outline-danger" @click="removeAchievement(index)">
+                        <i class="bi bi-trash"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <button class="btn btn-sm btn-outline-primary mt-2" @click="addAchievement">
+                    + 항목 추가
+                  </button>
+
+                  <h3 class="mt-4 mb-3">보유 기술</h3>
+                  <table class="table table-bordered resume-table">
+                    <tbody>
+                      <tr>
+                        <th class="table-header" width="20%">기술 스택</th>
+                        <td>
+                          <textarea class="form-control" rows="3" v-model="editData.skills"></textarea>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
 
@@ -215,13 +390,16 @@
 
               <!-- 하단 버튼 -->
               <div class="d-flex gap-3 justify-content-center">
-                <button class="btn btn-outline-secondary fw-medium btn-lg btn-fixed-width">
+                <button class="btn btn-outline-secondary fw-medium btn-lg btn-fixed-width" @click="$router.push('/resume/list')">
                   📄 리포트 다운로드
                 </button>
-                <button class="btn btn-mint fw-medium btn-lg btn-fixed-width">
-                  ✏️ 서류 수정하기
+
+                <!-- 수정 모드 전환 버튼 -->
+                <button class="btn btn-mint fw-medium btn-lg btn-fixed-width" @click="toggleEditMode">
+                  {{ isEditing ? '💾 수정완료' : '✏️ 서류 수정하기' }}
                 </button>
-                <button class="btn btn-outline-secondary fw-medium btn-lg btn-fixed-width">
+
+                <button class="btn btn-outline-secondary fw-medium btn-lg btn-fixed-width" @click="$router.push('/resume/list')">
                   💾 저장하기
                 </button>
               </div>
@@ -282,12 +460,14 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
-
+import { ref, computed, onMounted } from 'vue';
 import { Modal } from 'bootstrap';
 
 // ✅ 이력서 형식 상태 관리
 const resumeFormat = ref('default'); // default, text, standard
+
+// ✅ 수정 모드 상태
+const isEditing = ref(false);
 
 // ✅ 이력서 데이터 (실제로는 API에서 가져옴)
 const resumeData = ref({
@@ -306,6 +486,80 @@ const resumeData = ref({
   },
   skills: 'Java, Spring Boot, MySQL, Redis, AWS, Docker, Kubernetes'
 });
+
+// ✅ 수정용 임시 데이터 (textarea 입력용)
+const editData = ref({
+  ...resumeData.value,
+  birthdate: '1990.01.01',
+  address: '서울특별시 강남구',
+  // 줄글 형식용 텍스트
+  basicInfoText: '',
+  careerText: '',
+  achievementsText: '',
+  skillsText: ''
+});
+
+// 컴포넌트가 마운트될 때 텍스트 필드 초기화
+onMounted(() => {
+  // 줄글 형식 텍스트 필드 초기화
+  editData.value.basicInfoText = `저는 ${resumeData.value.name}이며, ${resumeData.value.email}으로 연락 가능합니다. 전화번호는 ${resumeData.value.phone}입니다.`;
+  
+  editData.value.careerText = `${resumeData.value.career.company}에서 ${resumeData.value.career.position}으로 ${resumeData.value.career.period} 근무하였습니다.`;
+  
+  editData.value.achievementsText = `주요 업무로는 Spring Boot 기반 전자상거래 플랫폼을 개발하고 운영하였으며, MSA 아키텍처 전환 프로젝트를 리드하여 응답속도를 50% 개선하는 성과를 달성했습니다. 또한 Redis 캐싱을 도입하여 DB 부하를 40% 감소시켰습니다.`;
+  
+  editData.value.skillsText = `${resumeData.value.skills}에 대한 실무 경험을 보유하고 있으며, 이를 활용하여 다양한 프로젝트를 성공적으로 수행하였습니다.`;
+});
+
+// ✅ 성과 항목 추가/삭제 메소드
+const addAchievement = () => {
+  editData.value.career.achievements.push('');
+};
+
+const removeAchievement = (index) => {
+  editData.value.career.achievements.splice(index, 1);
+};
+
+// ✅ 보기모드 ↔ 수정모드 전환
+const toggleEditMode = () => {
+  if (!isEditing.value) {
+    // 수정 시작: 현재 데이터를 복제하여 editData에 담기
+    editData.value = JSON.parse(JSON.stringify(resumeData.value));
+    
+    // 줄글 형식 텍스트 필드 초기화
+    editData.value.basicInfoText = `저는 ${resumeData.value.name}이며, ${resumeData.value.email}으로 연락 가능합니다. 전화번호는 ${resumeData.value.phone}입니다.`;
+    
+    editData.value.careerText = `${resumeData.value.career.company}에서 ${resumeData.value.career.position}으로 ${resumeData.value.career.period} 근무하였습니다.`;
+    
+    editData.value.achievementsText = `주요 업무로는 Spring Boot 기반 전자상거래 플랫폼을 개발하고 운영하였으며, MSA 아키텍처 전환 프로젝트를 리드하여 응답속도를 50% 개선하는 성과를 달성했습니다. 또한 Redis 캐싱을 도입하여 DB 부하를 40% 감소시켰습니다.`;
+    
+    editData.value.skillsText = `${resumeData.value.skills}에 대한 실무 경험을 보유하고 있으며, 이를 활용하여 다양한 프로젝트를 성공적으로 수행하였습니다.`;
+    
+    // 추가 필드 초기화
+    editData.value.birthdate = '1990.01.01';
+    editData.value.address = '서울특별시 강남구';
+  } else {
+    // 저장 완료: editData를 resumeData로 업데이트
+    resumeData.value = {
+      name: editData.value.name,
+      email: editData.value.email,
+      phone: editData.value.phone,
+      career: {
+        company: editData.value.career.company,
+        position: editData.value.career.position,
+        period: editData.value.career.period,
+        achievements: [...editData.value.career.achievements]
+      },
+      skills: editData.value.skills
+    };
+    
+    // 줄글 형식인 경우, 텍스트 필드에서 정보 추출하는 로직 추가 필요
+    // (실제 구현에서는 텍스트 파싱 또는 AI 분석을 통해 구조화된 데이터로 변환)
+    
+    alert('이력서가 저장되었습니다.');
+  }
+  isEditing.value = !isEditing.value;
+};
 
 // ✅ 형식 라벨 표시
 const formatLabel = computed(() => {
@@ -397,7 +651,6 @@ const applyStandardFormat = () => {
       modal.hide();
     }
   }
-
 
   alert('규격화된 이력서가 적용되었습니다.');
 };
@@ -504,13 +757,13 @@ const applyStandardFormat = () => {
   margin-bottom: 0.4rem;
   line-height: 1.6;
 }
+
 .resume-header {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   gap: 1rem;
   margin-bottom: 10px;
-
 }
 
 .button-item {
@@ -521,9 +774,11 @@ const applyStandardFormat = () => {
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.3s ease;
-  color: #000; /* 글씨 검정 */
+  color: #000;
+  /* 글씨 검정 */
   font-weight: 600;
-  background: linear-gradient(135deg, #71EBBE, #A2F1D6); /* 기본 민트색 */
+  background: linear-gradient(135deg, #71EBBE, #A2F1D6);
+  /* 기본 민트색 */
   box-shadow: 0 4px 15px rgba(113, 235, 190, 0.3);
   border: none;
 }
@@ -543,9 +798,6 @@ const applyStandardFormat = () => {
   border-left: 4px solid #71EBBE;
   padding-left: calc(1rem - 4px);
 }
-
-
-
 
 /* ✅ 줄글 형식 스타일 */
 .text-format .text-paragraph {
@@ -737,6 +989,10 @@ const applyStandardFormat = () => {
   color: #000;
 }
 
+.btn-fixed-width {
+  min-width: 200px;
+}
+
 /* 모달 스타일 */
 .resume-sample-container {
   display: flex;
@@ -763,6 +1019,29 @@ const applyStandardFormat = () => {
 
 .modal-footer .btn-mint {
   padding: 0.5rem 2rem;
+}
+
+/* 수정 모드 스타일 */
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-label {
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.form-control {
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  width: 100%;
+}
+
+textarea.form-control {
+  min-height: 80px;
 }
 
 /* 반응형 */
@@ -792,41 +1071,3 @@ const applyStandardFormat = () => {
   }
 }
 </style>
-```
-
-//-----
-// ✅ 주요 변경 사항:
-//
-// 1. **상태 관리**
-// - resumeFormat ref로 현재 선택된 형식 관리 ('default', 'text', 'standard')
-// - resumeData ref로 이력서 데이터 관리
-//
-// 2. **조건부 렌더링**
-// - v-if, v-else-if로 형식에 따라 다른 레이아웃 표시
-// - 기본 형식: 기존 섹션 기반 레이아웃
-// - 줄글 형식: 문단 중심의 자유로운 텍스트
-// - 규격화된 형식: 테이블 기반 표준 양식
-//
-// 3. **형식 전환 함수**
-// - applyTextFormat(): 줄글 형식으로 변경
-// - applyStandardFormat(): 규격화된 형식으로 변경
-// - TODO 주석으로 API 연동 부분 표시
-//
-// 4. **UI 개선**
-// - 선택된 형식에 대한 배지 표시 (formatLabel computed)
-// - 활성화된 버튼에 .active 클래스 적용
-// - 모달에 샘플 미리보기 추가
-//
-// 5. **API 연동 준비** (TODO)
-// - POST http://localhost:8081/ai/resume/convert-format
-// - Content-Type: application/json
-// - Body: { resumeId: number, targetFormat: 'text' | 'standard' }
-//-----
-
-## 📝 Postman 테스트 설정 (추후 백엔드 구현 시)
-
-**엔드포인트**: `POST http://localhost:8081/ai/resume/convert-format`
-
-**Headers**:
-```
-Content-Type: application/json
