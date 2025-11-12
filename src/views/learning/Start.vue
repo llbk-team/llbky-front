@@ -1,6 +1,6 @@
 <template>
   <div class="learning-progress container py-4">
-    <div class="d-flex justify-content-between align-items-end mb-3">
+    <div class="d-flex justify-content-between align-items-end mb-1">
       <div>
         <h1 class="fw-bold fs-3 mb-1" style="color:#111111;">백엔드 개발자 학습 코칭</h1>
         <p class="text-muted mb-0">취업 준비 · 주 {{ weeklyHours }}시간</p>
@@ -12,7 +12,7 @@
       <!-- 왼쪽 영역 -->
       <div class="col-lg-8">
         <!-- 주차별 진행 -->
-        <div class="mb-5 mt-4">
+        <div class="mb-4 mt-4">
           <div class="d-flex justify-content-between align-items-center mb-3">
             <h5 class="fw-semibold mb-0">주차별 학습 진행</h5>
             <span class="text-muted small">{{ currentWeek }}주차 진행 중</span>
@@ -48,14 +48,24 @@
 
         <!-- 이번 주 학습 내용 -->
         <div class="week-detail p-4 rounded-4 shadow-sm">
-          <h6 class="fw-bold mb-3">이번 주 학습 내용 ({{ currentWeek }}주차)</h6>
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="fw-bold mb-0">이번 주 학습 내용 ({{ currentWeek }}주차)</h6>
+
+            <!-- 페이지 전환 버튼 -->
+            <div>
+              <button class="page-btn me-2" :disabled="currentPage === 1" @click="prevPage">‹</button>
+              <button class="page-btn" :disabled="currentPage === totalPages" @click="nextPage">›</button>
+            </div>
+          </div>
+
           <p class="text-muted small mb-4">
             💡 각 항목을 클릭해서 학습 정리 노트를 작성하세요
           </p>
 
+          <!-- 일차별 카드 -->
           <div class="row g-3">
-            <div v-for="(item, index) in weeklyItems" :key="index" class="col-md-6" @click="selectItem(item)">
-              <div class="day-card rounded-3" :class="{ active: selectedItem?.title === item.title }">
+            <div v-for="(item, index) in paginatedItems || []" :key="index" class="col-md-6" @click="selectItem(item)">
+              <div class="day-card rounded-3" :class="{ active: selectedItem && selectedItem.title === item.title }">
                 <div class="d-flex justify-content-between align-items-center">
                   <div>
                     <span class="fw-semibold">{{ item.title }}</span>
@@ -73,6 +83,8 @@
             </div>
           </div>
         </div>
+
+
       </div>
 
       <!-- 오른쪽 영역 (메모 입력) -->
@@ -110,8 +122,8 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
-import WeekDetailModal from "@/components/modal/LearningWeekDetailModal.vue"; // ✅ 추가
+import { ref, computed } from "vue";
+import WeekDetailModal from "@/components/modal/LearningWeekDetailModal.vue";
 
 const weeklyHours = ref(25);
 const currentWeek = ref(2);
@@ -179,11 +191,30 @@ const weeklyProgress = ref([
 
 
 const weeklyItems = ref([
-  { day: "1~2일차", title: "인증/인가 기초", status: "완료" },
-  { day: "3~4일차", title: "Security 필터", status: "진행 중" },
-  { day: "5~6일차", title: "OAuth2 실습", status: "예정" },
-  { day: "7일차", title: "테스트 & 마무리", status: "예정" },
+  { day: "1일차", title: "인증/인가 개념 이해", status: "완료" },
+  { day: "2일차", title: "AuthenticationManager 학습", status: "완료" },
+  { day: "3일차", title: "Security 필터 체인 구조", status: "진행 중" },
+  { day: "4일차", title: "JWT 발급/검증 로직 구현", status: "진행 중" },
+  { day: "5일차", title: "OAuth2 로그인 실습", status: "예정" },
+  { day: "6일차", title: "AccessDeniedHandler 적용", status: "예정" },
+  { day: "7일차", title: "테스트 및 마무리", status: "예정" },
 ]);
+const currentPage = ref(1);
+const itemsPerPage = 4; // 첫 페이지에 1~4일차, 두 번째 페이지에 5~7일차
+const totalPages = computed(() => Math.ceil((weeklyItems.value?.length || 0) / itemsPerPage));
+
+const paginatedItems = computed(() => {
+  if (!weeklyItems.value) return [];
+  const start = (currentPage.value - 1) * itemsPerPage;
+  return weeklyItems.value.slice(start, start + itemsPerPage);
+});
+
+function nextPage() {
+  if (currentPage.value < totalPages.value) currentPage.value++;
+}
+function prevPage() {
+  if (currentPage.value > 1) currentPage.value--;
+}
 
 
 const showWeekModal = ref(false); // 모달 표시 여부
@@ -323,4 +354,24 @@ function submitMemo() {
 .btn-mint {
   background-color: #A2F1D6;
 }
+
+.page-btn {
+  border: none;      
+  background: transparent;  
+  font-size: 1.4rem;     
+  color: #444;          
+  cursor: pointer;
+  padding: 0 6px;       
+  transition: color 0.2s;
+}
+
+.page-btn:hover:not(:disabled) {
+  color: #00c896;       
+}
+
+.page-btn:disabled {
+  color: #ccc;            
+  cursor: default;
+}
+
 </style>

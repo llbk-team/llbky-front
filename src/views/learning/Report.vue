@@ -3,7 +3,7 @@
     <!-- 상단 헤더 -->
     <div class="d-flex justify-content-between align-items-end mb-3">
       <div>
-        <h1 class="fw-bold fs-3 mb-1" style="color:#111111;">📘 학습 리포트</h1>
+        <h1 class="fw-bold fs-3 mb-1" style="color:#111111;">학습 리포트</h1>
         <p class="text-muted mb-0">백엔드 취업 준비 · 총 4주 / 28일 학습 기록</p>
       </div>
       <router-link to="/learning/coach?tab=completed" class="btn btn-outline-green">← 돌아가기</router-link>
