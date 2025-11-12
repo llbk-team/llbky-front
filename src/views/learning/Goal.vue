@@ -30,7 +30,7 @@
       <!-- 오른쪽 -->
       <div class="col-md-8">
         <div class="card shadow-sm p-4 card-clean">
-          <h5 class="fw-bold mb-3 text-dark">학습 목록 (복수 선택)</h5>
+          <h5 class="fw-bold mb-3 text-dark">학습 목적 (복수 선택)</h5>
           <div class="row">
             <div class="col-md-4" v-for="(section, index) in goalSections" :key="index">
               <h6 class="fw-semibold mb-2 text-dark">{{ section.title }}</h6>

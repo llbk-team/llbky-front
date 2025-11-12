@@ -10,7 +10,7 @@
     </div>
 
     <!-- ✅ 진행바 -->
-    <div class="progress-container">
+    <!-- <div class="progress-container">
       <div class="progress-steps">
         <div class="step" :class="{ active: true }">1</div>
         <span class="step-label">AI 학습 설정</span>
@@ -22,7 +22,7 @@
         <div class="step" :class="{ active: currentStep >= 2 }">2</div>
         <span class="step-label">AI 학습 코치</span>
       </div>
-    </div>
+    </div> -->
   </div>
 </template>
 

@@ -28,7 +28,9 @@
               </div>
 
               <p class="text-secondary small mb-2">진행률 {{ plan.progress }}%</p>
-              <button class="btn btn-outline-green btn-sm">학습 이어하기 →</button>
+              <router-link :to="`/learning/start`" class="btn btn-outline-green btn-sm">
+                학습 이어하기 →
+              </router-link>
             </div>
           </div>
         </div>

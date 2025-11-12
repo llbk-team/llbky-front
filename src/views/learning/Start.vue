@@ -91,7 +91,7 @@
               <small class="text-muted">{{ memoContent.length }}/500자</small>
               <div>
                 <button class="btn btn-outline-secondary me-2" @click="cancelMemo">취소</button>
-                <button class="btn btn-primary" @click="submitMemo">
+                <button class="btn btn-mint" @click="submitMemo">
                   ⚡ AI 검증 받기
                 </button>
               </div>
@@ -118,11 +118,52 @@ const currentWeek = ref(2);
 const overallProgress = ref(45);
 
 const weeklyProgress = ref([
-  { label: "1주차", topic: "Java 기초", progress: 100 },
-  { label: "2주차", topic: "Spring Security", progress: 60 },
-  { label: "3주차", topic: "JPA & Database", progress: 0 },
-  { label: "4주차", topic: "REST API 설계", progress: 0 },
+  {
+    label: "1주차",
+    topic: "Java 기초",
+    progress: 100,
+    details: [
+      "💡 학습 목표: 객체지향 프로그래밍 기본 개념 이해, 변수와 제어문 익히기",
+      "📅 학습 일정: 1~2일차 - 자료형 & 연산자 / 3~4일차 - 조건문 & 반복문 / 5~7일차 - 클래스 및 객체",
+      "🧩 주요 학습 항목: 변수와 자료형, 제어문, 클래스 구조, 컬렉션 프레임워크",
+      "🎯 포인트: 코드 작성보다 개념 이해 중심으로 접근하세요."
+    ]
+  },
+  {
+    label: "2주차",
+    topic: "Spring Security",
+    progress: 60,
+    details: [
+      "💡 학습 목표: 인증/인가 구조 이해 및 JWT 기반 인증 실습",
+      "📅 학습 일정: 1일차 - FilterChain 구조 / 2~3일차 - JWT 발급 / 4~6일차 - OAuth2 실습",
+      "🧩 주요 학습 항목: Security 설정, JWT 토큰, OAuth2, AccessDeniedHandler",
+      "🎯 포인트: 요청 흐름(필터 순서)을 눈으로 직접 그려보세요."
+    ]
+  },
+  {
+    label: "3주차",
+    topic: "JPA & Database",
+    progress: 0,
+    details: [
+      "💡 학습 목표: ORM 개념 이해, Entity 설계, JPQL CRUD 작성",
+      "📅 학습 일정: 1~2일차 - JPA 설정 / 3~4일차 - 매핑 실습 / 5~7일차 - 트랜잭션 & JPQL",
+      "🧩 주요 학습 항목: Entity 매핑, JPQL, 연관관계 매핑, 트랜잭션 관리",
+      "🎯 포인트: DB 설계 → Entity 설계 순서로 접근하면 이해가 빨라요."
+    ]
+  },
+  {
+    label: "4주차",
+    topic: "REST API 설계",
+    progress: 0,
+    details: [
+      "💡 학습 목표: RESTful 설계 원칙과 API 문서화 이해",
+      "📅 학습 일정: 1~2일차 - REST 원칙 / 3~5일차 - Controller 설계 / 6~7일차 - Swagger & 예외 처리",
+      "🧩 주요 학습 항목: REST 설계, Controller, Exception Handling, Swagger",
+      "🎯 포인트: 실제 포트폴리오용 API를 만들어보세요."
+    ]
+  }
 ]);
+
 
 const weeklyItems = ref([
   { day: "1~2일차", title: "인증/인가 기초", status: "완료" },
@@ -264,5 +305,9 @@ function submitMemo() {
 .status-badge.planned {
   background: #f3f4f6;
   color: #6b7280;
+}
+
+.btn-mint {
+  background-color: #A2F1D6;
 }
 </style>

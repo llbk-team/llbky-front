@@ -313,7 +313,7 @@ function goToMyLearning() {
   text-align: left;
 }
 
-/* ✅ AI 질문 모달 */
+/* AI 질문 모달 */
 .ai-modal-overlay {
   position: fixed;
   inset: 0;
@@ -355,7 +355,7 @@ function goToMyLearning() {
   padding: 0 12px;
 }
 
-/* ✅ 민트 베이스 저장 완료 모달 */
+/* 민트 베이스 저장 완료 모달 */
 .save-modal-overlay {
   position: fixed;
   inset: 0;
@@ -431,6 +431,4 @@ function goToMyLearning() {
     transform: translateY(0);
   }
 }
-
-/* (부트스트랩 .btn-dark, .btn-outline-secondary는 기본 스타일 사용) */
 </style>
