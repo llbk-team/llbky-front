@@ -300,7 +300,7 @@ const areaData = ref({
 
 .card-header {
     height: 65px;
-    background: #111111;
+
     color: #fff;
     padding: 12px 20px;
     border-radius: 10px 10px 0 0;
@@ -309,11 +309,12 @@ const areaData = ref({
 .card-header h3 {
     font-size: 18px;
     font-weight: 700;
+    color: #111111;
 }
 
 .card-header p {
     font-size: 12px;
-    color: #B4B4B4;
+    color: #555555;
     margin-top: 3px;
 }
 
