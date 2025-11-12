@@ -2,7 +2,17 @@
   <div class="container py-4">
     <form @submit.prevent="generatePlan">
 
-      <LearningHeader :current-step="2" />
+      <!-- 제목 -->
+      <div class="d-flex justify-content-between align-items-end mb-3">
+        <div>
+          <h1 class="fw-bold fs-3 mb-1" style="color:#111111;">AI 학습 설정</h1>
+          <p class="text-muted fs-6 mb-0">
+            목표 직무와 학습 목적을 선택하고 나만의 코칭을 시작해보세요!
+          </p>
+        </div>
+      </div>
+
+      <!-- <LearningHeader :current-step="2" /> -->
 
       <section class="info-section">
         <div class="info-box green-info">
@@ -79,12 +89,7 @@
         </p>
 
         <ul class="resume-list">
-          <li
-            v-for="(item, index) in mockResumes"
-            :key="index"
-            @click="selectResume(item)"
-            class="resume-item"
-          >
+          <li v-for="(item, index) in mockResumes" :key="index" @click="selectResume(item)" class="resume-item">
             <strong>{{ item.title }}</strong>
             <p class="small text-muted mb-1">예상 강점: {{ item.strengths.join(', ') }}</p>
             <p class="small text-muted">보완 필요: {{ item.weaknesses.join(', ') }}</p>
@@ -103,7 +108,6 @@
 <script setup>
 import { ref, watch, onMounted } from "vue";
 import { useStore } from "vuex";
-import LearningHeader from "@/components/bar/LearningHeader.vue";
 
 const store = useStore();
 const skills = ["SQL", "Spring", "Docker", "AWS"];
@@ -469,8 +473,10 @@ function goToPrevious() {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.35); /* ← 진한 검정 대신 35% 투명도 */
-  backdrop-filter: blur(2px); /* 살짝 블러 효과 */
+  background: rgba(0, 0, 0, 0.35);
+  /* ← 진한 검정 대신 35% 투명도 */
+  backdrop-filter: blur(2px);
+  /* 살짝 블러 효과 */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -479,22 +485,26 @@ function goToPrevious() {
 
 /* ✅ 모달 박스 */
 .modal-content {
-  background: #ffffff; /* 완전 흰색 배경 */
+  background: #ffffff;
+  /* 완전 흰색 배경 */
   padding: 24px;
   border-radius: 12px;
   width: 90%;
   max-width: 500px;
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15);
-  color: #111111; /* 검정 텍스트 보이게 */
+  color: #111111;
+  /* 검정 텍스트 보이게 */
   pointer-events: auto;
   z-index: 2100;
 }
+
 .yellow-info {
   cursor: pointer;
   transition: background-color 0.2s;
 }
-.yellow-info:hover {
-  background-color: #fef3c7; /* 살짝 더 진한 노랑 */
-}
 
+.yellow-info:hover {
+  background-color: #fef3c7;
+  /* 살짝 더 진한 노랑 */
+}
 </style>

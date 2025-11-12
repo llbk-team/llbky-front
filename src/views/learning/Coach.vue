@@ -12,10 +12,27 @@
       </router-link>
     </div>
 
+    <!-- [추가1] 탭 버튼 -->
+    <ul class="nav nav-tabs mb-4">
+      <li class="nav-item">
+        <button class="nav-link" :class="{ active: currentTab === 'ongoing' }" @click="setTab('ongoing')">
+          진행 중
+        </button>
+      </li>
+      <li class="nav-item">
+        <button class="nav-link" :class="{ active: currentTab === 'completed' }" @click="setTab('completed')">
+          완료됨
+        </button>
+      </li>
+    </ul>
+
+
     <div class="row g-4">
       <!-- 왼쪽 -->
       <div class="col-md-7">
-        <div class="card shadow-sm p-4 mb-3 card-clean">
+        <!-- [추가2] 진행 중/완료 분리 -->
+        <!-- 진행 중 -->
+        <div v-if="currentTab === 'ongoing'" class="card shadow-sm p-4 mb-3 card-clean">
           <h5 class="fw-bold mb-3" style="color:#111111;">내 학습 이어하기</h5>
 
           <div v-for="(plan, i) in ongoingPlans" :key="i" class="card border-light mb-3 sub-card">
@@ -35,9 +52,11 @@
           </div>
         </div>
 
-        <div class="card shadow-sm p-4 card-clean">
+
+        <!-- 완료된 학습 -->
+        <div v-else class="card shadow-sm p-4 mb-3 card-clean">
           <h5 class="fw-bold mb-3" style="color:#111111;">완료된 학습 플랜</h5>
-          <div v-for="(plan, i) in completedPlans" :key="i" class="card border-light mb-3 sub-card">
+          <div v-for="(plan, i) in completedPlans" :key="i" class="card border-light mb-3 sub-card clickable" @click="goToReport(plan)">
             <div class="card-body">
               <h6 class="fw-semibold">{{ plan.title }}</h6>
               <p class="text-secondary small mb-1">{{ plan.period }}</p>
@@ -47,35 +66,62 @@
         </div>
       </div>
 
+
       <!-- 오른쪽 -->
       <div class="col-md-5">
+
         <div class="card shadow-sm p-4 mb-3 card-clean">
-          <h5 class="fw-bold mb-3" style="color:#111111;">나의 학습 현황</h5>
-
-          <div class="rounded-3 p-3 text-center mb-3" style="background-color:#DDF3EB;">
-            <p class="fw-bold fs-4 mb-0" style="color:#111111;">{{ stats.ongoing }}</p>
-            <p class="text-secondary small mb-0">진행 중인 플랜</p>
-          </div>
-
-          <div class="rounded-3 p-3 text-center" style="background-color:#A2F1D6;">
-            <p class="fw-bold fs-4 mb-0" style="color:#111111;">{{ stats.completed }}</p>
-            <p class="text-secondary small mb-0">완료한 플랜 🎉</p>
-          </div>
-        </div>
-
-        <div class="card shadow-sm p-4 card-clean">
           <h5 class="fw-bold mb-3" style="color:#111111;">AI 코멘트</h5>
           <div class="p-3 rounded border mb-2" style="background-color:#DDF3EB; border-color:#71EBBE;">
             <p class="small mb-0" style="color:#111111;">“{{ aiComment.main }}”</p>
           </div>
           <p class="text-muted small">참고: {{ aiComment.tip }} 💪</p>
         </div>
+
+        <div class="card shadow-sm p-4 card-clean">
+          <h5 class="fw-bold mb-3" style="color:#111111;">나의 학습 현황</h5>
+          <div class="rounded-3 p-3 text-center mb-3" style="background-color:#DDF3EB;">
+            <p class="fw-bold fs-4 mb-0" style="color:#111111;">{{ stats.ongoing }}</p>
+            <p class="text-secondary small mb-0">진행 중인 플랜</p>
+          </div>
+          <div class="rounded-3 p-3 text-center" style="background-color:#A2F1D6;">
+            <p class="fw-bold fs-4 mb-0" style="color:#111111;">{{ stats.completed }}</p>
+            <p class="text-secondary small mb-0">완료한 플랜 🎉</p>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
+import { ref, watch } from "vue";
+import { useRouter, useRoute } from "vue-router";
+
+const router = useRouter();
+const route = useRoute();
+
+// 기본 탭 상태 (진행 중)
+const currentTab = ref(route.query.tab || "ongoing");
+
+watch(
+  () => route.query.tab,
+  (newVal) => {
+    currentTab.value = newVal || "ongoing";
+  }
+);
+
+function setTab(tabName) {
+  currentTab.value = tabName;
+  router.replace({ query: { tab: tabName } }); // 쿼리도 함께 갱신
+}
+
+function goToReport(plan) {
+  router.push(`/learning/report`); // 임시로 report로 감. 나중에 planId별로 이동할 예정
+  // router.push(`/learning/report/${plan.id || 1}`);
+}
+
 const ongoingPlans = [
   { title: '백엔드 취업 준비', period: '4주 플랜', progress: 40 },
   { title: '백엔드 취업 준비', period: '4주 플랜', progress: 40 }
@@ -139,5 +185,25 @@ body {
 /* 그림자 */
 .shadow-sm {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05) !important;
+}
+
+.nav-tabs .nav-link {
+  color: #111111;
+  border: none;
+  font-weight: 500;
+}
+
+.nav-tabs .nav-link.active {
+  border-bottom: 3px solid #71EBBE;
+  color: #111111;
+}
+
+.clickable {
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.clickable:hover {
+  background-color: #e9faf5;
 }
 </style>

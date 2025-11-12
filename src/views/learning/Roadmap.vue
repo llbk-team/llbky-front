@@ -60,7 +60,7 @@
 
       <div>
         <button type="button" class="btn btn-mint me-2" @click="openAiModal">
-          AI 질문
+          플랜 수정하기
         </button>
         <button type="button" class="btn btn-dark" @click="openSaveModal">
           플랜 저장

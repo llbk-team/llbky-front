@@ -23,6 +23,11 @@ const routes = [
   {
     path: '/learning/start',
     component: () => import('@/views/learning/Start.vue')
+  },
+
+  {
+    path: '/learning/report',
+    component: () => import('@/views/learning/Report.vue')
   }
 ]
 

@@ -50,7 +50,7 @@
         <div class="week-detail p-4 rounded-4 shadow-sm">
           <h6 class="fw-bold mb-3">이번 주 학습 내용 ({{ currentWeek }}주차)</h6>
           <p class="text-muted small mb-4">
-            💡 각 항목을 클릭해서 학습 메모를 작성하세요
+            💡 각 항목을 클릭해서 학습 정리 노트를 작성하세요
           </p>
 
           <div class="row g-3">
@@ -80,7 +80,7 @@
         <div class="memo-box shadow-sm p-4 rounded-4">
           <div v-if="selectedItem">
             <h6 class="fw-bold mb-3">
-              📝 {{ selectedItem.title }} 학습 메모
+              📝 {{ selectedItem.title }} 학습 노트
             </h6>
             <p class="text-muted small mb-2">
               학습한 내용을 자유롭게 작성하세요. AI가 내용을 검토해드립니다.
@@ -98,7 +98,7 @@
             </div>
           </div>
           <div v-else class="text-center text-muted py-5">
-            <p>왼쪽에서 학습 항목을 선택하면<br />여기에 메모를 작성할 수 있습니다 ✍️</p>
+            <p>왼쪽에서 학습 항목을 선택하면<br />여기에 정리 노트를 작성할 수 있습니다 ✍️</p>
           </div>
         </div>
       </div>

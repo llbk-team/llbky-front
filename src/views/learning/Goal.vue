@@ -2,16 +2,16 @@
   <div class="container py-4">
 
     <!-- 제목 -->
-    <!-- <div class="d-flex justify-content-between align-items-end mb-3">
+    <div class="d-flex justify-content-between align-items-end mb-3">
       <div>
         <h1 class="fw-bold fs-3 mb-1" style="color:#111111;">AI 학습 설정</h1>
         <p class="text-muted fs-6 mb-0">
           목표 직무와 학습 목적을 선택하고 나만의 코칭을 시작해보세요!
         </p>
       </div>
-    </div> -->
+    </div>
 
-    <LearningHeader :progress="progress" :current-step="1" />
+    <!-- <LearningHeader :progress="progress" :current-step="1" /> -->
 
     <div class="row g-4">
       <!-- 왼쪽 -->
@@ -62,7 +62,7 @@
       </div>
     </div>
 
-    <router-link :to="`/learning/Skill`" class="btn btn-dark-solid w-100 fw-semibold py-3 fs-5">
+    <router-link :to="`/learning/skill`" class="btn btn-dark-solid w-100 fw-semibold py-3 fs-5">
       ▶ AI 코칭 시작하기
     </router-link>
 
@@ -72,7 +72,6 @@
 <script setup>
 import { ref, watch} from 'vue'
 import { useStore } from "vuex"
-import LearningHeader from '@/components/bar/LearningHeader.vue'
 
 const store = useStore();
 const goals = ["취업 준비", "이직 준비", "기술 심화", "자기계발"];
