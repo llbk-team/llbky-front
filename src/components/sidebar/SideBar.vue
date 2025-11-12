@@ -15,7 +15,7 @@
 
       <!-- 자기소개서 -->
       <RouterLink 
-        to="/resume/coverletter" 
+        to="/resume/coverletter/write" 
         class="menu-item" 
         active-class="active"
       >

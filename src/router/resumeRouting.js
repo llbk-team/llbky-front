@@ -28,11 +28,20 @@ const resumeRouting = [
     }
   },
   {
-    path: '/resume/coverletter',
-    name: 'coverletter-coach',
-    component: () => import('../views/resume/CoverLetterCoach.vue'),
+    path: '/resume/coverletter/write',
+    name: 'coverletter-write',
+    component: () => import('../views/resume/CoverLetterWrite.vue'),
     meta: { 
-      title: '서류코칭',
+      title: '자소서 코칭/작성',
+      requiresAuth: true 
+    }
+  },
+  {
+    path: '/resume/coverletter/detail',
+    name: 'coverletter-detail',
+    component: () => import('../views/resume/CoverLetterDetail.vue'),
+    meta: { 
+      title: '자소서 상세',
       requiresAuth: true 
     }
   },

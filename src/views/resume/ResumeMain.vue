@@ -76,7 +76,7 @@
 
           <div class="resume-grid">
             <!-- 새 자소서 카드 -->
-            <div class="resume-card add-card" @click="$router.push('/resume/coverletter')">
+            <div class="resume-card add-card" @click="$router.push('/resume/coverletter/write')">
               <div class="card-content">
                 <div class="add-icon">+</div>
                 <div class="add-text">새 자기소개서 작성</div>
@@ -231,7 +231,7 @@ const coverLetterList = ref([
 
 // 자소서 상세로 이동
 const goToCoverDetail = (coverId) => {
-  router.push(`/resume/coverletter?id=${coverId}`)
+  router.push(`/resume/coverletter/detail?id=${coverId}`)
 }
 
 // 사용자 정보 조회
