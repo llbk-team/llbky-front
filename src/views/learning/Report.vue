@@ -15,13 +15,7 @@
         <div class="card shadow-sm p-3 card-clean">
           <h5 class="fw-bold mb-3 text-dark">주차 선택</h5>
           <ul class="list-group">
-            <li
-              v-for="(week, index) in weeks"
-              :key="index"
-              class="list-group-item clickable"
-              :class="{ active: selectedWeekIndex === index }"
-              @click="selectWeek(index)"
-            >
+            <li v-for="(week, index) in weeks" :key="index" class="list-group-item clickable" :class="{ active: selectedWeekIndex === index }" @click="selectWeek(index)">
               <div class="fw-semibold">{{ week.label }}</div>
               <small class="text-muted">{{ week.topic }}</small>
             </li>
@@ -29,19 +23,14 @@
         </div>
       </div>
 
-      <!-- ✅ 오른쪽: 해당 주차의 일차별 내용 -->
+      <!-- 오른쪽: 해당 주차의 일차별 내용 -->
       <div class="col-md-9">
         <div class="card shadow-sm p-4 card-clean">
           <h5 class="fw-bold mb-3 text-dark">{{ currentWeek.label }} 상세 학습 기록</h5>
           <p class="text-muted mb-4">{{ currentWeek.topic }}</p>
 
           <ul class="list-group">
-            <li
-              v-for="(day, dIndex) in currentWeek.days"
-              :key="dIndex"
-              class="list-group-item clickable"
-              @click="toggleDay(dIndex)"
-            >
+            <li v-for="(day, dIndex) in currentWeek.days" :key="dIndex" class="list-group-item clickable" @click="toggleDay(dIndex)">
               <div class="d-flex justify-content-between align-items-center">
                 <div>
                   <strong>{{ day.label }}</strong> - {{ day.title }}
@@ -143,6 +132,7 @@ function toggleDay(index) {
   border: 1px solid #EAEBEC;
   background-color: #FFFFFF;
 }
+
 .list-group-item {
   background: #F8FAF9;
   border: 1px solid #EAEBEC;
@@ -151,16 +141,20 @@ function toggleDay(index) {
   color: #111111;
   transition: 0.2s;
 }
+
 .list-group-item.active {
   background-color: #DDF3EB;
   border-color: #71EBBE;
 }
+
 .clickable {
   cursor: pointer;
 }
+
 .clickable:hover {
   background-color: #F1F2F3;
 }
+
 .bg-light {
   background-color: #F8FAF9;
 }
@@ -170,6 +164,7 @@ function toggleDay(index) {
   color: #111111;
   border-radius: 0.5rem;
 }
+
 .btn-outline-green:hover {
   background-color: #71EBBE;
   color: #111111;

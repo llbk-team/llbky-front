@@ -62,22 +62,21 @@
       </div>
     </div>
 
-    <router-link :to="`/learning/skill`" class="btn btn-dark-solid w-100 fw-semibold py-3 fs-5">
+    <router-link :to="`/learning/skill`" class="btn btn-outline-mint w-100 fw-semibold py-2 fs-6">
       ▶ AI 코칭 시작하기
     </router-link>
-
   </div>
 </template>
 
 <script setup>
-import { ref, watch} from 'vue'
+import { ref, watch } from 'vue'
 import { useStore } from "vuex"
 
 const store = useStore();
 const goals = ["취업 준비", "이직 준비", "기술 심화", "자기계발"];
 const selectedGoals = ref([]);
 
-store.dispatch("learning/updateProgress", 0); // ✅ 모듈명 명시
+store.dispatch("learning/updateProgress", 0); 
 
 watch(selectedGoals, (newVal) => {
   store.dispatch("learning/updateProgress", newVal.length > 0 ? 50 : 0);
@@ -128,7 +127,6 @@ const goalSections = [
 </script>
 
 <style scoped>
-/* ✅ 전체 배경 */
 .goal-page-wrapper {
   background-color: #F1F2F3;
   min-height: calc(100vh - 80px);
@@ -139,16 +137,13 @@ const goalSections = [
   padding-top: 1.5rem;
 }
 
-/* ✅ 내부 컨테이너 (coach와 동일한 여백 유지) */
 .goal-container {
   width: 100%;
   max-width: 1140px;
-  /* coach.vue 기준 */
   padding-left: 1rem;
   padding-right: 1rem;
 }
 
-/* 공통 색상 */
 .text-dark {
   color: #111111 !important;
 }
@@ -165,7 +160,6 @@ const goalSections = [
   border-color: #71EBBE !important;
 }
 
-/* 카드 */
 .card-clean {
   border-radius: 1rem;
   border: 1px solid #EAEBEC;
@@ -173,7 +167,6 @@ const goalSections = [
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 
-/* 체크박스 */
 .checkbox-item {
   display: flex;
   align-items: center;
@@ -198,7 +191,6 @@ const goalSections = [
   margin-left: 6px;
 }
 
-/* 직무 태그 */
 .job-tag {
   display: inline-block;
   background-color: #111111;
@@ -209,7 +201,6 @@ const goalSections = [
   font-weight: 500;
 }
 
-/* 슬라이더 */
 .slider {
   -webkit-appearance: none;
   appearance: none;
@@ -230,7 +221,6 @@ const goalSections = [
   cursor: pointer;
 }
 
-/* 버튼 */
 .btn-green {
   background-color: #71EBBE;
   border: 1px solid #71EBBE;
@@ -259,11 +249,8 @@ const goalSections = [
   transform: translateY(-1px);
 }
 
-
-/* 슬라이더 가로폭 살짝 줄이기 */
 .slider-narrow {
   width: 94%;
-  /* 100% → 85%로 조정 (원하는 만큼 조절 가능) */
   flex-shrink: 0;
 }
 
@@ -271,5 +258,19 @@ const goalSections = [
   padding: 5px 16px;
   border-radius: 10px;
   font-size: 0.875rem;
+}
+
+.btn-outline-mint {
+  border: 2px solid #A2F1D6;
+  color: #111111;
+  background-color: transparent;
+  border-radius: 0.6rem;
+  transition: all 0.2s ease;
+}
+
+.btn-outline-mint:hover {
+  background-color: #111111;
+  color: #ffffff;
+  border-color: #111111;
 }
 </style>

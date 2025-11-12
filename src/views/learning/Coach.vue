@@ -12,7 +12,7 @@
       </router-link>
     </div>
 
-    <!-- [추가1] 탭 버튼 -->
+    <!-- 탭 버튼 -->
     <ul class="nav nav-tabs mb-4">
       <li class="nav-item">
         <button class="nav-link" :class="{ active: currentTab === 'ongoing' }" @click="setTab('ongoing')">
@@ -30,7 +30,7 @@
     <div class="row g-4">
       <!-- 왼쪽 -->
       <div class="col-md-7">
-        <!-- [추가2] 진행 중/완료 분리 -->
+        <!-- 진행 중/완료 분리 -->
         <!-- 진행 중 -->
         <div v-if="currentTab === 'ongoing'" class="card shadow-sm p-4 mb-3 card-clean">
           <div class="d-flex justify-content-between align-items-center mb-3">
