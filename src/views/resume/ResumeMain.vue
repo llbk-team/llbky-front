@@ -23,16 +23,47 @@
           </div>
         </div>
 
+        <div class="resume-section">
+          <div class="section-header compact">
+            <div class="left-group">
+              <h2>내 최종 지원서 리스트</h2>
+              <button class="select-toggle-btn" @click="toggleSelectMode">
+                {{ isSelecting ? '선택 완료' : '선택하기' }}
+              </button>
+              <button class="integrate-button small" @click="createIntegratedDocument">
+                📚 통합 문서 만들기
+              </button>
+            </div>
+            <div class="right-group">
+              <span class="ai-suggestion">✨ AI 최종 지원서 생성</span>
+            </div>
+          </div>
+          <div class="resume-grid">
+            <!-- 기존 지원서 카드 -->
+            <div 
+              v-for="resume in resumeList" 
+              :key="resume.id" 
+              class="resume-card"
+            >
+              <div class="card-content" @click="router.push('/resume/final')">
+                <div class="resume-icon">📄</div>
+                <div class="resume-info">
+                  <h3 class="resume-title">{{ resume.title }}</h3>
+                  <p class="resume-description">{{ resume.description }}</p>
+                  <div class="resume-meta">
+                    <span class="update-date">📅 등록: {{ resume.updatedAt }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- 내 이력서 리스트 -->
         <div class="resume-section">
           
           <div class="section-header">
             <h2>내 이력서 리스트</h2>
-            <div style="margin-left: 650px;">
-              <button class="select-toggle-btn" @click="toggleSelectMode">
-              {{ isSelecting ? '선택 완료' : '선택하기' }}
-              </button>
-            </div>
             <div class="header-actions">
               <span class="ai-suggestion">✨ AI 이력서 작성</span>
             </div>
@@ -164,17 +195,6 @@
             </div>
           </div>
         </div>
-
-        <!-- 통합 문서 만들기 버튼 -->
-        <div class="integrate-section">
-          <button 
-            class="integrate-button"
-            
-            @click="createIntegratedDocument"
-          >
-            📚 통합 문서 만들기
-          </button>
-        </div>
       </div>
     </div>
   </div>
@@ -257,7 +277,7 @@ const createIntegratedDocument = () => {
   })
 
   router.push({
-    path: '/resume/integrated',
+    path: '/resume/final',
     query: {
       resumeId: selectedResume.value,
       coverId: selectedCover.value,
@@ -500,6 +520,55 @@ onMounted(() => {
   font-weight: 700;
   color: #333;
 }
+.section-header.compact {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.left-group {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* 제목과 버튼 간 최소 간격 */
+}
+
+.left-group h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #333;
+  line-height: 1;
+}
+
+/* 버튼 살짝 작게 맞춤 */
+.select-toggle-btn,
+.integrate-button.small {
+  background: #71EBBE;
+  color: white;
+  border: none;
+  padding: 6px 14px; /* 작게 조정 */
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.2s;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08);
+  margin-left: 0; /* 혹시 기존에 남아있으면 꼭 0으로 */
+}
+
+/* 통합 버튼만 색 다르게 */
+.integrate-button.small {
+  background: #5BC7A7;
+}
+
+/* hover 효과 */
+.select-toggle-btn:hover,
+.integrate-button.small:hover {
+  transform: translateY(-2px);
+}
 
 .header-actions {
   display: flex;
@@ -619,7 +688,6 @@ onMounted(() => {
 }
 
 .select-checkbox {
-  
   position: relative;
   top: 2px;
   left: 220px;
@@ -627,6 +695,7 @@ onMounted(() => {
   height: 35px;
   cursor: pointer;
   accent-color: #71EBBE;
+  margin-right: 12px; /* ✅ 카드와의 간격 확보 */
 }
 
 .integrate-section {

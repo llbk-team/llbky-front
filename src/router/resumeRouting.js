@@ -62,7 +62,16 @@ const resumeRouting = [
       title: '서류코칭',
       requiresAuth: true 
     }
-  }
+  },
+  {
+    path: '/resume/final',
+    name: 'fianl-documents',
+    component: () => import('../views/resume/FinalDocuments.vue'),
+    meta: { 
+      title: '최종 지원서',
+      requiresAuth: true 
+    }
+  },
   
 ]
 
