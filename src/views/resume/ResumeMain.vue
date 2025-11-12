@@ -83,8 +83,8 @@
               v-for="resume in resumeList" 
               :key="resume.id" 
               class="resume-card"
-              :class="{ selecting: isSelecting }"
-            >
+              :class="{ selecting: isSelecting }">
+              
               <!-- 체크박스 -->
               <input 
                 v-if="isSelecting"

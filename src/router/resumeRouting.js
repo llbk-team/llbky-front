@@ -64,6 +64,15 @@ const resumeRouting = [
     }
   },
   {
+    path: '/resume/portfolio/stepbystep',
+    name: 'portfolio-coach',
+    component: () => import('../views/resume/PortfolioStepbystep.vue'),
+    meta: { 
+      title: '서류코칭',
+      requiresAuth: true 
+    }
+  },
+  {
     path: '/resume/final',
     name: 'fianl-documents',
     component: () => import('../views/resume/FinalDocuments.vue'),
