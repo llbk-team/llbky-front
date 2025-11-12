@@ -82,13 +82,6 @@
           </h2>
         </div>
 
-        <!-- Score Circle -->
-        <div class="score-section">
-          <div class="score-circle">
-            <div class="score-value">{{ analysisData.score }}</div>
-            <div class="score-label">점</div>
-          </div>
-        </div>
 
         <!-- Feedback Sections -->
         <div class="feedback-sections">

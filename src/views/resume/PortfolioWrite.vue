@@ -38,40 +38,7 @@
           </button>
         </div>
 
-        <!-- Tab Navigation -->
-        <div class="tab-nav">
-          <div 
-            v-for="tab in tabs" 
-            :key="tab.id"
-            class="tab-item" 
-            :class="{ active: activeTab === tab.id }"
-            @click="setActiveTab(tab.id)"
-          >
-            {{ tab.name }}
-          </div>
-        </div>
-
-        <!-- Review Cards -->
-        <div class="review-grid">
-          <div 
-            v-for="card in reviewCards" 
-            :key="card.id"
-            class="review-card"
-            @click="selectCard(card)"
-          >
-            <div class="card-icon-wrapper">
-              {{ card.icon }}
-            </div>
-            <div class="card-title">{{ card.title }}</div>
-            <div class="card-description">
-              {{ card.description }}
-            </div>
-            <div class="rating-wrapper">
-              <div class="rating-stars">{{ card.stars }}</div>
-              <div class="rating-text">{{ card.score }}점</div>
-            </div>
-          </div>
-        </div>
+  
 
         <!-- Action Button -->
         <div class="action-section">
