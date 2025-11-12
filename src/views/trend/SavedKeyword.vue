@@ -43,7 +43,7 @@
     <!-- 비어있을 때 -->
     <div v-else class="empty">
       <p>저장된 키워드가 없습니다 😢</p>
-      <p class="empty-hint">AI 인사이트 페이지나 직접 입력으로 관심 키워드를 추가해보세요!</p>
+      <p class="empty-hint">AI 인사이트 페이지에서 관심 키워드를 추가해보세요!</p>
     </div>
 
     <!-- 통계 -->
@@ -85,7 +85,6 @@ const addKeyword = () => {
   const kw = newKeyword.value.trim();
   if (!kw) return alert("키워드를 입력해주세요.");
   if (keywords.value.includes(kw)) return alert("이미 추가된 키워드입니다.");
-
   keywords.value.push(kw);
   localStorage.setItem("user_keywords", JSON.stringify(keywords.value));
   newKeyword.value = "";
@@ -115,26 +114,20 @@ const groupedKeywords = computed(() => {
   return groups;
 });
 
-// ✅ 빈 카테고리 제외 + 내가 추가한 키워드를 맨 위로 배치
+// ✅ 내가 추가한 키워드 맨 위
 const filteredKeywords = computed(() => {
   const filtered = {};
-  const groups = groupedKeywords.value;
-
-  // 표시 순서 정의
-  const orderedCategories = [
+  const order = [
     "내가 추가한 키워드",
     "AI 엔지니어",
     "클라우드 엔지니어",
     "데이터 사이언티스트",
     "보안 전문가",
   ];
-
-  orderedCategories.forEach((category) => {
-    if (groups[category] && groups[category].length > 0) {
-      filtered[category] = groups[category];
-    }
+  order.forEach((cat) => {
+    if (groupedKeywords.value[cat]?.length > 0)
+      filtered[cat] = groupedKeywords.value[cat];
   });
-
   return filtered;
 });
 
