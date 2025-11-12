@@ -1,11 +1,8 @@
 <template>
   <div class="d-flex bg-light min-vh-100 overflow-auto">
-    <SideBar />
-
     <!-- 메인 -->
-    <section class="flex-grow-1 p-4">
-      <div class="text-muted small mb-2">my &gt; 서류작성 &gt; 자기소개서</div>
-      <h2 class="fw-semibold mb-4 text-dark">AI 자기소개서 코칭</h2>
+    <section class="flex-grow-1 content-wrapper">
+      <h2 class="fw-semibold mb-4 text-dark">자기소개서 작성하기</h2>
 
       <div class="row g-4">
         <!-- 왼쪽: 작성 / 코칭 영역 -->
@@ -13,7 +10,6 @@
 
           <!-- 작성 모드 -->
           <div v-if="!isCoachingStarted">
-            <h5 class="fw-bold text-dark mb-3">✏️ 자기소개서 작성</h5>
             <p class="text-muted small mb-4">
               각 항목에 맞게 자기소개서를 입력한 후 “AI 코칭 받기” 버튼을 눌러보세요.
             </p>
@@ -164,6 +160,7 @@
         </div>
       </div>
     </section>
+    
   </div>
 </template>
 
@@ -307,5 +304,23 @@ const handleFullEdit = (e, section) => {
 }
 .bg-light-mint {
   background-color: #eafff5 !important;
+}
+.content-wrapper {
+  padding: 3rem 6rem; /* ✅ 상하 3rem, 좌우 6rem (기존보다 훨씬 여유) */
+  max-width: 1440px;
+  margin: 0 auto; /* ✅ 중앙 정렬 */
+}
+
+/* 좁은 화면에서는 자동으로 줄여줌 */
+@media (max-width: 1200px) {
+  .content-wrapper {
+    padding: 2rem 3rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .content-wrapper {
+    padding: 1.5rem 1.5rem;
+  }
 }
 </style>
