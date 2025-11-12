@@ -8,7 +8,7 @@
       </div>
 
       <p class="text-muted mb-3">
-        {{ week.topic }} 관련 학습 목표 및 세부 학습 항목입니다.
+        {{ week.topic }} 관련 세부 학습 항목입니다.
       </p>
 
       <ul class="list-group mb-4">

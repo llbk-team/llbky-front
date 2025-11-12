@@ -123,10 +123,13 @@ const weeklyProgress = ref([
     topic: "Java 기초",
     progress: 100,
     details: [
-      "💡 학습 목표: 객체지향 프로그래밍 기본 개념 이해, 변수와 제어문 익히기",
-      "📅 학습 일정: 1~2일차 - 자료형 & 연산자 / 3~4일차 - 조건문 & 반복문 / 5~7일차 - 클래스 및 객체",
-      "🧩 주요 학습 항목: 변수와 자료형, 제어문, 클래스 구조, 컬렉션 프레임워크",
-      "🎯 포인트: 코드 작성보다 개념 이해 중심으로 접근하세요."
+      "1일차: Java 개발 환경 설정 및 Hello World 출력",
+      "2일차: 변수, 자료형, 연산자 실습",
+      "3일차: 조건문과 반복문 학습",
+      "4일차: 배열과 메서드 이해",
+      "5일차: 클래스와 객체 개념 정리",
+      "6일차: 간단한 콘솔 미니프로젝트 제작",
+      "7일차: 주간 복습 및 퀴즈"
     ]
   },
   {
@@ -134,10 +137,13 @@ const weeklyProgress = ref([
     topic: "Spring Security",
     progress: 60,
     details: [
-      "💡 학습 목표: 인증/인가 구조 이해 및 JWT 기반 인증 실습",
-      "📅 학습 일정: 1일차 - FilterChain 구조 / 2~3일차 - JWT 발급 / 4~6일차 - OAuth2 실습",
-      "🧩 주요 학습 항목: Security 설정, JWT 토큰, OAuth2, AccessDeniedHandler",
-      "🎯 포인트: 요청 흐름(필터 순서)을 눈으로 직접 그려보세요."
+      "1일차: 스프링 시큐리티 구조와 필터 이해",
+      "2일차: AuthenticationManager 학습",
+      "3일차: JWT 발급 및 검증 로직 구현",
+      "4일차: OAuth2 로그인 구조 실습",
+      "5일차: AccessDeniedHandler 설정",
+      "6일차: 커스텀 로그인 페이지 구현",
+      "7일차: 예외 처리 및 테스트"
     ]
   },
   {
@@ -145,10 +151,13 @@ const weeklyProgress = ref([
     topic: "JPA & Database",
     progress: 0,
     details: [
-      "💡 학습 목표: ORM 개념 이해, Entity 설계, JPQL CRUD 작성",
-      "📅 학습 일정: 1~2일차 - JPA 설정 / 3~4일차 - 매핑 실습 / 5~7일차 - 트랜잭션 & JPQL",
-      "🧩 주요 학습 항목: Entity 매핑, JPQL, 연관관계 매핑, 트랜잭션 관리",
-      "🎯 포인트: DB 설계 → Entity 설계 순서로 접근하면 이해가 빨라요."
+      "1일차: JPA 환경 설정 및 기본 CRUD",
+      "2일차: Entity 매핑 실습",
+      "3일차: 연관관계 매핑 (1:N, N:M)",
+      "4일차: JPQL 쿼리 작성",
+      "5일차: 영속성 컨텍스트 이해",
+      "6일차: 트랜잭션 및 롤백 실습",
+      "7일차: 데이터베이스 최적화 복습"
     ]
   },
   {
@@ -156,13 +165,17 @@ const weeklyProgress = ref([
     topic: "REST API 설계",
     progress: 0,
     details: [
-      "💡 학습 목표: RESTful 설계 원칙과 API 문서화 이해",
-      "📅 학습 일정: 1~2일차 - REST 원칙 / 3~5일차 - Controller 설계 / 6~7일차 - Swagger & 예외 처리",
-      "🧩 주요 학습 항목: REST 설계, Controller, Exception Handling, Swagger",
-      "🎯 포인트: 실제 포트폴리오용 API를 만들어보세요."
+      "1일차: RESTful 설계 원칙 학습",
+      "2일차: Controller 및 Service 설계",
+      "3일차: 요청/응답 구조 정의",
+      "4일차: 예외 처리(Exception Handling)",
+      "5일차: Swagger API 문서화",
+      "6일차: 배포 환경 테스트",
+      "7일차: 프로젝트 리팩토링 및 점검"
     ]
   }
 ]);
+
 
 
 const weeklyItems = ref([
