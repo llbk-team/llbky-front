@@ -17,20 +17,18 @@
           <p class="upload-subtitle">포트폴리오나 링크나 파일을 업로드하면 AI가 전문적으로 리뷰해드립니다.</p>
           
           <div class="upload-types">
-            <div class="type-btn" :class="{ active: selectedType === 'link' }" @click="selectType('link')">
-              <div class="type-icon">🔗</div>
-              <div class="type-label">포트폴리오 링크</div>
+            <div class="type-btn" :class="{ active: selectedType === 'link' }" @click="handleUpload">
+              <div class="type-icon">📤</div>
+              <div class="type-label">포트폴리오 올리기</div>
             </div>
             
-            <div class="type-btn" :class="{ active: selectedType === 'project' }" @click="selectType('project')">
+            <div class="type-btn" :class="{ active: selectedType === 'project' }" @click="router.push('/resume/portfolio/stepbystep')">
               <div class="type-icon">📊</div>
-              <div class="type-label">문서PDF/img</div>
+              <div class="type-label">포트폴리오 만들기</div>
             </div>
           </div>
 
-          <button class="upload-btn" @click="handleUpload">
-            📤 포트폴리오 업로드하기
-          </button>
+          
         </div>
 
   
