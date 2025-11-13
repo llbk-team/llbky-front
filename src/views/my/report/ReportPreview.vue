@@ -1,61 +1,79 @@
 <template>
-  <div class="report-preview-wrapper">
-    <div v-for="(section, i) in sections" :key="i" class="report-card">
-      <header class="report-header">
-        <h3>{{ section.title }}</h3>
-        <p class="report-desc">
-          <strong>강점:</strong> {{ section.strength }}<br />
-          <strong>개선점:</strong> {{ section.weakness }}<br />
-          <strong>보완점:</strong> {{ section.suggestion }}
-        </p>
-      </header>
+  <!-- 데이터 준비 안되었을 때 -->
+  <div v-if="!report || !report.chartData" class="loading">
+    <p>리포트 데이터를 불러오는 중...</p>
+  </div>
 
-      <div class="chart-group">
-        <div class="chart-box" v-for="(chart, idx) in section.charts" :key="idx">
-          <component :is="chart.type" :data="chart.data" :options="chart.options" />
-        </div>
+  <!-- 정상 렌더링 -->
+  <section v-else class="preview-wrapper">
+    <h2>{{ report.title }}</h2>
+    <p class="date">{{ formatDate(report.date) }}</p>
+    <p class="memo">{{ report.memo }}</p>
+
+    <!-- 이력서 -->
+    <div class="preview-card">
+      <h3>📄 이력서 분석</h3>
+      <div class="chart-wrap">
+        <Bar :data="safeResume" :options="opt" />
       </div>
     </div>
-  </div>
+
+    <!-- 면접 -->
+    <div class="preview-card">
+      <h3>💬 면접 분석</h3>
+      <div class="chart-wrap">
+        <Radar :data="safeInterview" :options="opt" />
+      </div>
+    </div>
+
+    <!-- 학습 -->
+    <div class="preview-card">
+      <h3>📚 학습 분석</h3>
+      <div class="chart-wrap">
+        <Doughnut :data="safeLearning" :options="opt" />
+      </div>
+    </div>
+  </section>
 </template>
 
 <script setup>
-defineProps({ sections: Array });
+import { computed } from "vue";
+import { Bar, Radar, Doughnut } from "vue-chartjs";
+
+// Chart.js register 생략 (이미 적용한 것 그대로 유지)
+
+const props = defineProps({
+  report: Object
+});
+
+// 안전한 데이터 변환
+const safeResume = computed(() =>
+  props.report?.chartData?.resumeChart ?? { labels: [], datasets: [] }
+);
+
+const safeInterview = computed(() =>
+  props.report?.chartData?.interviewChart ?? { labels: [], datasets: [] }
+);
+
+const safeLearning = computed(() =>
+  props.report?.chartData?.learningChart ?? { labels: [], datasets: [] }
+);
+
+const opt = { responsive: true, maintainAspectRatio: false };
+
+function formatDate(date) {
+  return new Date(date).toLocaleDateString("ko-KR");
+}
 </script>
 
 <style scoped>
-.report-preview-wrapper {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  margin-top: 10px;
+.loading {
+  margin-top: 200px;
+  text-align: center;
+  font-size: 14px;
+  color: #666;
 }
-.report-card {
-  background: #f9f9f9;
-  border: 1px solid #eaebec;
-  border-radius: 16px;
-  padding: 20px;
-}
-.report-header h3 {
-  font-size: 16px;
-  font-weight: 600;
-  margin-bottom: 6px;
-}
-.report-desc {
-  font-size: 12px;
-  line-height: 1.6;
-}
-.chart-group {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-  margin-top: 10px;
-}
-.chart-box {
+.chart-wrap {
   height: 180px;
-  background: #fff;
-  border-radius: 10px;
-  padding: 8px;
-  border: 1px solid #f1f2f3;
 }
 </style>
