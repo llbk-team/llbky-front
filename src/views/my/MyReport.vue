@@ -16,6 +16,8 @@
                 <p>문서별 작성 완성도와 점수 향상 추이를 기반으로, 자기표현 역량의 성장 방향을 분석합니다</p>
             </div>
 
+            <hr class="header-line" />
+
             <div class="card-body">
                 <!-- 차트1 -->
                 <div class="chart-item">
@@ -74,6 +76,8 @@
                 <p>면접 현황과 내용 구성을 정밀하게 평가하여, 커뮤니케이션 역량과 개선점을 진단합니다</p>
             </div>
 
+            <hr class="header-line" />
+
             <div class="card-body">
                 <div class="chart-item">
                     <div class="canvas-wrap">
@@ -129,6 +133,8 @@
                 <p>학습 주제별 비중과 진도를 종합 분석해, 학습 집중도와 성장 지속성을 시각화합니다</p>
             </div>
 
+            <hr class="header-line" />
+            
             <div class="card-body">
                 <div class="chart-item">
                     <div class="canvas-wrap">
@@ -247,9 +253,9 @@ const areaData = ref({
 </script>
 
 <style scoped>
-:global(body) {
+/* :global(body) {
     background-color: #F1F3F4;
-}
+} */
 
 /* 공통 */
 .report-wrapper {
@@ -295,6 +301,7 @@ const areaData = ref({
     height: 350px;
     background: #fff;
     border-radius: 10px;
+    border: 1px solid #eeeeee;
     box-shadow: 0 1px 3px rgba(0, 0, 0, .05);
     margin-bottom: 25px;
     overflow: hidden;
@@ -302,10 +309,16 @@ const areaData = ref({
 
 .card-header {
     height: 65px;
-
     color: #fff;
     padding: 12px 20px;
     border-radius: 10px 10px 0 0;
+}
+
+.header-line {
+  border: none;
+  height: 1px;
+  background-color: #cccccc; /* 회색 계열의 미묘한 구분선 */
+  margin-top: 8px;
 }
 
 .card-header h3 {
@@ -324,7 +337,7 @@ const areaData = ref({
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    padding: 20px;
+    padding: 15px;
 }
 
 /* =======================
@@ -351,7 +364,7 @@ const areaData = ref({
     align-items: flex-start;
     justify-content: center;
     /* 차트 기준 가운데 배치 */
-    margin-top: 35px;
+    margin-top: 15px;
     text-align: left;
 }
 
