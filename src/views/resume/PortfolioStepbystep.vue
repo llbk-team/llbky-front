@@ -187,15 +187,34 @@
       </div>
     </div>
   </div>
+
+ <!-- 페이지 하단에 등록 버튼 영역 추가 -->
+    <div class="registration-button mt-1 mb-1">
+      <div v-if="!isAllComplete" class="warning-message mb-3 p-3 rounded-3 bg-warning-light">
+        <p class="mb-0">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>
+          완전하지 않은 상태로 등록 시 코칭 결과가 부정확할 수 있습니다.
+        </p>
+      </div>
+      <button class="btn btn-mint w-100 py-3 fw-bold"  :class="isAllComplete ? 'btn-mint' : 'btn-outline-secondary'"
+      @click="router.push('/resume/list')">
+        <i class="bi bi-check-circle me-2"></i>
+        포트폴리오 등록하기
+      </button>
+    </div>
+  
 </template>
 
 <script setup>
 import { ref, computed } from "vue";
 import { onMounted } from "vue";
+import { useRouter } from "vue-router";
 
 // 전체 진행률
 const overallProgress = ref(35);
 const currentStep = ref(1);
+const router = useRouter();
+
 
 // 포트폴리오 단계
 //LLM으로 공통적으로 사용할수 있는포트폴리오가 될수 있는지 확인할것
@@ -375,6 +394,20 @@ function updateProgress() {
   
   overallProgress.value = Math.round((totalCompleted / totalItems) * 100);
 }
+
+// 모든 단계가 100% 완료되었는지 확인하는 계산된 속성 추가
+const isAllComplete = computed(() => {
+  // 5단계가 존재하고 그 진행률이 100%인지 확인
+  const stage5 = portfolioSteps.value.find(step => step.label === "5단계");
+  
+  // 모든 단계가 100%인지 확인
+  const allStagesComplete = portfolioSteps.value.every(step => step.progress === 100);
+  
+  return stage5 && stage5.progress === 100 && allStagesComplete;
+});
+
+
+
 
 // 초기 설정 - 1단계 열기
 onMounted(() => {
@@ -605,4 +638,15 @@ onMounted(() => {
 .btn-mint:hover {
   background-color: #71EBBE;
 }
+
+
+.registration-button {
+  max-width: 800px;
+  margin: 0 auto;
+  }
+.registration-button2 {
+  background-color: #71EBBE;
+}
+
+
 </style>
