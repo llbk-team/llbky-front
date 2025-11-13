@@ -213,7 +213,8 @@ const aiCompareText = computed(() => {
 ----------------- */
 .header-section {
   text-align: left;
-  margin-bottom: 8px; /* 제목과 카드 사이 간격 축소 */
+  margin-bottom: 8px;
+  /* 제목과 카드 사이 간격 축소 */
 }
 
 .header-section .title {
@@ -298,6 +299,7 @@ const aiCompareText = computed(() => {
 .change.up {
   color: #00a870;
 }
+
 .change.down {
   color: #ff4d4f;
 }

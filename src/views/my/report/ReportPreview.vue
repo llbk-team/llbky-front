@@ -251,16 +251,16 @@ onMounted(loadReport);
 /* 공통 */
 .report-wrapper {
   width: 100% !important;
-  margin: 0 auto;
   color: #111;
-  padding: 20px;
 }
 
+/*
 .preview-scale {
-  transform: scale(0.75);
+  transform: scale(0.);
   transform-origin: top left;
-  width: 133%;
+  width: auto !important;
 }
+*/
 
 .report-header {
   display: flex;
@@ -269,14 +269,14 @@ onMounted(loadReport);
 }
 
 .header-left h2 {
-  font-size: 28px;
+  font-size: 22px;
   font-weight: 700;
   color: #000;
-  margin-bottom: 3px;
+  text-align: left;
 }
 
 .header-left p {
-  font-size: 15px;
+  font-size: 14px;
   color: #555;
 }
 
@@ -299,10 +299,9 @@ onMounted(loadReport);
 /* 카드 */
 .report-card {
   width: 100% !important;
-  height: auto; /* 고정 350px 제거 */
+  height: auto;
+  /* 고정 350px 제거 */
   background: #fff;
-  border-radius: 10px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   margin-bottom: 25px;
   padding-bottom: 20px;
 }
@@ -318,7 +317,8 @@ onMounted(loadReport);
 .header-line {
   border: none;
   height: 1px;
-  background-color: #cccccc; /* 회색 계열의 미묘한 구분선 */
+  background-color: #cccccc;
+  /* 회색 계열의 미묘한 구분선 */
   margin-top: 8px;
 }
 
@@ -336,26 +336,24 @@ onMounted(loadReport);
 
 .card-body {
   display: flex;
+  flex-wrap: nowrap;
   justify-content: space-between;
-  align-items: flex-start;
-  padding: 15px;
+  gap: 20px;
+  overflow: hidden;
 }
 
-/* =======================
-   📊 최종 스타일 수정본
-   ======================= */
 .chart-item {
-  width: 460px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  /* ✅ 차트 중심 기준으로 캡션 정렬 */
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .canvas-wrap {
-  width: 460px;
-  height: 180px;
+  width: 100% !important;
+  /* ← 고정폭 제거 */
+  height: 170px;
+  /* ← 높이 줄여서 카드 줄임 */
 }
+
 
 /* ✅ 차트 설명 중앙 배치 + 왼쪽정렬 */
 .chart-desc {
