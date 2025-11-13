@@ -10,7 +10,7 @@
             <button class="save-btn" @click="openSaveModal">리포트 생성 <i class="ri-download-2-line"></i> </button>
         </header>
 
-         <ReportSaveModal />
+        <ReportSaveModal />
 
         <!-- 이력서 분석 -->
         <div class="report-card">
@@ -52,8 +52,6 @@
 
                 <!-- AI 요약 -->
                 <aside class="ai-summary">
-                    <!-- <h4>✨ AI 요약</h4> -->
-
                     <div class="ai-card strength">
                         <p class="title">✅ 강점</p>
                         <p class="content">협업 참여율이 높고 책임감이 뛰어남</p>
@@ -109,8 +107,6 @@
                 </div>
 
                 <aside class="ai-summary">
-                    <!-- <h4>✨ AI 요약</h4> -->
-
                     <div class="ai-card strength">
                         <p class="title">✅ 강점</p>
                         <p class="content">면접 대화응대 능력과 표현력이 뛰어남</p>
@@ -137,7 +133,7 @@
             </div>
 
             <hr class="header-line" />
-            
+
             <div class="card-body">
                 <div class="chart-item">
                     <div class="canvas-wrap">
@@ -166,8 +162,6 @@
                 </div>
 
                 <aside class="ai-summary">
-                    <!-- <h4>✨ AI 요약</h4> -->
-
                     <div class="ai-card strength">
                         <p class="title">✅ 강점</p>
                         <p class="content">학습 참여율이 높고 목표 달성도가 우수함</p>
@@ -218,18 +212,15 @@ Chart.register(
     CategoryScale, LinearScale, Title, Tooltip, Legend, RadialLinearScale
 );
 
-// Bootstrap modal 제어용
 let modalInstance = null;
 onMounted(() => {
-  const modalEl = document.getElementById("reportSaveModal");
-  if (modalEl) {
-    modalInstance = new Modal(modalEl, { backdrop: "static" });
-  }
+    const modalEl = document.getElementById("reportSaveModal");
+    if (modalEl) {
+        modalInstance = new Modal(modalEl, { backdrop: "static" });
+    }
 });
 
-const openSaveModal = () => {
-  modalInstance.show();
-};
+const openSaveModal = () => modalInstance.show();
 
 const chartOpt = { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: "top" } } };
 
@@ -249,22 +240,26 @@ const stackedData = ref({
         { type: "line", label: "Trend", data: [20, 45, 60, 55, 75, 85], borderColor: "#36A2EB", tension: .3, fill: false },
     ],
 });
+
 const radarData = ref({
     labels: ["논리성", "표현력", "대응력", "분석력", "발음"],
     datasets: [
         { label: "면접 점수", data: [80, 70, 85, 90, 75], backgroundColor: "rgba(255,177,193,.4)", borderColor: "#FFB1C1" },
     ],
 });
+
 const lineData = ref({
     labels: ["January", "February", "March", "April", "May", "June"],
     datasets: [
         { label: "면접 점수", data: [60, 70, 80, 90, 85, 88], borderColor: "#36A2EB", backgroundColor: "rgba(154,208,245,.3)", fill: true, tension: .4 },
     ],
 });
+
 const doughnutData = ref({
     labels: ["이론", "실습", "복습", "테스트"],
     datasets: [{ data: [30, 25, 25, 20], backgroundColor: ["#71EBBE", "#DDF3EB", "#EAEBEC", "#A2F1D6"] }],
 });
+
 const areaData = ref({
     labels: ["January", "February", "March", "April", "May"],
     datasets: [{ label: "학습 효율", data: [50, 60, 75, 90, 100], borderColor: "#9AD0F5", backgroundColor: "rgba(154,208,245,.3)", fill: true, tension: .3 }],
@@ -272,13 +267,12 @@ const areaData = ref({
 </script>
 
 <style scoped>
-/* :global(body) {
-    background-color: #F1F3F4;
-} */
-
-/* 공통 */
+/* ======================
+   공통
+======================= */
 .report-wrapper {
-    width: 1440px;
+    max-width: 1440px;
+    width: 100%;
     margin: 0 auto;
     color: #111;
     padding: 20px;
@@ -318,10 +312,16 @@ const areaData = ref({
     background-color: #71EBBE;
 }
 
-/* 카드 */
+/* ======================
+   카드
+======================= */
 .report-card {
-    width: 1400px;
-    height: 350px;
+    max-width: 1400px;
+    /* 🔧 width → max-width */
+    width: 100%;
+    /* 🔧 추가 */
+    height: auto;
+    /* 🔧 고정 height 제거 (반응형 핵심) */
     background: #fff;
     border-radius: 10px;
     border: 1px solid #eeeeee;
@@ -332,16 +332,15 @@ const areaData = ref({
 
 .card-header {
     height: 65px;
-    color: #fff;
     padding: 15px 20px;
     border-radius: 10px 10px 0 0;
 }
 
 .header-line {
-  border: none;
-  height: 1px;
-  background-color: #cccccc; /* 회색 계열의 미묘한 구분선 */
-  margin-top: 8px;
+    border: none;
+    height: 1px;
+    background-color: #cccccc;
+    margin-top: 8px;
 }
 
 .card-header h3 {
@@ -361,32 +360,36 @@ const areaData = ref({
     justify-content: space-between;
     align-items: flex-start;
     padding: 15px;
+    flex-wrap: wrap;
 }
 
-/* =======================
-   📊 최종 스타일 수정본
-   ======================= */
+/* ======================
+   차트
+======================= */
 .chart-item {
     width: 460px;
+    min-width: 320px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    /* ✅ 차트 중심 기준으로 캡션 정렬 */
 }
 
 .canvas-wrap {
-    width: 460px;
+    max-width: 460px;
+    width: 100%;
     height: 180px;
 }
 
-/* ✅ 차트 설명 중앙 배치 + 왼쪽정렬 */
+.canvas-wrap canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
 .chart-desc {
     width: 300px;
-    /* 캡션 텍스트 블록 너비 */
     display: flex;
     align-items: flex-start;
     justify-content: center;
-    /* 차트 기준 가운데 배치 */
     margin-top: 15px;
     text-align: left;
 }
@@ -411,28 +414,31 @@ const areaData = ref({
 
 .text p {
     font-size: 12px;
-    color: #111;
+    color: #555555;
     margin: 0;
     white-space: nowrap;
-    color: #555555;
 }
 
-/* AI 요약 */
+/* ======================
+   AI 요약
+======================= */
 .ai-summary {
-    width: 400px;
+    max-width: 400px;
+    /* 🔧 width → max-width */
+    width: 100%;
+    /* 🔧 추가 */
+    min-width: 320px;
     display: flex;
     flex-direction: column;
     margin-top: 10px;
     gap: 15px;
 }
 
-.ai-summary h4 {
-    font-size: 14px;
-    margin: 0 0 8px 0;
-}
-
 .ai-card {
-    width: 400px;
+    max-width: 400px;
+    /* 🔧 width → max-width */
+    width: 100%;
+    /* 🔧 추가 */
     height: 50px;
     border-radius: 8px;
     padding: 8px 12px;
@@ -442,16 +448,16 @@ const areaData = ref({
 }
 
 .ai-card .title {
-    margin: 0;
     font-size: 14px;
     font-weight: 700;
+    margin: 0;
 }
 
 .ai-card .content {
-    margin: 2px 0 0 0;
     font-size: 12px;
     line-height: 1.3;
     color: #333;
+    margin: 2px 0 0;
 }
 
 .strength {
@@ -469,9 +475,14 @@ const areaData = ref({
     border: 1px solid #9AD0F5;
 }
 
-/* 하단 요약 (좌측 정렬, 지정 테두리/배경) */
+/* ======================
+   최종 요약
+======================= */
 .final-summary {
-    width: 1400px;
+    max-width: 1400px;
+    /* 🔧 width → max-width */
+    width: 100%;
+    /* 🔧 추가 */
     height: 80px;
     background: #E9F8F2;
     border: 1px solid #71EBBE;
@@ -483,13 +494,12 @@ const areaData = ref({
 .final-summary h4 {
     font-size: 16px;
     font-weight: 700;
-    color: #000;
     margin: 0 0 4px 0;
 }
 
 .final-summary p {
     font-size: 13px;
-    color: #333;
     margin: 0;
+    color: #333;
 }
 </style>
