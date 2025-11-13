@@ -47,7 +47,7 @@
                 />
               </div>
             </div>
-            <div class="form-group">
+            <div class="form-group mb-4">
               <label>이메일 *</label>
               <input 
                 type="email" 
@@ -723,6 +723,7 @@ onMounted(() => {
 .skill-item input {
   flex: 1;
   padding: 10px 12px;
+  border: 1px solid #f0f0f0;
 }
 
 .remove-skill-btn {

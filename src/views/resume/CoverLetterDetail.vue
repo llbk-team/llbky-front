@@ -82,13 +82,6 @@
                 </div>
               </div>
             </div>
-
-            <!-- 리포트 버튼 -->
-            <div class="text-end mt-4">
-              <button class="btn btn-outline-secondary fw-medium btn-sm px-4 py-2" @click="$router.push('/resume/list')">
-                📄 리포트 생성하기
-              </button>
-            </div>
           </div>
         </div>
 
@@ -255,13 +248,11 @@ Spring Boot와 MSA 구조를 활용하여 안정적인 서버를 구축했습니
 // 복사 / 적용 기능
 const copyVersion = async (text) => {
   await navigator.clipboard.writeText(text);
-  alert("복사되었습니다 ✅");
 };
 
 const applyVersion = (text) => {
   const lines = text.split("\n");
   Object.keys(tabContent).forEach((key) => (tabContent[key] = lines));
-  alert("선택한 문체 버전이 전체 항목에 적용되었습니다 ✨");
 };
 
 // 수정 기능
@@ -279,7 +270,6 @@ const saveEdit = (section) => {
   tabContent[section] = editedText.value.split("\n\n");
   isEditing.value = false;
   editingSection.value = null;
-  alert(`"${section}" 수정이 저장되었습니다 ✅`);
 };
 
 const cancelEdit = () => {

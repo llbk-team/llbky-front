@@ -14,35 +14,24 @@
             <div class="mb-4">
               <label class="fw-semibold mb-2 text-dark mt-4">어떤 유형의 면접을 연습하실 건가요?</label>
               <div class="d-flex gap-3">
-              <button
-                class="btn type-btn flex-fill py-3 d-flex flex-column align-items-center border rounded-3 w-50"
-                :class="type === 'comprehensive' ? 'btn-mint' : 'btn-outline-dark'"
-                @click="type = 'comprehensive'"
-              >
-                <span class="fw-bold">종합 면접</span>
-                <small class="text-muted">직무+인성 질문을 함께 준비</small>
-              </button>
-              <button
-                class="btn type-btn flex-fill py-3 d-flex flex-column align-items-center border rounded-3 w-50"
-                :class="type === 'technical' ? 'btn-mint' : 'btn-outline-dark'"
-                @click="type = 'technical'"
-              >
-                <span class="fw-bold">직무 면접</span>
-                <small class="text-muted">기술 중심 평가</small>
-              </button>
-            </div>
+                <button class="btn type-btn flex-fill py-3 d-flex flex-column align-items-center border rounded-3 w-50" :class="type === 'comprehensive' ? 'btn-mint' : 'btn-outline-dark'"
+                  @click="type = 'comprehensive'">
+                  <span class="fw-bold">종합 면접</span>
+                  <small class="text-muted">직무+인성 질문을 함께 준비</small>
+                </button>
+                <button class="btn type-btn flex-fill py-3 d-flex flex-column align-items-center border rounded-3 w-50" :class="type === 'technical' ? 'btn-mint' : 'btn-outline-dark'"
+                  @click="type = 'technical'">
+                  <span class="fw-bold">직무 면접</span>
+                  <small class="text-muted">기술 중심 평가</small>
+                </button>
+              </div>
 
             </div>
 
             <!-- 기업 선택 -->
             <div class="mb-4">
               <label class="fw-semibold mb-2 text-dark mt-4">희망하시는 기업이 어디인가요?</label>
-              <input
-                type="text"
-                class="form-control p-3 rounded-3"
-                v-model="selectedCompany"
-                placeholder="예: 네이버, 삼성전자, 카카오 등"
-              />
+              <input type="text" class="form-control p-3 rounded-3" v-model="selectedCompany" placeholder="예: 네이버, 삼성전자, 카카오 등" />
               <small class="text-muted d-block mt-2">
                 *AI가 입력된 기업명을 기반으로 질문을 생성합니다.
               </small>
@@ -57,25 +46,15 @@
 
               <!-- 스크롤 박스 -->
               <div class="bg-light rounded-3 p-3 border mb-4 checkbox-scroll">
-                <div
-                  v-for="(keyword, index) in keywordList"
-                  :key="index"
-                  class="form-check mb-2"
-                >
-                  <input
-                    class="form-check-input"
-                    type="checkbox"
-                    :id="'keyword' + index"
-                    v-model="selectedKeywords"
-                    :value="keyword"
-                  />
+                <div v-for="(keyword, index) in keywordList" :key="index" class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" :id="'keyword' + index" v-model="selectedKeywords" :value="keyword" />
                   <label class="form-check-label text-dark" :for="'keyword' + index">
                     {{ keyword }}
                   </label>
                 </div>
               </div>
             </div>
-            
+
             <!-- 서류 선택 -->
             <div class="mb-4">
               <label class="fw-semibold mb-2 text-dark mt-4">관련 서류 선택</label>
@@ -84,13 +63,7 @@
               </small>
               <div class="bg-light rounded-3 p-3 border checkbox-scroll">
                 <div v-for="(file, index) in files" :key="index" class="form-check mb-2">
-                  <input
-                    class="form-check-input"
-                    type="checkbox"
-                    :id="'file' + index"
-                    v-model="selectedFiles"
-                    :value="file"
-                  />
+                  <input class="form-check-input" type="checkbox" :id="'file' + index" v-model="selectedFiles" :value="file" />
                   <label class="form-check-label text-dark" :for="'file' + index">
                     {{ file }}
                   </label>
@@ -115,45 +88,30 @@
 
             <div class="ai-question-body">
 
-              <div
-                v-for="(q, i) in questions"
-                :key="i"
-                class="ai-question-item"
-              >
+              <div v-for="(q, i) in questions" :key="i" class="ai-question-item">
                 <strong>Q{{ i + 1 }}.</strong> {{ q }}
               </div>
 
               <!-- 새 질문 입력 -->
               <div v-if="isAdding" class="d-flex align-items-center gap-2 mb-3 add-question-box">
-                <input
-                  type="text"
-                  v-model="newQuestion"
-                  placeholder="새 질문을 입력하세요"
-                  class="form-control flex-grow-1 w-auto"
-                  @keyup.enter="addQuestion"
-                />
+                <input type="text" v-model="newQuestion" placeholder="새 질문을 입력하세요" class="form-control flex-grow-1 w-auto" @keyup.enter="addQuestion" />
                 <button class="btn btn-mint ai-add-btn" @click="addQuestion">추가</button>
               </div>
 
               <!-- 플러스 버튼 -->
               <div class="d-flex justify-content-center my-3">
-                <button
-                  class="btn rounded-circle ai-plus-btn"
-                  @click="isAdding = !isAdding"
-                >
+                <button class="btn rounded-circle ai-plus-btn" @click="isAdding = !isAdding">
                   <i class="ri-add-line fs-4"></i>
                 </button>
               </div>
 
-      <button class="btn btn-mint w-100 py-3 fw-medium" @click="router.push('/interview/progress')">
-        모의 면접 시작하기 →
-      </button>
+              <button class="btn btn-mint w-100 py-3 fw-medium" @click="router.push('/interview/progress')">
+                모의 면접 시작하기 →
+              </button>
 
-    </div>
-  </div>
-</div>
-
-
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -212,8 +170,10 @@ const generateQuestions = () => {
 
 <style scoped>
 /* 제목 */
-.title, h3.fw-bold {
-  font-size: 1.75rem !important; /* 28px */
+.title,
+h3.fw-bold {
+  font-size: 1.75rem !important;
+  /* 28px */
   font-weight: 700 !important;
 }
 
@@ -224,7 +184,8 @@ p,
 label,
 span,
 small {
-  font-size: 1rem !important; /* 16px */
+  font-size: 1rem !important;
+  /* 16px */
 }
 
 .btn-mint {
@@ -232,6 +193,7 @@ small {
   color: #000 !important;
   border: none !important;
 }
+
 .btn-mint:hover {
   background-color: #5cd8ab !important;
 }
@@ -241,6 +203,7 @@ small {
   color: #fff !important;
   border: none !important;
 }
+
 .btn-deep-mint:hover {
   background-color: #009a70 !important;
 }
@@ -257,13 +220,16 @@ small {
   justify-content: center !important;
   align-items: center !important;
   gap: 4px;
-  padding: 0 !important; /* py-3 덮어쓰기 */
+  padding: 0 !important;
+  /* py-3 덮어쓰기 */
   white-space: nowrap;
   text-align: center;
 }
+
 .type-btn span {
   font-size: 16px;
 }
+
 .type-btn small {
   font-size: 13px;
   color: #666;
@@ -272,15 +238,21 @@ small {
 
 
 /* 입력칸이 flex에서 과도하게 넓어지지 않도록 */
-.add-question-box .form-control { min-width: 0; }
+.add-question-box .form-control {
+  min-width: 0;
+}
 
 /* 버튼이 줄바꿈되지 않도록(안전장치) */
-.add-question-box .btn { white-space: nowrap; }
+.add-question-box .btn {
+  white-space: nowrap;
+}
 
 /* 입력 필드 placeholder 색상 연하게 */
 input::placeholder {
-  color: #bcbcbc !important; /* 좀 더 연한 회색 */
-  opacity: 1; /* Safari용 (기본 투명도 제거) */
+  color: #bcbcbc !important;
+  /* 좀 더 연한 회색 */
+  opacity: 1;
+  /* Safari용 (기본 투명도 제거) */
 }
 
 /* 오른쪽 AI 질문 영역 전체 스타일 */
@@ -290,7 +262,7 @@ input::placeholder {
   border-radius: 16px !important;
   padding: 0 !important;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
 }
 
 /* 헤더 (bg-dark 부분 대체) */
@@ -320,7 +292,7 @@ input::placeholder {
 
 .ai-question-item:hover {
   background: #f8fafc !important;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
 }
 
 /* 플러스 버튼 배경 정리 */
@@ -340,7 +312,8 @@ input::placeholder {
 
 /* 체크박스 영역 스크롤 – 3줄까지만 보이도록 */
 .checkbox-scroll {
-  max-height: 140px; /* 약 3줄 높이 */
+  max-height: 140px;
+  /* 약 3줄 높이 */
   overflow-y: auto;
 }
 </style>

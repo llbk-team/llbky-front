@@ -20,7 +20,7 @@
 
     <div class="row g-4">
       <!-- 왼쪽 -->
-      <div class="col-md-7">
+      <div class="col-md-8">
         <!-- 진행 중 -->
         <div v-if="currentTab === 'ongoing'" class="card shadow-sm p-4 mb-3 card-clean ongoing-container">
           <div class="d-flex justify-content-between align-items-center mb-3">
@@ -69,28 +69,50 @@
 
 
       <!-- 오른쪽 -->
-      <div class="col-md-5">
+      <div class="col-md-4">
+
+        <div class="stats-bar d-flex justify-content-between align-items-center mb-3">
+          <span class="fw-bold py-1 ms-2">나의 학습 현황</span>
+          <div class="d-flex align-items-center gap-3 small">
+            <span>진행 중 | <span class="fw-bold">{{ stats.ongoing }}</span></span>
+            <span>완료 | <span class="fw-bold">{{ stats.completed }}</span></span>
+          </div>
+        </div>
 
         <div class="card shadow-sm p-4 mb-3 card-clean">
-          <h5 class="fw-bold mb-3" style="color:#111111;">AI 코멘트</h5>
+          <h5 class="fw-bold mb-3">AI 코멘트</h5>
           <div class="p-3 rounded border mb-2" style="background-color:#DDF3EB; border-color:#71EBBE;">
-            <p class="small mb-0" style="color:#111111;">“{{ aiComment.main }}”</p>
+            <p class="small mb-0">“{{ aiComment.main }}”</p>
           </div>
           <p class="text-muted small">참고: {{ aiComment.tip }} 💪</p>
         </div>
-        <div class="card shadow-sm p-4 card-clean">
-          <h5 class="fw-bold mb-3" style="color:#111111;">나의 학습 현황</h5>
-          <div class="rounded-3 p-3 text-center mb-3" style="background-color:#DDF3EB;">
-            <p class="fw-bold fs-4 mb-0" style="color:#111111;">{{ stats.ongoing }}</p>
-            <p class="text-secondary small mb-0">진행 중인 플랜</p>
-          </div>
-          <div class="rounded-3 p-3 text-center" style="background-color:#A2F1D6;">
-            <p class="fw-bold fs-4 mb-0" style="color:#111111;">{{ stats.completed }}</p>
-            <p class="text-secondary small mb-0">완료한 플랜 🎉</p>
-          </div>
-        </div>
 
+        <!-- 학습 루틴 캘린더 -->
+        <div class="card shadow-sm p-4 mt-3 card-clean">
+          <div class="calendar-header d-flex justify-content-between align-items-center mb-2">
+            <button class="page-btn" @click="prevMonth">‹</button>
+            <span class="fw-semibold">{{ year }}년 {{ month + 1 }}월</span>
+            <button class="page-btn" @click="nextMonth">›</button>
+          </div>
+          <table class="table text-center small mb-0">
+            <thead>
+              <tr>
+                <th v-for="d in ['일', '월', '화', '수', '목', '금', '토']" :key="d">{{ d }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(week, wi) in calendar" :key="wi">
+                <td v-for="(day, di) in week" :key="di" :class="{ 'calendar-today': isToday(day) }">
+                  {{ day > 0 ? day : '' }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="small text-muted mt-2">✓ 오늘 학습 완료 시 자동 표시됩니다</p>
+        </div>
       </div>
+
+
     </div>
   </div>
 </template>
@@ -98,6 +120,70 @@
 <script setup>
 import { ref, computed, watch } from "vue";
 import { useRouter, useRoute } from "vue-router";
+
+
+// 📅 ----- 달력 로직 ----- //
+const today = new Date();
+const year = ref(today.getFullYear());
+const month = ref(today.getMonth()); // 0~11
+const calendar = ref([]);
+
+function generateCalendar() {
+  const firstDay = new Date(year.value, month.value, 1).getDay();
+  const daysInMonth = new Date(year.value, month.value + 1, 0).getDate();
+
+  const temp = [];
+  let week = Array(7).fill(0);
+  let day = 1;
+
+  // 첫 주
+  for (let i = firstDay; i < 7; i++) {
+    week[i] = day++;
+  }
+  temp.push(week);
+
+  // 중간 주
+  while (day <= daysInMonth) {
+    week = Array(7).fill(0);
+    for (let i = 0; i < 7 && day <= daysInMonth; i++) {
+      week[i] = day++;
+    }
+    temp.push(week);
+  }
+
+  calendar.value = temp;
+}
+
+function isToday(d) {
+  return (
+    d === today.getDate() &&
+    month.value === today.getMonth() &&
+    year.value === today.getFullYear()
+  );
+}
+
+function prevMonth() {
+  if (month.value === 0) {
+    month.value = 11;
+    year.value--;
+  } else {
+    month.value--;
+  }
+  generateCalendar();
+}
+
+function nextMonth() {
+  if (month.value === 11) {
+    month.value = 0;
+    year.value++;
+  } else {
+    month.value++;
+  }
+  generateCalendar();
+}
+
+generateCalendar();
+// 달력 끝
 
 const router = useRouter();
 const route = useRoute();
@@ -179,7 +265,7 @@ const stats = { ongoing: 2, completed: 1 }
 
 const aiComment = {
   main: 'SQL 학습 플랜을 잘 진행 중이에요! 이번 주 목표는 Spring Security를 공부해봐요.',
-  tip: '하루 30분만 더 투자하면 목표 자격증 합격 확률이 눈에 띄게 높아져요!'
+  tip: '하루 30분만 더 투자하면 목표 자격증 합격 확률이 높아져요!'
 }
 </script>
 
@@ -297,4 +383,45 @@ body {
   min-height: 520px;
 }
 
+.calendar-today {
+  background-color: #DDF3EB;
+  border-radius: 6px;
+  font-weight: 700;
+  color: #111111;
+}
+
+/* 나의 학습 현황 미니 박스 */
+.mini-stats-card {
+  padding: 12px !important;
+  border-radius: 10px !important;
+}
+
+.mini-stats-card h5 {
+  font-size: 14px !important;
+  margin-bottom: 10px !important;
+}
+
+/* 안의 블록 크기 줄이기 */
+.mini-stat-box {
+  padding: 8px 0 !important;
+  border-radius: 6px !important;
+  margin-bottom: 8px !important;
+}
+
+.mini-stat-number {
+  font-size: 18px !important;
+  margin-bottom: 0 !important;
+}
+
+.mini-stat-label {
+  font-size: 11px !important;
+  margin-bottom: 0 !important;
+}
+
+.stats-bar {
+  padding: 8px 12px;
+  border: 1px solid #EAEBEC;
+  border-radius: 10px;
+  background-color: #FFFFFF;
+}
 </style>
