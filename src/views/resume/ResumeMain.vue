@@ -23,41 +23,6 @@
           </div>
         </div>
 
-        <div class="resume-section">
-          <div class="section-header compact">
-            <div class="left-group">
-              <h2>내 최종 지원서 리스트</h2>
-              <button class="select-toggle-btn" @click="toggleSelectMode">
-                {{ isSelecting ? '선택 완료' : '선택하기' }}
-              </button>
-              <button class="integrate-button small" @click="createIntegratedDocument">
-                📚 통합 문서 만들기
-              </button>
-            </div>
-            <div class="right-group">
-              <span class="ai-suggestion">✨ AI 최종 지원서 생성</span>
-            </div>
-          </div>
-          <div class="resume-grid">
-            <!-- 기존 지원서 카드 -->
-            <div 
-              v-for="resume in resumeList" 
-              :key="resume.id" 
-              class="resume-card"
-            >
-              <div class="card-content" @click="router.push('/resume/final')">
-                <div class="resume-icon">📄</div>
-                <div class="resume-info">
-                  <h3 class="resume-title">{{ resume.title }}</h3>
-                  <p class="resume-description">{{ resume.description }}</p>
-                  <div class="resume-meta">
-                    <span class="update-date">📅 등록: {{ resume.updatedAt }}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
 
         <!-- 내 이력서 리스트 -->
         <div class="resume-section">
