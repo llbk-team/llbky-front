@@ -6,8 +6,11 @@
                 <h2>통합 리포트</h2>
                 <p>기능별 상세 분석 및 통계를 확인하세요</p>
             </div>
-            <button class="save-btn">리포트 생성 ⬇</button>
+
+            <button class="save-btn" @click="openSaveModal">리포트 생성 <i class="ri-download-2-line"></i> </button>
         </header>
+
+         <ReportSaveModal />
 
         <!-- 이력서 분석 -->
         <div class="report-card">
@@ -49,7 +52,7 @@
 
                 <!-- AI 요약 -->
                 <aside class="ai-summary">
-                    <h4>✨ AI 요약</h4>
+                    <!-- <h4>✨ AI 요약</h4> -->
 
                     <div class="ai-card strength">
                         <p class="title">✅ 강점</p>
@@ -106,7 +109,7 @@
                 </div>
 
                 <aside class="ai-summary">
-                    <h4>✨ AI 요약</h4>
+                    <!-- <h4>✨ AI 요약</h4> -->
 
                     <div class="ai-card strength">
                         <p class="title">✅ 강점</p>
@@ -163,7 +166,7 @@
                 </div>
 
                 <aside class="ai-summary">
-                    <h4>✨ AI 요약</h4>
+                    <!-- <h4>✨ AI 요약</h4> -->
 
                     <div class="ai-card strength">
                         <p class="title">✅ 강점</p>
@@ -192,7 +195,8 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
+import ReportSaveModal from "./report/ReportSaveModal.vue";
 import { Bar, Line, Radar, Doughnut } from "vue-chartjs";
 import {
     Chart,
@@ -207,10 +211,25 @@ import {
     Legend,
     RadialLinearScale,
 } from "chart.js";
+import { Modal } from "bootstrap";
+
 Chart.register(
     BarElement, LineElement, ArcElement, PointElement,
     CategoryScale, LinearScale, Title, Tooltip, Legend, RadialLinearScale
 );
+
+// Bootstrap modal 제어용
+let modalInstance = null;
+onMounted(() => {
+  const modalEl = document.getElementById("reportSaveModal");
+  if (modalEl) {
+    modalInstance = new Modal(modalEl, { backdrop: "static" });
+  }
+});
+
+const openSaveModal = () => {
+  modalInstance.show();
+};
 
 const chartOpt = { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: "top" } } };
 
@@ -259,7 +278,7 @@ const areaData = ref({
 
 /* 공통 */
 .report-wrapper {
-    width: 1400px;
+    width: 1440px;
     margin: 0 auto;
     color: #111;
     padding: 20px;
@@ -269,7 +288,6 @@ const areaData = ref({
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 10px;
 }
 
 .header-left h2 {
@@ -280,19 +298,24 @@ const areaData = ref({
 }
 
 .header-left p {
-    font-size: 12px;
+    font-size: 15px;
     color: #555;
 }
 
 .save-btn {
-    width: 110px;
-    height: 33px;
-    background: #71EBBE;
+    width: 130px;
+    height: 37px;
+    color: #ffffff;
+    background: #111111;
     border: none;
     border-radius: 6px;
-    font-size: 12px;
+    font-size: 13.5px;
     font-weight: 500;
     cursor: pointer;
+}
+
+.save-btn:hover {
+    background-color: #71EBBE;
 }
 
 /* 카드 */
@@ -310,7 +333,7 @@ const areaData = ref({
 .card-header {
     height: 65px;
     color: #fff;
-    padding: 12px 20px;
+    padding: 15px 20px;
     border-radius: 10px 10px 0 0;
 }
 
@@ -328,9 +351,9 @@ const areaData = ref({
 }
 
 .card-header p {
-    font-size: 12px;
+    font-size: 13px;
     color: #555555;
-    margin-top: 3px;
+    margin-top: -3px;
 }
 
 .card-body {
@@ -358,7 +381,7 @@ const areaData = ref({
 
 /* ✅ 차트 설명 중앙 배치 + 왼쪽정렬 */
 .chart-desc {
-    width: 200px;
+    width: 300px;
     /* 캡션 텍스트 블록 너비 */
     display: flex;
     align-items: flex-start;
@@ -369,10 +392,9 @@ const areaData = ref({
 }
 
 .vline {
-    width: 3px;
+    width: 5px;
     height: 14px;
     background: #71EBBE;
-    border-radius: 2px;
     margin-right: 8px;
 }
 
@@ -381,16 +403,18 @@ const areaData = ref({
 }
 
 .text h4 {
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 700;
     color: #111;
     margin: 0 0 2px 0;
 }
 
 .text p {
-    font-size: 10px;
+    font-size: 12px;
     color: #111;
     margin: 0;
+    white-space: nowrap;
+    color: #555555;
 }
 
 /* AI 요약 */
@@ -398,6 +422,8 @@ const areaData = ref({
     width: 400px;
     display: flex;
     flex-direction: column;
+    margin-top: 10px;
+    gap: 15px;
 }
 
 .ai-summary h4 {
@@ -410,7 +436,6 @@ const areaData = ref({
     height: 50px;
     border-radius: 8px;
     padding: 8px 12px;
-    margin-bottom: 8px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -424,8 +449,9 @@ const areaData = ref({
 
 .ai-card .content {
     margin: 2px 0 0 0;
-    font-size: 10px;
+    font-size: 12px;
     line-height: 1.3;
+    color: #333;
 }
 
 .strength {
@@ -446,7 +472,7 @@ const areaData = ref({
 /* 하단 요약 (좌측 정렬, 지정 테두리/배경) */
 .final-summary {
     width: 1400px;
-    height: 70px;
+    height: 80px;
     background: #E9F8F2;
     border: 1px solid #71EBBE;
     border-radius: 8px;
@@ -458,11 +484,11 @@ const areaData = ref({
     font-size: 16px;
     font-weight: 700;
     color: #000;
-    margin: 0 0 6px 0;
+    margin: 0 0 4px 0;
 }
 
 .final-summary p {
-    font-size: 12px;
+    font-size: 13px;
     color: #333;
     margin: 0;
 }
