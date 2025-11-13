@@ -36,9 +36,9 @@
       <div class="personal-context-box">
         <p>
           🧠 <strong>맞춤 분석 고도화</strong><br />
-          AI는 사용자의 <strong>이력서</strong>·<strong>면접 피드백</strong>·<strong>학습 내역</strong>을 함께 분석하여 
+          AI는 사용자의 <strong>이력서</strong>·<strong>면접 피드백</strong>·<strong>학습 내역</strong>을 함께 분석하여
           현재 역량과 시장 수요 간의 <strong>기술 격차(Skill Gap)</strong>를 파악합니다.<br />
-          이를 바탕으로 <strong>보완이 필요한 기술</strong>과 
+          이를 바탕으로 <strong>보완이 필요한 기술</strong>과
           <strong>성장 방향</strong>을 함께 제안합니다.
         </p>
       </div>
@@ -48,7 +48,7 @@
     <div class="recommend-section">
       <h3>🤖 AI 추천 인사이트</h3>
       <p class="sub-desc">
-        최근 뉴스·트렌드 분석과 저장된 키워드를 바탕으로 
+        최근 뉴스·트렌드 분석과 저장된 키워드를 바탕으로
         AI가 제안하는 연관 직무와 핵심 기술 키워드입니다.
       </p>
 
@@ -65,14 +65,10 @@
           <div class="keyword-box">
             <h5>💡 관련 키워드</h5>
             <div class="tags">
-              <button
-                v-for="tag in job.tags"
-                :key="tag"
-                class="tag-btn"
-                @click="saveKeyword(tag)"
-              >
-                {{ tag }}
+              <button v-for="tag in job.tags" :key="tag" class="tag-btn" :class="{ saved: isSaved(tag) }" @click="toggleKeyword(tag)">
+                {{ isSaved(tag) ? `✔ ${tag}` : tag }}
               </button>
+
             </div>
           </div>
 
@@ -87,24 +83,24 @@
     <div class="career-analysis-box">
       <p>
         💼 <strong>희망 직무 중심 성장 제안</strong><br />
-        AI가 사용자의 <strong>희망 직무</strong>를 중심으로 최근 트렌드와 
+        AI가 사용자의 <strong>희망 직무</strong>를 중심으로 최근 트렌드와
         이력서·면접·학습 데이터를 함께 분석했습니다.<br />
         아래는 시장 흐름과 현재 역량을 바탕으로 제안하는 성장 방향입니다.
       </p>
 
       <ul class="feedback-list">
         <li>
-          <strong>📄 이력서 분석:</strong> 최근 업계에서는 
-          <b>MLOps</b>와 <b>LLM 응용</b>이 핵심 키워드로 부상했습니다. 
-          현재 이력서에는 관련 프로젝트 경험이 적게 나타나므로 
+          <strong>📄 이력서 분석:</strong> 최근 업계에서는
+          <b>MLOps</b>와 <b>LLM 응용</b>이 핵심 키워드로 부상했습니다.
+          현재 이력서에는 관련 프로젝트 경험이 적게 나타나므로
           모델 배포 및 운영 경험을 보완해보세요.
         </li>
         <li>
-          <strong>🎤 면접 분석:</strong> 답변에서 프로젝트 성과나 수치를 구체적으로 제시하지 않은 경우가 있었습니다. 
+          <strong>🎤 면접 분석:</strong> 답변에서 프로젝트 성과나 수치를 구체적으로 제시하지 않은 경우가 있었습니다.
           <b>정량적 결과 중심의 스토리텔링</b>을 추가하면 전문성이 강화됩니다.
         </li>
         <li>
-          <strong>📚 학습 데이터 분석:</strong> 현재 학습 내역은 Python 중심입니다. 
+          <strong>📚 학습 데이터 분석:</strong> 현재 학습 내역은 Python 중심입니다.
           최근 트렌드에 맞춰 <b>데이터 거버넌스</b>나 <b>LLM 파인튜닝</b> 과정을 함께 진행하면 좋습니다.
         </li>
       </ul>
@@ -119,17 +115,38 @@
 <script setup>
 import { ref, onMounted } from "vue";
 
+const savedKeywords = ref([]);
 const savedCount = ref(0);
 
-// 로컬 스토리지에서 희망 직무 가져오기
+// 저장된 희망 직무
 const userJob = ref(localStorage.getItem("user_job") || "AI 엔지니어");
 
 onMounted(() => {
-  const saved = JSON.parse(localStorage.getItem("user_keywords") || "[]");
-  savedCount.value = saved.length;
+  const stored = JSON.parse(localStorage.getItem("user_keywords") || "[]");
+  savedKeywords.value = Array.isArray(stored) ? stored : [];
+  savedCount.value = savedKeywords.value.length;
 });
 
-// 첫 번째 카드 = 희망 직무
+// 저장 여부 체크
+const isSaved = (tag) => savedKeywords.value.includes(tag);
+
+// ⭐ 저장/삭제 토글
+const toggleKeyword = (tag) => {
+  const index = savedKeywords.value.indexOf(tag);
+
+  if (index === -1) {
+    // 추가
+    savedKeywords.value.push(tag);
+  } else {
+    // 삭제
+    savedKeywords.value.splice(index, 1);
+  }
+
+  localStorage.setItem("user_keywords", JSON.stringify(savedKeywords.value));
+  savedCount.value = savedKeywords.value.length;
+};
+
+// 첫 번째 추천 직무 = 사용자 희망 직무
 const jobs = ref([
   {
     title: userJob.value,
@@ -156,18 +173,6 @@ const jobs = ref([
     tags: ["SQL", "Pandas", "Machine Learning", "Visualization"],
   },
 ]);
-
-const saveKeyword = (tag) => {
-  const saved = JSON.parse(localStorage.getItem("user_keywords") || "[]");
-  if (!saved.includes(tag)) {
-    saved.push(tag);
-    localStorage.setItem("user_keywords", JSON.stringify(saved));
-    savedCount.value = saved.length;
-    alert(`'${tag}' 키워드가 저장되었습니다 ✅`);
-  } else {
-    alert(`이미 저장된 키워드입니다.`);
-  }
-};
 </script>
 
 <style scoped>
@@ -188,15 +193,18 @@ const saveKeyword = (tag) => {
   flex-wrap: wrap;
   margin-bottom: 28px;
 }
+
 .title-section h2 {
   font-size: 24px;
   font-weight: 700;
 }
+
 .title-section p {
   font-size: 14px;
   color: #555;
   margin-top: 4px;
 }
+
 .saved-btn {
   background: #00c896;
   color: #fff;
@@ -207,6 +215,7 @@ const saveKeyword = (tag) => {
   text-decoration: none;
   transition: 0.2s;
 }
+
 .saved-btn:hover {
   background: #00b487;
 }
@@ -228,6 +237,7 @@ const saveKeyword = (tag) => {
   gap: 20px;
   margin-bottom: 30px;
 }
+
 .context-box,
 .personal-context-box {
   border-radius: 10px;
@@ -235,19 +245,23 @@ const saveKeyword = (tag) => {
   font-size: 13px;
   line-height: 1.6;
 }
+
 .context-box {
   background: #fff8ea;
   border: 1px solid #ffe19d;
   color: #444;
 }
+
 .context-box strong {
   color: #b25c00;
 }
+
 .personal-context-box {
   background: #eef7ff;
   border: 1px solid #c9e3ff;
   color: #333;
 }
+
 .personal-context-box strong {
   color: #0059b3;
 }
@@ -258,16 +272,19 @@ const saveKeyword = (tag) => {
   font-weight: 700;
   margin-bottom: 6px;
 }
+
 .sub-desc {
   font-size: 13px;
   color: #555;
   margin-bottom: 20px;
 }
+
 .recommend-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 24px;
 }
+
 .recommend-card {
   background: #fff;
   border-radius: 12px;
@@ -279,16 +296,19 @@ const saveKeyword = (tag) => {
   justify-content: space-between;
   transition: 0.2s;
 }
+
 .recommend-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
 }
+
 .summary {
   font-size: 13px;
   color: #444;
   line-height: 1.6;
   margin-bottom: 14px;
 }
+
 .trend-box,
 .keyword-box {
   background: #f7fcfa;
@@ -297,6 +317,7 @@ const saveKeyword = (tag) => {
   padding: 12px 16px;
   margin-bottom: 12px;
 }
+
 .trend-box h5,
 .keyword-box h5 {
   font-size: 13px;
@@ -304,24 +325,45 @@ const saveKeyword = (tag) => {
   color: #00b487;
   margin-bottom: 6px;
 }
+
 .tags {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
+
 .tag-btn {
   border: 1px solid #a2f1d6;
   background: #ddf3eb;
-  padding: 4px 10px;
+  padding: 5px 12px;
   border-radius: 8px;
   font-size: 12px;
   cursor: pointer;
-  transition: 0.2s;
+  transition: all 0.2s ease;
 }
+
 .tag-btn:hover {
-  background: #a2f1d6;
   transform: scale(1.05);
 }
+
+/* ⭐ 저장된 키워드 시각적 표시 */
+.tag-btn.saved {
+  background: #00c896;
+  border-color: #009b72;
+  color: #fff;
+}
+
+.tag-btn.saved:hover {
+  background: #00c896;
+  transform: scale(1.0);
+}
+
+/* 클릭 시 살짝 눌리는 효과 */
+.tag-btn:active {
+  transform: scale(0.92);
+}
+
+
 .note {
   font-size: 12px;
   color: #777;
@@ -339,14 +381,17 @@ const saveKeyword = (tag) => {
   color: #333;
   line-height: 1.6;
 }
+
 .career-analysis-box strong {
   color: #0040a8;
 }
+
 .feedback-list {
   margin-top: 10px;
   list-style: none;
   padding-left: 0;
 }
+
 .feedback-list li {
   background: #fff;
   border: 1px solid #dbe7ff;
@@ -355,6 +400,7 @@ const saveKeyword = (tag) => {
   margin-bottom: 8px;
   font-size: 13px;
 }
+
 .feedback-list b {
   color: #0069ff;
 }
