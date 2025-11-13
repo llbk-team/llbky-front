@@ -103,56 +103,6 @@
               </div>
             </div>
           </div>
-
-          <!-- ✅ 전체 구조/흐름 분석 (본문과 같은 너비, 같은 wrapper 안) -->
-          <div class="overall-structure rounded">
-            <h5 class="fw-bold mb-3" style="color:#111;">📚 전체 구조 · 흐름 분석</h5>
-
-            <p class="small text-muted mb-3">
-              AI가 포트폴리오 전체를 기반으로 페이지 간 흐름, 콘텐츠 구성, 논리적 구조를 분석한 리포트입니다.
-            </p>
-
-            <div class="structure-item mb-3">
-              <h6 class="fw-semibold mb-1">1️⃣ 전체 페이지 구성</h6>
-              <p class="small text-muted">
-                페이지 간 흐름이 자연스럽고 주제 전환이 매끄럽습니다. 프로젝트 소개 → 기능 설명 → 기술
-                스택 → 데이터 분석 → 결론으로 이어지는 구조는 논리적으로 탄탄합니다.
-              </p>
-            </div>
-
-            <div class="structure-item mb-3">
-              <h6 class="fw-semibold mb-1">2️⃣ 스토리텔링 구성</h6>
-              <p class="small text-muted">
-                서비스 문제 정의와 해결 과정이 명확하며 사용자의 동선을 고려한 설명 방식이 설득력을
-                높입니다. 기술적 성과와 정량적 지표가 자연스럽게 녹아 있습니다.
-              </p>
-            </div>
-
-            <div class="structure-item mb-3">
-              <h6 class="fw-semibold mb-1">3️⃣ 시각적 정보 배치</h6>
-              <p class="small text-muted">
-                그래프·다이어그램·UI 이미지의 배치가 균형감 있으며 중요한 요소가 중앙에 집중되어 시선
-                흐름이 안정적입니다.
-              </p>
-            </div>
-
-            <div class="structure-item mb-3">
-              <h6 class="fw-semibold mb-1">4️⃣ 정보 밀도 & 가독성</h6>
-              <p class="small text-muted">
-                텍스트와 시각 자료의 비율이 적절하여 정보 과부하가 없으며, 중요한 설명은 강조 처리되어
-                이해하기 쉽습니다.
-              </p>
-            </div>
-
-            <div class="structure-item">
-              <h6 class="fw-semibold mb-1">5️⃣ 종합 의견</h6>
-              <p class="small text-muted">
-                전체적으로 구조적 완성도가 높고, 일관성 있는 레이아웃과 정보 흐름으로 인해 프로젝트 목적이
-                명확히 전달됩니다. 포트폴리오 전체가 하나의 “스토리”처럼 자연스럽게 연결되는 것이
-                장점입니다.
-              </p>
-            </div>
-          </div>
         </div>
       </div> <!-- /content-wrapper -->
     </div>
@@ -174,28 +124,43 @@ const images = ref([portfolio1, portfolio2, portfolio3, portfolio4, portfolio5])
 const pageFeedbacks = ref([
   {
     page: 1,
-    summary: "프로젝트 개요가 명확하며 서비스 목적이 잘 드러납니다.",
-    comment: "상단 타이틀과 간격 조정 시 시각 안정감 향상.",
+    summary:
+      "해당 페이지는 프로젝트의 전체 개요를 간결하게 제시하고 있으며, 시각적으로도 명확한 첫인상을 제공합니다. 프로젝트 목적, 문제 정의, 해결 방향을 한눈에 파악할 수 있도록 구성된 점이 매우 좋습니다. 또한 표기된 주요 기능이나 특징들이 명확하게 분리되어 있어 사용자가 프로젝트의 핵심 포인트를 빠르게 캐치할 수 있습니다.\n\n" +
+      "다만 제목과 본문 사이의 여백이 조금 넓어 시선이 한 번 끊기는 느낌이 있어, 해당 거리만 조금 좁혀도 집중도가 훨씬 좋아질 것으로 보입니다.",
+    comment:
+      "전체적으로 좋은 구성입니다만, 핵심 메시지를 강조하는 부분이 상대적으로 약합니다. 주요 포인트 아래에 간단한 하이라이트 색상 혹은 짧은 키워드를 추가하면 페이지의 정보 전달력이 더 선명해질 것입니다."
   },
   {
     page: 2,
-    summary: "핵심 기능과 흐름이 잘 정리되어 있습니다.",
-    comment: "섹션별 강조색 대비를 약간 더 줘도 좋습니다.",
+    summary:
+      "이번 페이지는 기능 흐름과 서비스 이용 절차가 단계별로 잘 정리되어 있어 사용자가 서비스 구조를 빠르게 이해할 수 있습니다. 플로우 차트와 설명 텍스트의 길이도 적절해 과도한 정보량 없이 핵심만 전달됩니다.\n\n" +
+      "특히 유저가 어떤 과정을 거쳐 서비스에 도달하는지 시각화가 잘 되어 있어 전체적인 이해 흐름이 매우 매끄럽습니다.",
+    comment:
+      "각 단계 요소 간 간격이 약간 좁아 보입니다. 요소 간 padding을 조금만 늘리면 훨씬 안정적인 레이아웃이 됩니다. 또한 강조 색상 대비를 조금만 강하게 주면 주요 프로세스가 더 눈에 띌 것입니다."
   },
   {
     page: 3,
-    summary: "기술 스택 및 아키텍처 구성이 명확합니다.",
-    comment: "노드 간 여백 조정으로 가독성 개선 가능.",
+    summary:
+      "기술 스택 부분은 전체적으로 깔끔하고 정리된 느낌을 줍니다. 백엔드, 프론트엔드, 인프라, 데이터베이스 등 범주를 잘 나누어 기술 요소들을 표현한 점이 돋보입니다. 아키텍처 다이어그램 역시 서비스 구조를 한눈에 보여주어 매우 효과적입니다.\n\n" +
+      "각 기술 요소가 프로젝트 내에서 어떤 역할을 했는지 간단한 설명이 더해진다면 기술 선택의 타당성을 더욱 강하게 어필할 수 있을 것입니다.",
+    comment:
+      "아키텍처 박스 간의 여백 혹은 연결선 간격이 조금 좁아 답답해 보일 수 있습니다. 노드 간 간격을 6~10px 정도만 늘리면 훨씬 균형 잡힌 다이어그램이 됩니다."
   },
   {
     page: 4,
-    summary: "데이터 시각화 구성이 깔끔하고 핵심이 명확합니다.",
-    comment: "그래프의 축 레이블을 추가하면 명료도 향상.",
+    summary:
+      "데이터 시각화 페이지는 숫자와 그래프의 가독성이 좋아서 분석 결과를 명확하게 드러내고 있습니다. 데이터 기반 사고를 강조한다는 점에서 매우 강점이 되는 페이지입니다.\n\n" +
+      "또한 그래프 색상이 안정적인 톤으로 구성되어 있어 시선이 산만하지 않고, 주요 수치가 강조되어 있어 의도한 메시지가 효과적으로 전달됩니다.",
+    comment:
+      "그래프 축 라벨이나 단위(%)를 조금 더 자세히 표기하면 신뢰도가 올라갑니다. 그래프 하단의 캡션을 한 줄 추가하는 것도 좋은 방법입니다."
   },
   {
     page: 5,
-    summary: "결론 및 향후 계획이 잘 정리되어 있습니다.",
-    comment: "팀 역할 구분 그래픽 추가 시 완성도 향상.",
+    summary:
+      "프로젝트 결론 및 회고 페이지는 전체 프로젝트를 마무리짓는 데 필요한 요소가 잘 정리되어 있습니다. 배운 점, 기술적으로 성장한 부분, 향후 개선 방향 등이 균형 있게 배치되어 있어 완성도가 높습니다.\n\n" +
+      "다만 이미지보다는 텍스트 비중이 많아 다소 단조로울 수 있으므로, 시각적 포인트를 조금 추가하면 훨씬 더 매력적인 마무리 페이지가 될 것입니다.",
+    comment:
+      "프로젝트에서 본인이 맡았던 역할을 시각적으로 정리한 그래픽(예: 역할 비율, 역할 다이어그램)을 넣으면 페이지의 흡입력과 전문성이 더 강해집니다."
   },
 ]);
 
@@ -282,9 +247,12 @@ function saveReport() {
 
 /* 버튼 통합 규격 */
 .btn-save {
-  background: linear-gradient(135deg, #71ebbe, #a2f1d6);
+  /* background: linear-gradient(135deg, #71ebbe, #a2f1d6); */
+  background: #00c896;
+  border-color: #009b72;
+  color: #fff;
   border: none;
-  color: #000;
+  /* color: #000; */
   width: auto;
   height: 37px !important;
   border-radius: 30px !important;
@@ -313,9 +281,10 @@ function saveReport() {
 /* 왼쪽 이미지 뷰어 */
 .preview-section {
   width: 50%;
-  background: #ffffff;
+  background: #f7f4ff;
+  border-color: #b5a1ec;
   border-radius: 16px;
-  border: 1px solid #e5e5e5;
+  border: 2px solid #e5e5e5;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
   padding: 24px;
   display: flex;
@@ -479,52 +448,4 @@ function saveReport() {
   padding: 12px;
 }
 
-/* ============================================================
-   🌿 전체 구조/흐름 분석
-   ============================================================ */
-
-.overall-structure {
-  background: #f7f4ff;
-  border-radius: 16px;
-  border: 1px solid #e5e5e5;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
-  padding: 24px;
-}
-
-.overall-structure h5 {
-  font-size: 22px;
-  font-weight: 700;
-  margin-bottom: 16px;
-}
-
-.structure-item h6 {
-  font-size: 15px;
-  font-weight: 700;
-  color: #000;
-  margin-bottom: 6px;
-}
-
-.structure-item p {
-  font-size: 14px;
-  line-height: 1.55;
-  color: #555;
-}
-
-/* 반응형 살짝 */
-@media (max-width: 992px) {
-  .content-wrapper {
-    padding: 24px;
-  }
-  .content-main-row {
-    flex-direction: column;
-  }
-  .preview-section,
-  .analysis-section {
-    width: 100%;
-  }
-  .content-header-row {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-}
 </style>
