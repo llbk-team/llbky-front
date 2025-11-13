@@ -56,31 +56,98 @@
       </div>
     </form>
 
-    <div class="modal-backdrop" v-if="showModal" @click.self="closeModal">
-      <div class="modal-content">
-        <h4 class="fw-bold mb-3">📄 이력서 분석 결과 선택</h4>
-        <p class="text-muted small mb-3">아래 결과 중 하나를 선택하세요. (가상 데이터)</p>
 
+    <!-- 모달 -->
+    <div class="modal-backdrop" v-if="showModal" @click.self="closeModal">
+      <div class="resume-modal">
+        <button class="modal-close-btn" @click="closeModal">&times;</button>
+        <h4 class="fw-bold mb-2">📄 분석 결과 가져오기</h4>
+        <p class="text-muted small mb-3">이력서 / 자소서 / 포트폴리오 중 선택하세요</p>
+        <!-- 카테고리 탭 -->
+        <div class="doc-tabs mb-3">
+          <button v-for="tab in docTabs" :key="tab.value" class="doc-tab-btn" :class="{ active: selectedTab === tab.value }" @click="selectedTab = tab.value">
+            {{ tab.label }}
+          </button>
+        </div>
+        <!-- 문서 리스트 (카테고리별 필터링) -->
         <ul class="resume-list">
-          <li v-for="(item, index) in mockResumes" :key="index" @click="selectResume(item)" class="resume-item">
-            <strong>{{ item.title }}</strong>
-            <p class="small text-muted mb-1">예상 강점: {{ item.strengths.join(', ') }}</p>
-            <p class="small text-muted">보완 필요: {{ item.weaknesses.join(', ') }}</p>
+          <li v-for="(item, index) in filteredDocuments" :key="index" class="resume-item-new">
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="resume-item-title">{{ item.title }}</span>
+              <input type="checkbox" :value="item" v-model="selectedDocuments" class="resume-checkbox" />
+            </div>
           </li>
         </ul>
-        <button class="btn btn-dark w-100 mt-3" @click="closeModal">닫기</button>
+        <button class="btn btn-dark w-100 mt-3" @click="applySelectedDocuments">
+          선택한 문서 적용하기
+        </button>
       </div>
     </div>
+
+
 
   </div>
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from "vue";
+import { ref, watch, onMounted, computed } from "vue";
 import { useStore } from "vuex";
 
 const store = useStore();
 const selectedSkills = ref([]);
+const showModal = ref(false)
+
+const docTabs = [
+  { label: "이력서", value: "resume" },
+  { label: "자소서", value: "cover-letter" },
+  { label: "포트폴리오", value: "portfolio" }
+]
+
+const selectedTab = ref("resume")
+
+// 전체 문서
+const allDocuments = ref([
+  { type: "resume", title: "이력서 #1 - Java 백엔드", weaknesses: ["AWS", "Docker"] },
+  { type: "resume", title: "이력서 #2 - 인프라 기반", weaknesses: ["JPA"] },
+  { type: "cover-letter", title: "자소서 #1 - 백엔드 지원", weaknesses: ["근거 부족"] },
+  { type: "cover-letter", title: "자소서 #2 - 성장 경험 중심", weaknesses: ["협업 표현 부족"] },
+  { type: "portfolio", title: "포트폴리오 #1 - 쇼핑몰", weaknesses: ["테스트 자동화"] },
+  { type: "portfolio", title: "포트폴리오 #2 - Spring 프로젝트", weaknesses: ["CI/CD"] },
+])
+
+// 문서 필터링된 목록
+const filteredDocuments = computed(() =>
+  allDocuments.value.filter(doc => doc.type === selectedTab.value)
+)
+
+const selectedDocuments = ref([])
+
+function openResumeModal() {
+  selectedTab.value = "resume"
+  selectedDocuments.value = []
+  showModal.value = true
+}
+
+function applySelectedDocuments() {
+  if (selectedDocuments.value.length === 0) {
+    alert("선택된 문서가 없습니다!")
+    return
+  }
+
+  const combinedWeakness = [
+    ...new Set(selectedDocuments.value.flatMap(d => d.weaknesses))
+  ]
+
+  formData.value.lackingSkills = combinedWeakness
+  showModal.value = false
+
+  alert(`📄 ${selectedDocuments.value.length}개의 문서를 불러왔어요!`)
+}
+
+function closeModal() {
+  showModal.value = false
+}
+
 
 onMounted(() => {
   if (store.getters["learning/getProgress"] < 50) {
@@ -115,45 +182,13 @@ function removeSkill(index) {
   formData.value.interestedSkills.splice(index, 1);
 }
 
-const showModal = ref(false)
-const mockResumes = ref([
-  {
-    title: '이력서 #1 - Java 백엔드 중심',
-    strengths: ['Java', 'Spring Boot', '팀 협업'],
-    weaknesses: ['Docker', 'AWS', '보안']
-  },
-  {
-    title: '이력서 #2 - 인프라 기반 백엔드',
-    strengths: ['Linux', 'CI/CD', '서버 운영'],
-    weaknesses: ['Spring Security', 'JPA']
-  },
-  {
-    title: '이력서 #3 - 데이터 중심 개발자',
-    strengths: ['SQL', '데이터 분석', '문제 해결 능력'],
-    weaknesses: ['REST API', '테스트 자동화']
-  }
-])
 
-function openResumeModal() {
-  showModal.value = true
-}
-function closeModal() {
-  showModal.value = false
-}
-function selectResume(item) {
-  formData.value.lackingSkills = [...new Set(item.weaknesses)]
-  showModal.value = false
-  alert(`✅ "${item.title}" 결과를 불러왔습니다!`)
-}
 
-function generatePlan() {
-  console.log('플랜 생성 데이터:', formData.value);
-  alert('플랜을 생성합니다!\n' + JSON.stringify(formData.value, null, 2));
-}
 
 </script>
 
 <style scoped>
+/* 전체 박스 */
 .ai-coaching-container {
   max-width: 1000px;
   margin: 20px auto;
@@ -162,12 +197,19 @@ function generatePlan() {
   border-radius: 6px;
 }
 
-.main-title {
-  font-size: 28.8px;
+/* 제목 */
+.title {
   font-weight: 700;
-  margin-bottom: 24px;
+  font-size: 28px;
 }
 
+.subtitle {
+  color: #6C757D;
+  font-size: 16px;
+  margin-bottom: 0px;
+}
+
+/* 안내 박스 */
 .info-section {
   margin-bottom: 24px;
 }
@@ -201,6 +243,12 @@ function generatePlan() {
   display: flex;
   align-items: center;
   gap: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.yellow-info:hover {
+  background-color: #FEF3C7;
 }
 
 .yellow-info span {
@@ -217,6 +265,7 @@ function generatePlan() {
   font-size: 14px;
 }
 
+/* 메인 2컬럼 */
 .main-content {
   display: flex;
   gap: 24px;
@@ -233,6 +282,7 @@ function generatePlan() {
   margin-bottom: 12px;
 }
 
+/* 체크박스 리스트 */
 .skill-list-wrapper {
   border: 1px solid #E5E7EB;
   border-radius: 6px;
@@ -256,32 +306,18 @@ function generatePlan() {
   font-weight: 500;
 }
 
-.checkbox-item:last-child {
-  margin-bottom: 0;
-}
-
 .checkbox-item:hover {
   background-color: #F9FAFB;
 }
 
-.checkbox-item:has(input[type="checkbox"]:checked) {
-  background-color: #F0FDF4;
-  border-color: #10B981;
-}
-
-.checkbox-item input[type="checkbox"] {
+.checkbox-item input {
   width: 18px;
   height: 18px;
   margin-right: 10px;
   cursor: pointer;
 }
 
-.checkbox-item label {
-  font-size: 16px;
-  cursor: pointer;
-  flex-grow: 1;
-}
-
+/* 관심 기술 추가 */
 .add-skill-form {
   display: flex;
   gap: 8px;
@@ -298,21 +334,21 @@ function generatePlan() {
 
 .add-button {
   padding: 0px 16px;
+  height: 37px;
   font-size: 13.5px;
   font-weight: 500;
-  height: 37px;
   border-radius: 6px;
-  background-color: #A2F1D6;
   border: none;
-  border-radius: 6px;
+  background-color: #A2F1D6;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: 0.2s;
 }
 
 .add-button:hover {
   background-color: #71EBBE;
 }
 
+/* 관심 기술 리스트 */
 .added-skills-list {
   list-style: none;
   padding: 0;
@@ -327,38 +363,29 @@ function generatePlan() {
   background-color: #F9FAFB;
   border-radius: 6px;
   margin-bottom: 8px;
-  font-size: 15.2px;
 }
 
 .remove-button {
   background: none;
   border: none;
   color: #9CA3AF;
-  font-size: 19.2px;
+  font-size: 20px;
   cursor: pointer;
-  padding: 0px 4px;
 }
 
 .remove-button:hover {
   color: #EF4444;
 }
 
-.navigation-buttons {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 48px;
-  padding-top: 24px;
-  border-top: 1px solid #E5E7EB;
-}
-
+/* prev/next 버튼 */
 .btn-primary,
 .btn-secondary {
   display: inline-flex;
   align-items: center;
-  font-size: 13.5px;
-  font-weight: 500;
   height: 37px;
   border-radius: 6px;
+  font-size: 13.5px;
+  font-weight: 500;
 }
 
 .btn-primary {
@@ -372,68 +399,139 @@ function generatePlan() {
 
 .btn-secondary {
   background-color: #FFFFFF;
-  color: #374151;
   border: 1px solid #D1D5DB;
+  color: #374151;
 }
 
 .btn-secondary:hover {
   background-color: #F9FAFB;
 }
 
+/* 모바일 */
 @media (max-width: 768px) {
   .main-content {
     flex-direction: column;
   }
-
-  .yellow-info {
-    flex-direction: column;
-    align-items: flex-start;
-  }
 }
 
+/*──────────────────────────────*/
+/* 모달 */
 .modal-backdrop {
   position: fixed;
-  top: 0px;
-  left: 0px;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.35);
-  backdrop-filter: blur(2px);
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  backdrop-filter: blur(4px);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 2000;
 }
 
-.modal-content {
-  background-color: #FFFFFF;
-  padding: 24px;
+.resume-modal {
+  background: #FFFFFF;
+  padding: 36px 40px;
   border-radius: 6px;
-  width: 90%;
-  max-width: 500px;
-  box-shadow: 0px 6px 24px rgba(0, 0, 0, 0.15);
-  color: #111111;
-  pointer-events: auto;
-  z-index: 2100;
+  width: 95%;
+  max-width: 720px;
+  max-height: 80vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.14);
 }
 
-.yellow-info {
+.modal-close-btn {
+  position: absolute;
+  right: 20px;
+  top: 20px;
+  background: none;
+  border: none;
+  font-size: 30px;
   cursor: pointer;
-  transition: background-color 0.2s;
+  color: #999;
+  transition: 0.2s;
 }
 
-.yellow-info:hover {
-  background-color: #FEF3C7;
+.modal-close-btn:hover {
+  color: #555;
 }
 
-.title {
-  font-weight: 700;
-  font-size: 28px;
+/* 탭 */
+.doc-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
 }
 
-.subtitle {
-  color: #6C757D;
+.doc-tab-btn {
+  width: 130px;
+  height: 37px;
+  border-radius: 6px;
+  font-size: 13.5px;
+  font-weight: 500;
+  border: 1px solid #E5E7EB;
+  background-color: #F9FAFB;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.doc-tab-btn.active {
+  background-color: #E8FFF5;
+  border-color: #71EBBE;
+  color: #0F5132;
+}
+
+/* 문서 리스트 */
+.resume-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 55vh;
+  overflow-y: auto;
+}
+
+.resume-item-new {
+  padding: 20px 22px;
+  background: #F9FAFB;
+  border: 1px solid #EAEBEC;
+  border-radius: 10px;
+  margin-bottom: 14px;
+  transition: 0.25s;
+  cursor: pointer;
+}
+
+.resume-item-new:hover {
+  background: #F0FDF4;
+  border-color: #71EBBE;
+}
+
+.resume-item-title {
   font-size: 16px;
-  margin-bottom: 0px;
+  font-weight: 500;
 }
+
+.resume-checkbox {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+/* 적용 버튼 */
+.resume-modal .btn-dark {
+  width: 100%;
+  height: 37px;
+  border-radius: 6px;
+  font-size: 13.5px;
+  font-weight: 500;
+  background-color: #111827;
+  color: #FFFFFF;
+  border: none;
+  transition: 0.2s;
+}
+
+.resume-modal .btn-dark:hover {
+  background-color: #374151;
+}
+
+
+
 </style>
