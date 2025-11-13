@@ -46,8 +46,8 @@
 
         <!-- 버튼 -->
         <div class="action-buttons">
-          <button class="save-btn" @click="alert('리포트가 생성되었습니다 📄')">
-            📄 리포트 생성
+          <button class="save-btn" @click="router.push('/resume/list')">
+            📄 작성 완료
           </button>
         </div>
       </div>
@@ -63,7 +63,7 @@
             <span class="ai-desc">컴퓨터공학 프로젝트 출력고</span>
           </div>
         </div>
-        <button class="close-btn" @click="alert('AI 코칭 패널 닫기')">×</button>
+        <button class="close-btn">×</button>
       </div>
 
       <div class="ai-status">
@@ -114,6 +114,7 @@
 
 <script setup>
 import SideBar from '@/components/sidebar/SideBar.vue'
+import router from '@/router'
 import { reactive } from 'vue'
 
 const introFields = reactive({
@@ -165,13 +166,31 @@ const toggleSection = (key) => (sections[key] = !sections[key])
 }
 
 /* 섹션 */
+/* 폼 섹션 */
 .form-section {
   background: #fff;
-  border: 2px solid #d8f5e1;
+  border: 2px solid #f0f0f0;
   border-radius: 12px;
-  margin-bottom: 24px;
+  margin-bottom: 16px;
   transition: all 0.3s ease;
+  overflow: hidden;
 }
+
+.form-section.active {
+  border-color: #71EBBE;
+  box-shadow: 0 0 0 1px rgba(113, 235, 190, 0.2);
+}
+
+/* 접혔을 때(기본) 완전 흰색 */
+.form-section .section-header {
+  background: #ffffff !important;
+}
+
+/* 열렸을 때만 민트색 */
+.form-section.active .section-header {
+  background: #f6fffa !important;
+}
+
 .section-header {
   padding: 20px 24px;
   background: #f6fffa;
@@ -266,7 +285,10 @@ const toggleSection = (key) => (sections[key] = !sections[key])
   transform: translateY(-1px);
 }
 
-/* AI 패널 */
+/* ─────────────────────────────── */
+/*      AI 코칭 패널 (오른쪽 패널)   */
+/* ─────────────────────────────── */
+
 .ai-coaching-panel {
   width: 380px;
   background: #fff;
@@ -277,42 +299,69 @@ const toggleSection = (key) => (sections[key] = !sections[key])
   border-left: 1px solid #e5e5e5;
   display: flex;
   flex-direction: column;
+  z-index: 1000;
+  font-family: 'Pretendard', sans-serif;
+  font-size: 13px;        /* 기본 폰트 */
+  color: #333;
 }
+
+/* 헤더 */
 .ai-header {
   background: #000;
-  color: #fff;
+  color: white;
   padding: 16px 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
+
 .ai-profile {
   display: flex;
   align-items: center;
   gap: 12px;
 }
+
 .ai-avatar {
   font-size: 18px;
 }
+
 .ai-name {
   font-weight: 600;
   font-size: 14px;
+  display: block;
 }
+
 .ai-desc {
   font-size: 11px;
   color: #ccc;
+  display: block;
 }
+
 .close-btn {
   background: none;
   border: none;
-  color: #fff;
+  color: white;
   font-size: 18px;
   cursor: pointer;
+  padding: 4px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
 }
+
+.close-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* AI 활성 상태 표시 */
 .ai-status {
   padding: 16px 20px;
   border-bottom: 1px solid #f0f0f0;
 }
+
 .status-indicator {
   display: flex;
   align-items: center;
@@ -321,21 +370,46 @@ const toggleSection = (key) => (sections[key] = !sections[key])
   border-radius: 6px;
   padding: 8px 12px;
 }
+
+.status-icon {
+  font-size: 14px;
+}
+
 .status-text {
   font-size: 12px;
   color: #666;
 }
+
+/* 콘텐츠 스크롤 영역 */
 .ai-content {
   flex: 1;
   padding: 20px;
   overflow-y: auto;
 }
+
+/* 환영 섹션 */
 .welcome-section {
   background: #f8f9fa;
   border-radius: 8px;
   padding: 16px;
   margin-bottom: 20px;
 }
+
+.welcome-section p {
+  margin: 0 0 12px 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #333;
+}
+
+.welcome-section p:last-child {
+  margin-bottom: 0;
+}
+
+/* ─────────────── */
+/*   TIPS SECTION   */
+/* ─────────────── */
+
 .tips-section {
   background: #f0fdf4;
   border: 1px solid #bbf7d0;
@@ -343,12 +417,48 @@ const toggleSection = (key) => (sections[key] = !sections[key])
   padding: 16px;
   margin-bottom: 20px;
 }
+
+/* 제목 아이콘 + 제목 */
+.tips-section .section-title {
+  font-size: 14px;       /* ✔ 더 크게 */
+  font-weight: 600;
+  color: #166534;
+  margin-bottom: 12px;
+}
+
+/* 소제목 */
+.tips-section h4 {
+  font-size: 14px;       /* ✔ 기존보다 업 */
+  font-weight: 600;
+  color: #166534;
+  margin-bottom: 12px;
+}
+
+/* 체크 리스트 항목 */
+.tips-section .check-item {
+  font-size: 13.5px;     /* ✔ 본문 통일 */
+  line-height: 1.5;
+  color: #166534;
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+/* 피드백 섹션 */
 .feedback-section {
   border: 1px solid #e5e5e5;
   border-radius: 8px;
   padding: 16px;
   margin-bottom: 20px;
 }
+
+/* 버튼 */
+.ai-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
 .ai-action-btn {
   background: #f8f9fa;
   border: 1px solid #e5e5e5;
@@ -362,8 +472,17 @@ const toggleSection = (key) => (sections[key] = !sections[key])
   width: 100%;
   margin-bottom: 8px;
 }
+
 .ai-action-btn:hover {
   background: #f0f0f0;
   border-color: #ddd;
 }
+
+/* 반응형 */
+@media (max-width: 1200px) {
+  .ai-coaching-panel {
+    display: none;
+  }
+}
+
 </style>

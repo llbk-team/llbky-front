@@ -266,12 +266,10 @@ const goPrevQuestion = () => {
 
 const handleSubmit = () => {
   if (current.value < total) {
-    alert(`질문 ${current.value}의 답변이 제출되었습니다.`);
     lastAnswered.value = Math.max(lastAnswered.value, current.value);
     current.value++;
     stopRecording();
   } else {
-    alert("면접이 완료되었습니다! AI 분석을 시작합니다.");
     stopRecording();
     router.push("/interview/report");
   }
