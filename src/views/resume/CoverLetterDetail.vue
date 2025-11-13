@@ -165,7 +165,6 @@
 </template>
 
 <script setup>
-import SideBar from "@/components/sidebar/SideBar.vue";
 import { ref, reactive, onMounted } from "vue";
 import { useRoute } from "vue-router";
 
@@ -323,4 +322,13 @@ const handleFullEdit = (e, section) => {
     padding: 1.5rem 1.5rem;
   }
 }
+
+/* 페이지 제목 통일 스타일 */
+.content-wrapper > h2 {
+  font-size: 1.75rem !important;
+  font-weight: 700 !important;
+  color: #111 !important;
+  margin-bottom: 1.5rem !important;
+}
+
 </style>
