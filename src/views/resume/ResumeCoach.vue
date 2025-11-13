@@ -5,7 +5,7 @@
 
       <!-- ✅ 컨텐츠 영역 -->
       <section class="content">
-        <h1 class="page-title">서류 AI 코칭</h1>
+        <h1 class="title">서류 AI 코칭</h1>
         <div class="resume-layout">
 
           <!-- ✅ 상단: 이력서 상세(2) + AI 첨삭 제안(1) - 2:1 비율 -->
@@ -136,36 +136,6 @@
                   </div>
                 </div>
                 
-                <!-- 수정 모드인 경우: 텍스트 영역 -->
-                <div v-else>
-                  <div class="section">
-                    <h3>기본 정보</h3>
-                    <textarea class="form-control" rows="4" v-model="editData.basicInfoText"
-                    >
-
-                    </textarea>
-                  </div>
-
-                  <div class="section">
-                    <h3>경력 및 성과</h3>
-                    <textarea class="form-control" rows="4" v-model="editData.careerText"
-                    placeholder="(주)테크컴퍼니에서 백엔드 개발자 2021.03 - 2023.06 (2년 3개월)근무했습니다.">
-
-                    </textarea>
-                    <textarea class="form-control mt-3" rows="6" v-model="editData.achievementsText">
-                    주요 업무로는 Spring Boot 기반 전자상거래 플랫폼을 개발하고 운영하였으며, 
-                    MSA 아키텍처 전환 프로젝트를 리드하여 응답속도를 50% 개선하는 성과를 달성했습니다. 
-                    또한 Redis 캐싱을 도입하여 DB 부하를 40% 감소시켰습니다.
-                    </textarea>
-                  </div>
-
-                  <div class="section">
-                    <h3>보유 기술</h3>
-                    <textarea class="form-control" rows="4" v-model="editData.skillsText" >
-                        Java, Spring Boot, MySQL, Redis, AWS, Docker, Kubernetes
-                    </textarea>
-                  </div>
-                </div>
               </div>
 
               <!-- ✅ 규격화된 형식 (standard) -->
@@ -230,95 +200,15 @@
                 </div>
                 
                 <!-- 수정 모드인 경우: 편집 가능한 테이블 -->
-                <div v-else>
-                  <table class="table table-bordered resume-table">
-                    <tbody>
-                      <tr>
-                        <th class="table-header" width="20%">성명</th>
-                        <td width="30%">
-                          <input type="text" class="form-control" v-model="editData.name">
-                        </td>
-                        <th class="table-header" width="20%">생년월일</th>
-                        <td width="30%">
-                          <input type="text" class="form-control" v-model="editData.birthdate" placeholder="1990.01.01">
-                        </td>
-                      </tr>
-                      <tr>
-                        <th class="table-header">연락처</th>
-                        <td>
-                          <input type="text" class="form-control" v-model="editData.phone">
-                        </td>
-                        <th class="table-header">이메일</th>
-                        <td>
-                          <input type="email" class="form-control" v-model="editData.email">
-                        </td>
-                      </tr>
-                      <tr>
-                        <th class="table-header">주소</th>
-                        <td colspan="3">
-                          <input type="text" class="form-control" v-model="editData.address" placeholder="서울특별시 강남구">
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-
-                  <h3 class="mt-4 mb-3">경력사항</h3>
-                  <table class="table table-bordered resume-table">
-                    <thead>
-                      <tr>
-                        <th class="table-header">회사명</th>
-                        <th class="table-header">직위</th>
-                        <th class="table-header">근무기간</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>
-                          <input type="text" class="form-control" v-model="editData.career.company">
-                        </td>
-                        <td>
-                          <input type="text" class="form-control" v-model="editData.career.position">
-                        </td>
-                        <td>
-                          <input type="text" class="form-control" v-model="editData.career.period">
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-
-                  <h4 class="mt-3 mb-2">주요 업무 및 성과</h4>
-                  <div v-for="(achievement, index) in editData.career.achievements" :key="index" class="mb-2">
-                    <div class="d-flex gap-2">
-                      <input type="text" class="form-control" v-model="editData.career.achievements[index]">
-                      <button class="btn btn-sm btn-outline-danger" @click="removeAchievement(index)">
-                        <i class="bi bi-trash"></i>
-                      </button>
-                    </div>
-                  </div>
-                  <button class="btn btn-sm btn-outline-primary mt-2" @click="addAchievement">
-                    + 항목 추가
-                  </button>
-
-                  <h3 class="mt-4 mb-3">보유 기술</h3>
-                  <table class="table table-bordered resume-table">
-                    <tbody>
-                      <tr>
-                        <th class="table-header" width="20%">기술 스택</th>
-                        <td>
-                          <textarea class="form-control" rows="3" v-model="editData.skills"></textarea>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
+                
               </div>
             </div>
 
             <!-- 오른쪽: AI 첨삭 제안 (1/3) -->
             <div class="edit-card">
-              <h2>✏️ AI 첨삭 제안</h2>
+              <h2>✏️AI 첨삭 제안</h2>
 
-              <p class="edit-label">경력사항 개선 제안</p>
+              <p class="edit-label ms-1">경력사항 개선 제안</p>
 
               <div class="before">
                 <strong>수정 전:</strong><br>
@@ -329,13 +219,16 @@
                 <strong>수정 후:</strong><br>
                 Spring Boot API 개발 및 운영, 5명 개발 리드 역할 수행
               </div>
+              <div class="d-flex gap-4 mb-4 justify-content-end">
+                <button class="btn btn-sm btn-dark "> AI 피드백 반영</button>
+              </div>
             </div>
           </div>
 
           <!-- ✅ 하단: AI 코칭 결과 -->
           <div class="card border-0 shadow-sm mt-4">
             <div class="card-body">
-              <h2 class="mb-4">🧠 AI 코칭 결과</h2>
+              <h2 class="title p-2">🧠 AI 코칭 결과</h2>
 
               <div class="score-details mb-4">
                 <span><strong>경력 기술</strong> 92%</span>
@@ -361,37 +254,34 @@
               </div>
 
               <!-- ✅ 이력서 형식 선택 버튼들 -->
-              <h4 class="fw-semibold mb-3 text-dark">이력서 형식 선택</h4>
-              <p class="text-muted small mb-4">
-                원하는 이력서 형식을 선택하면 자동으로 변환됩니다
-              </p>
-
+               <div class="d-flex flex-column gap-3 mb-4 align-items-center">
+                  <div class="subtitle2">이력서 형식 선택</div>
+                  <div class="text-muted small">
+                    원하는 이력서 형식을 선택하면 자동으로 변환됩니다
+                  </div>
+              </div>
               <div class="d-flex gap-4 mb-4 justify-content-center">
                 <!-- 줄글 형식 이력서 버튼 -->
                 <button class="btn btn-resume-format" :class="{ active: resumeFormat === 'text' }" data-bs-toggle="modal" data-bs-target="#textFormatModal">
-                  <div class="format-icon">📝</div>
                   <div class="format-title">줄글 형식 이력서</div>
-                  <div class="format-desc">자유로운 텍스트 형식</div>
+                  
                 </button>
 
                 <!-- 규격화된 이력서 버튼 -->
                 <button class="btn btn-resume-format" :class="{ active: resumeFormat === 'standard' }" data-bs-toggle="modal" data-bs-target="#standardFormatModal">
-                  <div class="format-icon">📋</div>
-                  <div class="format-title">규격화된 이력서</div>
-                  <div class="format-desc">표준 양식 형식</div>
+                  
+                  <div class="format-title">표준 양식 형식</div>
+                 
                 </button>
               </div>
 
               <!-- 하단 버튼 -->
               <div class="d-flex gap-3 justify-content-center">
                 <button class="btn btn-outline-secondary fw-medium btn-lg btn-fixed-width" @click="$router.push('/resume/list')">
-                  📄 리포트 생성
+                  리포트 생성
                 </button>
 
-                <!-- 수정 모드 전환 버튼 -->
-                <button class="btn btn-mint fw-medium btn-lg btn-fixed-width" @click="toggleEditMode">
-                  {{ isEditing ? '💾 수정완료' : '✏️ 서류 수정하기' }}
-                </button>
+                
               </div>
             </div>
           </div>
@@ -510,46 +400,7 @@ const removeAchievement = (index) => {
   editData.value.career.achievements.splice(index, 1);
 };
 
-// ✅ 보기모드 ↔ 수정모드 전환
-const toggleEditMode = () => {
-  if (!isEditing.value) {
-    // 수정 시작: 현재 데이터를 복제하여 editData에 담기
-    editData.value = JSON.parse(JSON.stringify(resumeData.value));
-    
-    // 줄글 형식 텍스트 필드 초기화
-    editData.value.basicInfoText = `저는 ${resumeData.value.name}이며, ${resumeData.value.email}으로 연락 가능합니다. 전화번호는 ${resumeData.value.phone}입니다.`;
-    
-    editData.value.careerText = `${resumeData.value.career.company}에서 ${resumeData.value.career.position}으로 ${resumeData.value.career.period} 근무하였습니다.`;
-    
-    editData.value.achievementsText = `주요 업무로는 Spring Boot 기반 전자상거래 플랫폼을 개발하고 운영하였으며, MSA 아키텍처 전환 프로젝트를 리드하여 응답속도를 50% 개선하는 성과를 달성했습니다. 또한 Redis 캐싱을 도입하여 DB 부하를 40% 감소시켰습니다.`;
-    
-    editData.value.skillsText = `${resumeData.value.skills}에 대한 실무 경험을 보유하고 있으며, 이를 활용하여 다양한 프로젝트를 성공적으로 수행하였습니다.`;
-    
-    // 추가 필드 초기화
-    editData.value.birthdate = '1990.01.01';
-    editData.value.address = '서울특별시 강남구';
-  } else {
-    // 저장 완료: editData를 resumeData로 업데이트
-    resumeData.value = {
-      name: editData.value.name,
-      email: editData.value.email,
-      phone: editData.value.phone,
-      career: {
-        company: editData.value.career.company,
-        position: editData.value.career.position,
-        period: editData.value.career.period,
-        achievements: [...editData.value.career.achievements]
-      },
-      skills: editData.value.skills
-    };
-    
-    // 줄글 형식인 경우, 텍스트 필드에서 정보 추출하는 로직 추가 필요
-    // (실제 구현에서는 텍스트 파싱 또는 AI 분석을 통해 구조화된 데이터로 변환)
-    
-    alert('이력서가 저장되었습니다.');
-  }
-  isEditing.value = !isEditing.value;
-};
+
 
 // ✅ 형식 라벨 표시
 const formatLabel = computed(() => {
@@ -664,18 +515,25 @@ const applyStandardFormat = () => {
   margin: 0 auto;
 }
 
-.breadcrumb {
-  color: #999;
-  font-size: 0.9rem;
-  margin-bottom: 1rem;
+
+.title {
+    font-weight: 700;
+    font-size: 1.75rem; /* 28px */
+    margin-bottom: 15px;
 }
 
-.page-title {
-  font-size: 1.8rem;
-  font-weight: bold;
-  color: #000;
-  margin-bottom: 2rem;
+.subtitle2 {
+    font-weight: 600;
+    font-size: 1.375rem; /* 22px */
+    color: #333;
 }
+
+.subtitle {
+    color: #6c757d;
+    font-size: 1rem; /* 16px */
+}
+
+
 
 /* 레이아웃 */
 .resume-layout {
@@ -850,27 +708,27 @@ const applyStandardFormat = () => {
 }
 
 .edit-label {
-  font-weight: 600;
+  font-weight: 500;
   color: #333;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
 }
 
 .before,
 .after {
   padding: 1rem;
-  border-radius: 8px;
+  border-radius: 10px;
   margin-bottom: 1rem;
   line-height: 1.6;
 }
 
 .before {
-  background: #f8f9fa;
-  border-left: 3px solid #dc3545;
+  background: #fff8ea;
+  border: 1px solid #ffe19d;
 }
 
 .after {
-  background: #CFFFE2;
-  border-left: 3px solid #A2D5C6;
+  background: #e9f8f2;
+  border: 1px solid #A2D5C6;
 }
 
 /* AI 코칭 결과 카드 */
@@ -899,13 +757,13 @@ const applyStandardFormat = () => {
 }
 
 .good {
-  background: #CFFFE2;
-  border-left: 4px solid #A2D5C6;
+  background: #e9f8f2;
+  border: 1px solid #A2D5C6;
 }
 
 .bad {
-  background: #fff3cd;
-  border-left: 4px solid #ffc107;
+  background: #eef7ff;
+  border: 1px solid #c9e3ff;
 }
 
 .good ul,
@@ -923,10 +781,10 @@ const applyStandardFormat = () => {
 
 /* 이력서 형식 선택 버튼 */
 .btn-resume-format {
-  width: 400px;
-  height: 200px;
-  background: white;
-  border: 2px solid #A2D5C6;
+  width: 250px;
+  height: 37px;
+  background: #acedd3;
+  border: 1px solid #A2D5C6;
   border-radius: 12px;
   display: flex;
   flex-direction: column;
@@ -937,7 +795,7 @@ const applyStandardFormat = () => {
 }
 
 .btn-resume-format:hover {
-  background: #CFFFE2;
+  background: #A2D5C6;
   border-color: #A2D5C6;
   transform: translateY(-5px);
   box-shadow: 0 6px 20px rgba(162, 213, 198, 0.3);
@@ -955,16 +813,14 @@ const applyStandardFormat = () => {
 }
 
 .format-title {
-  font-size: 1.3rem;
-  font-weight: bold;
+  
+  font-size: 18px;
+  font-weight: 700;
   color: #000;
-  margin-bottom: 0.5rem;
+  
 }
 
-.format-desc {
-  font-size: 0.95rem;
-  color: #666;
-}
+
 
 /* 하단 버튼들 */
 .btn-mint {
