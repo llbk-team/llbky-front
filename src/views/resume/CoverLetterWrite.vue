@@ -188,7 +188,7 @@ const toggleSection = (key) => (sections[key] = !sections[key])
 
 /* 열렸을 때만 민트색 */
 .form-section.active .section-header {
-  background: #f6fffa !important;
+  background: #F0FDF4 !important;
 }
 
 .section-header {
