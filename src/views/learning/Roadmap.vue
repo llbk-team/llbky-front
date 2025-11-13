@@ -1,12 +1,12 @@
 <template>
   <div class="roadmap-container container py-5">
 
-    <h2 class="main-title text-center">나의 맞춤 학습 로드맵</h2>
+    <div class="title mb-3 text-center">나의 맞춤 학습 로드맵</div>
     <div class="alert alert-mint shadow-sm" role="alert">
       AI 학습 코치가 목표 <strong>'백엔드 개발자'</strong>를 기준으로 <strong>'취업 준비 + 자기계발'</strong> 플랜을 생성했어요!
     </div>
 
-    <div class="d-flex justify-content-center flex-wrap gap-3 my-4">
+    <div class="d-flex flex-wrap justify-content-center gap-3 my-4">
       <span class="summary-tag">📅 총 4주</span>
       <span class="summary-tag">⏰ 주당 25시간</span>
       <span class="summary-tag">🏁 백엔드 포트폴리오 완성</span>
@@ -34,7 +34,6 @@
           <h5 class="fw-bold mb-0">🧭 현재 로드맵 요약</h5>
           <button class="btn-close" @click="closeAiModal"></button>
         </div>
-
         <ul class="list-group mb-3">
           <li v-for="week in roadmapData" :key="week.week" class="list-group-item">{{ week.week }}주차: {{ week.title.replace(/\[.*?\]\s*/, '') }}</li>
         </ul>
@@ -51,22 +50,14 @@
       </div>
     </div>
 
-
-    <footer class="d-flex justify-content-between align-items-center mt-4 pt-4 border-top">
-
-      <router-link :to="`/learning/skill`" class="btn btn-outline-secondary">
-        ← 이전
-      </router-link>
-
-      <div>
-        <button type="button" class="btn btn-mint me-2" @click="openAiModal">
-          플랜 수정하기
-        </button>
-        <button type="button" class="btn btn-dark" @click="openSaveModal">
-          플랜 저장
-        </button>
+    <div class="bottom-actions d-flex justify-content-between align-items-center">
+      <router-link :to="`/learning/skill`" class="btn btn-secondary">← 이전</router-link>
+      <div class="d-flex gap-2">
+        <button type="button" class="btn btn-mint" @click="openAiModal">플랜 수정하기</button>
+        <button type="button" class="btn btn-dark" @click="openSaveModal">플랜 저장</button>
       </div>
-    </footer>
+    </div>
+
 
     <!-- 저장 완료 모달 -->
     <div v-if="showSaveModal" class="save-modal-overlay" @click.self="closeSaveModal">
@@ -81,18 +72,10 @@
         <p class="fw-semibold mb-3">👉 다음 단계로 이동할까요?</p>
 
         <div class="d-flex justify-content-center gap-3 mb-4">
-          <router-link :to="`/learning/start`" class="btn btn-green" @click="startLearning">
-            ▶ 학습 시작하기
-          </router-link>
-          <router-link :to="`/learning/coach`" class="btn btn-outline-mint" @click="goToMyLearning">
-            📁 내 학습함
-          </router-link>
+          <router-link :to="`/learning/start`" class="btn btn-dark" @click="startLearning">▶ 학습 시작하기</router-link>
+          <router-link :to="`/learning/coach`" class="btn btn-mint" @click="goToMyLearning">📁 내 학습함</router-link>
         </div>
-
-        <div class="ai-tip">
-          💬 <strong>AI 팁:</strong> 이제 주차별 학습을 진행하면,<br />
-          진행률과 피드백을 자동으로 기록해드릴게요!!!!!!!!!!!!!!!
-        </div>
+        <div class="ai-tip">💬 <strong>AI 팁:</strong> 이제 주차별 학습을 진행하면,<br />진행률과 피드백을 자동으로 기록해드릴게요!!!!!!!!!!!!!!!</div>
       </div>
     </div>
 
@@ -102,7 +85,6 @@
 <script setup>
 import { ref } from 'vue';
 
-const selectedWeek = ref(null);
 const showAiModal = ref(false);
 const aiInput = ref("");
 const showSaveModal = ref(false);
@@ -183,85 +165,101 @@ function goToMyLearning() {
   max-width: 1100px;
 }
 
-.main-title {
+.title {
   font-weight: 700;
-  margin-bottom: 1.5rem;
+  font-size: 28px;
 }
 
 .alert-mint {
-  background-color: #f0fdf4;
+  background-color: #F0FDF4;
   color: #166534;
-  border: 1px solid #bbf7d0;
+  border: 1px solid #BBF7D0;
 }
 
 .alert-mint strong {
-  color: #15803d;
+  color: #15803D;
 }
 
 .summary-tag {
   display: inline-block;
-  padding: 0.5rem 1rem;
-  font-size: 0.9rem;
+  padding: 8px 16px;
+  font-size: 14.4px;
   font-weight: 500;
-  background-color: #ffffff;
-  border: 1px solid #e0e0e0;
-  border-radius: 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  background-color: #FFFFFF;
+  border: 1px solid #E0E0E0;
+  border-radius: 6px;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .week-card {
-  border: 1px solid #e5e7eb;
-  border-radius: 0.5rem;
-  padding: 1.5rem;
-  background-color: #ffffff;
+  border: 1px solid #E5E7EB;
+  border-radius: 6px;
+  padding: 24px;
+  background-color: #FFFFFF;
   height: 100%;
 }
 
 .week-card h4 {
-  font-size: 1.25rem;
+  font-size: 20px;
   font-weight: 600;
-  margin-bottom: 1rem;
+  margin-bottom: 16px;
 }
 
 .topic-list {
-  padding-left: 0;
-  margin-bottom: 1rem;
+  padding-left: 0px;
+  margin-bottom: 16px;
 }
 
 .topic-list li {
   position: relative;
-  padding-left: 1.2rem;
-  font-size: 0.95rem;
-  color: #333;
-  margin-bottom: 0.5rem;
+  padding-left: 19.2px;
+  font-size: 15.2px;
+  color: #333333;
+  margin-bottom: 8px;
 }
 
 .topic-list li::before {
   content: '-';
   position: absolute;
-  left: 0;
-  top: 0;
+  left: 0px;
+  top: 0px;
   font-weight: 600;
-  color: #10b981;
+  color: #10B981;
 }
 
 .week-note {
-  font-size: 0.875rem;
-  background-color: #f8fcfb;
-  border-color: #e0f3eb;
-  color: #333;
+  font-size: 14px;
+  background-color: #F8FCFB;
+  border-color: #E0F3EB;
+  color: #333333;
 }
 
 .btn-mint {
-  background-color: #f0fdf4;
+  height: 37px;
+  font-weight: 500;
+  border-radius: 6px;
+  font-size: 13.5px;
+  background-color: #F0FDF4;
   color: #166534;
-  border: 1px solid #bbf7d0;
-  font-weight: 600;
+  border: 1px solid #BBF7D0;
+  font-weight: 500;
 }
 
 .btn-mint:hover {
-  background-color: #e0f3eb;
-  border-color: #bbf7d0;
+  background-color: #E0F3EB;
+  border-color: #BBF7D0;
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  font-size: 13.5px;
+  font-weight: 500;
+  height: 37px;
+  border-radius: 6px;
+  background-color: #FFFFFF;
+  color: #374151;
+  border: 1px solid #D1D5DB;
 }
 
 .modal-overlay {
@@ -275,9 +273,9 @@ function goToMyLearning() {
 }
 
 .modal-content {
-  background: white;
-  border-radius: 0.75rem;
-  padding: 2rem;
+  background-color: #FFFFFF;
+  border-radius: 6px;
+  padding: 32px;
   width: 90%;
   max-width: 600px;
   text-align: left;
@@ -294,19 +292,19 @@ function goToMyLearning() {
 }
 
 .ai-modal-content {
-  background-color: #ffffff;
-  border-radius: 0.75rem;
-  padding: 2rem;
+  background-color: #FFFFFF;
+  border-radius: 6px;
+  padding: 32px;
   width: 90%;
   max-width: 600px;
   animation: fadeIn 0.3s ease-in-out;
 }
 
 .list-group-item {
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
+  background-color: #F9FAFB;
+  border: 1px solid #E5E7EB;
   border-radius: 6px;
-  margin-bottom: 0.4rem;
+  margin-bottom: 6.4px;
 }
 
 .ai-input {
@@ -318,15 +316,15 @@ function goToMyLearning() {
 .ai-input input {
   flex: 1;
   height: 44px;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  padding: 0 12px;
+  border: 1px solid #D1D5DB;
+  border-radius: 6px;
+  padding: 0px 12px;
 }
 
 .save-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.45);
+  background-color: rgba(0, 0, 0, 0.45);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -334,55 +332,66 @@ function goToMyLearning() {
 }
 
 .save-modal-content {
-  background: #FFFFFF;
+  background-color: #FFFFFF;
   border: 1px solid #EAEBEC;
-  border-radius: 1rem;
-  padding: 2rem;
+  border-radius: 6px;
+  padding: 32px;
   width: 90%;
   max-width: 500px;
   animation: fadeIn 0.3s ease-in-out;
   color: #111111;
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
+  box-shadow: 0px 6px 24px rgba(0, 0, 0, 0.08);
 }
 
 .check-icon {
-  font-size: 3rem;
+  font-size: 48px;
   color: #71EBBE;
 }
 
 .alert-mint-light {
-  background-color: #ffffff;
-  color: #166534;
-  border: 1px solid #bbf7d0;
-  border-radius: 0.75rem;
-  padding: 1rem;
-}
-
-.btn-green {
-  background-color: #000000;
-  color: #fff;
-  font-weight: 600;
-  border-radius: 10px;
-  padding: 0.6rem 1.2rem;
-  border: none;
-}
-
-.btn-outline-mint {
   background-color: #FFFFFF;
-  color: #111111;
-  border: 1.5px solid #000000;
-  font-weight: 600;
-  border-radius: 10px;
-  padding: 0.6rem 1.2rem;
-  transition: 0.2s;
+  color: #166534;
+  border: 1px solid #BBF7D0;
+  border-radius: 6px;
+  padding: 16px;
 }
+
+.btn-dark {
+  display: inline-flex;
+  align-items: center;
+  background-color: #000000;
+  color: #FFFFFF;
+  border-radius: 6px;
+  font-size: 13.5px;
+  font-weight: 500;
+}
+
+.btn-mint {
+  display: inline-flex;
+  align-items: center;
+  background-color: #BBF7D0;
+  color: #111111;
+  font-weight: 500;
+  height: 37px;
+  font-size: 13.5px;
+  border-radius: 6px;
+}
+
+.navigation-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 48px;
+  padding-top: 24px;
+  border-top: 1px solid #E5E7EB;
+}
+
 
 .ai-tip {
   background-color: #F1F2F3;
   color: #111111;
-  border-radius: 10px;
-  padding: 0.8rem;
-  font-size: 0.9rem;
+  border-radius: 6px;
+  padding: 12.8px;
+  font-size: 14.4px;
   border: 1px solid #EAEBEC;
   line-height: 1.6;
 }
@@ -395,7 +404,7 @@ function goToMyLearning() {
 
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0px);
   }
 }
 </style>

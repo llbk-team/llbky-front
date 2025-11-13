@@ -3,14 +3,14 @@
     <!-- 상단 헤더 -->
     <div class="d-flex justify-content-between align-items-end mb-3">
       <div>
-        <h1 class="fw-bold fs-3 mb-1" style="color:#111111;">학습 리포트</h1>
-        <p class="text-muted mb-0">백엔드 취업 준비 · 총 4주 / 28일 학습 기록</p>
+        <div class="title">학습 리포트</div>
+        <div class="subtitle">백엔드 취업 준비 · 총 4주 / 28일 학습 기록</div>
       </div>
       <router-link to="/learning/coach?tab=completed" class="btn btn-outline-green">← 돌아가기</router-link>
     </div>
 
     <div class="row g-4">
-      <!-- 왼쪽: 주차 선택 -->
+      <!-- 주차 선택 -->
       <div class="col-md-3">
         <div class="card shadow-sm p-3 card-clean">
           <h5 class="fw-bold mb-3 text-dark">주차 선택</h5>
@@ -23,12 +23,11 @@
         </div>
       </div>
 
-      <!-- 오른쪽: 해당 주차의 일차별 내용 -->
+      <!-- 해당 주차의 일차별 내용 -->
       <div class="col-md-9">
         <div class="card shadow-sm p-4 card-clean">
           <h5 class="fw-bold mb-3 text-dark">{{ currentWeek.label }} 상세 학습 기록</h5>
           <p class="text-muted mb-4">{{ currentWeek.topic }}</p>
-
           <ul class="list-group">
             <li v-for="(day, dIndex) in currentWeek.days" :key="dIndex" class="list-group-item clickable" @click="toggleDay(dIndex)">
               <div class="d-flex justify-content-between align-items-center">
@@ -39,7 +38,6 @@
                   {{ day.open ? "접기 ▲" : "펼치기 ▼" }}
                 </span>
               </div>
-
               <transition name="slide">
                 <div v-if="day.open" class="mt-2 p-3 rounded bg-light">
                   <p class="small text-muted mb-1">{{ day.date }}</p>
@@ -128,13 +126,13 @@ function toggleDay(index) {
 
 <style scoped>
 .card-clean {
-  border-radius: 1rem;
+  border-radius: 16px;
   border: 1px solid #EAEBEC;
   background-color: #FFFFFF;
 }
 
 .list-group-item {
-  background: #F8FAF9;
+  background-color: #F8FAF9;
   border: 1px solid #EAEBEC;
   margin-bottom: 8px;
   border-radius: 8px;
@@ -160,13 +158,31 @@ function toggleDay(index) {
 }
 
 .btn-outline-green {
+  display: inline-flex;
+  align-items: center;
   border: 1px solid #71EBBE;
   color: #111111;
-  border-radius: 0.5rem;
+  border-radius: 8px;
+  height: 37px;
+  border-radius: 6px;
+  font-size: 13.5px;
+  font-weight: 500;
 }
 
 .btn-outline-green:hover {
   background-color: #71EBBE;
   color: #111111;
 }
+
+.title {
+  font-weight: 700;
+  font-size: 28px;
+}
+
+.subtitle {
+  color: #6C757D;
+  font-size: 16px;
+  margin-bottom: 0px;
+}
+
 </style>
