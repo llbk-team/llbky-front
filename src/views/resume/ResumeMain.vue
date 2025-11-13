@@ -26,14 +26,28 @@
 
         <!-- 내 이력서 리스트 -->
         <div class="resume-section">
-          
-          <div class="section-header">
+          <div class="section-header d-flex justify-content-between align-items-center">
             <h2>내 이력서 리스트</h2>
-            <div class="header-actions">
+            
+            <div class="d-flex align-items-center">
+              <button 
+                class="btn btn-primary select-btn me-3" 
+                @click="toggleSelectMode" 
+                :class="{ 'active': isSelecting }">
+                {{ isSelecting ? '취소' : '선택하기' }}
+              </button>
+
+              <button 
+                v-if="isSelecting" 
+                class="btn btn-danger delete-btn" 
+                @click="confirmDelete"
+                :disabled="!hasSelectedItems">
+                삭제하기
+              </button>
+              
               <span class="ai-suggestion">✨ AI 이력서 작성</span>
             </div>
           </div>
-
           <div class="resume-grid">
             <!-- 새 이력서 작성 -->
             <div class="resume-card add-card" @click="$router.push('/resume/write')">
@@ -50,12 +64,12 @@
               class="resume-card"
               :class="{ selecting: isSelecting }">
               
-              <!-- 체크박스 -->
+              <!-- 체크박스 - position absolute 적용 -->
               <input 
                 v-if="isSelecting"
                 type="checkbox" 
                 class="select-checkbox"
-                :checked="selectedResume === resume.id"
+                :checked="selectedResumes === resume.id"
                 @change="selectResume(resume.id)"
               />
               <div class="card-content" @click="goToResumeDetail(resume.id)">
@@ -100,7 +114,7 @@
                   v-if="isSelecting"
                   type="checkbox" 
                   class="select-checkbox"
-                  :checked="selectedCover === cover.id"
+                  :checked="selectedCovers === cover.id"
                   @change="selectCover(cover.id)"
                 />
               <div class="card-content" @click="goToCoverDetail(cover.id)">
@@ -144,7 +158,7 @@
                 v-if="isSelecting"
                 type="checkbox" 
                 class="select-checkbox"
-                :checked="selectedPortfolio === portfolio.id"
+                :checked="selectedPortfolios === portfolio.id"
                 @change="selectPortfolio(portfolio.id)"
               />
               <div class="card-content" @click="goToPortfolioDetail(portfolio.id)">
@@ -167,7 +181,7 @@
 
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
@@ -176,6 +190,12 @@ const router = useRouter()
 const isSelecting = ref(false)
 const toggleSelectMode = () => {
   isSelecting.value = !isSelecting.value
+  // 선택 모드를 종료할 때 선택된 항목들 초기화
+  if (!isSelecting.value) {
+    selectedResumes.value = []
+    selectedCovers.value = []
+    selectedPortfolios.value = []
+  }
 }
 
 // 사용자 정보
@@ -212,44 +232,107 @@ const goToPortfolioDetail = () => {
   router.push(`/resume/portfolio/coach`)
 }
 
-const selectedResume = ref(null)
-const selectedCover = ref(null)
-const selectedPortfolio = ref(null)
+// 다중 선택을 위한 배열 선언
+const selectedResumes = ref([])
+const selectedCovers = ref([])
+const selectedPortfolios = ref([])
 
+// 선택 항목이 있는지 확인하는 computed 속성
+const hasSelectedItems = computed(() => {
+  return selectedResumes.value.length > 0 || 
+         selectedCovers.value.length > 0 || 
+         selectedPortfolios.value.length > 0
+})
+
+// 선택 토글 함수 예시 (이력서)
 const selectResume = (id) => {
-  selectedResume.value = selectedResume.value === id ? null : id
+  const index = selectedResumes.value.indexOf(id)
+  if (index === -1) {
+    // 없으면 추가
+    selectedResumes.value.push(id)
+  } else {
+    // 있으면 제거
+    selectedResumes.value.splice(index, 1)
+  }
 }
-
 const selectCover = (id) => {
-  selectedCover.value = selectedCover.value === id ? null : id
+   const index = selectedCovers.value.indexOf(id)
+   if (index === -1) {
+    selectedCovers.value.push(id)  
+   }else{
+    selectedCovers.value.splice(index, 1)
+   }
+ 
 }
 
 const selectPortfolio = (id) => {
-  selectedPortfolio.value = selectedPortfolio.value === id ? null : id
+   const index = selectedPortfolios.value.indexOf(id)
+   if (index === -1) {
+    selectedPortfolios.value.push(id)  
+   }else{
+    selectedPortfolios.value.splice(index, 1)
+   }
+ 
 }
 
-const createIntegratedDocument = () => {
-  if (!selectedResume.value || !selectedCover.value ) {
-    alert('이력서, 자기소개서 중 최소 1개를 선택해주세요!')
-    return
+
+
+// 삭제 확인 함수
+const confirmDelete = () => {
+  // 선택된 항목이 없으면 실행하지 않음
+  if (!hasSelectedItems.value) return
+  
+  if (confirm('정말로 선택한 항목을 삭제하시겠습니까?')) {
+    deleteSelectedItems()
   }
-
-  // 통합 문서 생성 로직 (API 호출 or 페이지 이동)
-  console.log('통합 문서 생성:', {
-    resumeId: selectedResume.value,
-    coverId: selectedCover.value,
-    portfolioId: selectedPortfolio.value
-  })
-
-  router.push({
-    path: '/resume/final',
-    query: {
-      resumeId: selectedResume.value,
-      coverId: selectedCover.value,
-      portfolioId: selectedPortfolio.value
-    }
-  })
 }
+
+// 선택된 항목 삭제 함수
+const deleteSelectedItems = () => {
+  // 이력서 삭제
+  if (selectedResumes.value.length > 0) {
+    resumeList.value = resumeList.value.filter(item => !selectedResumes.value.includes(item.id))
+    console.log(`이력서 ID:${selectedResumes.value.join(', ')} 삭제됨`)
+    selectedResumes.value = []
+  }
+  
+  // 자기소개서 삭제
+  if (selectedCovers.value.length > 0) {
+    coverLetterList.value = coverLetterList.value.filter(item => !selectedCovers.value.includes(item.id))
+    console.log(`자기소개서 ID:${selectedCovers.value.join(', ')} 삭제됨`)
+    selectedCovers.value = []
+  }
+  
+  // 포트폴리오 삭제
+  if (selectedPortfolios.value.length > 0) {
+    // 포트폴리오 삭제 로직
+    console.log(`포트폴리오 ID:${selectedPortfolios.value.join(', ')} 삭제됨`)
+    selectedPortfolios.value = []
+  }
+}
+
+// const createIntegratedDocument = () => {
+//   if (!selectedResume.value || !selectedCover.value ) {
+//     alert('이력서, 자기소개서 중 최소 1개를 선택해주세요!')
+//     return
+//   }
+
+//   // 통합 문서 생성 로직 (API 호출 or 페이지 이동)
+//   console.log('통합 문서 생성:', {
+//     resumeId: selectedResume.value,
+//     coverId: selectedCover.value,
+//     portfolioId: selectedPortfolio.value
+//   })
+
+//   router.push({
+//     path: '/resume/final',
+//     query: {
+//       resumeId: selectedResume.value,
+//       coverId: selectedCover.value,
+//       portfolioId: selectedPortfolio.value
+//     }
+//   })
+// }
 
 
 // API 호출로 이력서 리스트 조회
@@ -333,37 +416,29 @@ onMounted(() => {
   display: flex;
   min-height: 100vh;
 }
-
-/* 사이드바 */
-.sidebar {
-  background: #f8f9fa; /* 기존 white에서 변경 */
-  border-right: 1px solid #e9ecef;
-}
-
-
-.sidebar-menu {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.menu-item {
-  padding: 16px 24px; /* 기존 12px에서 16px로 증가 */
-  font-size: 15px; /* 기존 14px에서 15px로 증가 */
-  color: #495057; /* 더 진한 회색 */
-}
-
-.menu-item:hover {
-  background: #f8f9fa;
-  color: #71EBBE;
-}
-
-.menu-item.active {
-  background: #ffffff;
-  color: #212529;
-  border-right: none; /* 기존 녹색 보더 제거 */
+.delete-btn {
+  background-color: #ff6b6b;
+  border: none;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 6px;
   font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
 }
+
+.delete-btn:hover {
+  background-color: #fa5252;
+}
+
+.delete-btn:disabled {
+  background-color: #ffc9c9;
+  cursor: not-allowed;
+}
+
+
+
+
 
 /* 메인 콘텐츠 */
 .main-content {
@@ -574,11 +649,10 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  position: relative;
+  position: relative; /* 이 부분이 중요합니다 */
   overflow: hidden;
   margin-bottom: 12px;
 }
-
 .resume-card.selecting {
   border-color: #71EBBE;
   box-shadow: 0 0 0 2px rgba(113, 235, 190, 0.3);
@@ -660,15 +734,22 @@ onMounted(() => {
   gap: 4px;
 }
 
+/* 체크박스 스타일 수정 */
 .select-checkbox {
-  position: relative;
-  top: 2px;
-  left: 220px;
-  width: 35px;
-  height: 35px;
+  position: absolute; /* 절대 위치로 설정 */
+  top: 15px;          /* 상단에서 15px 떨어진 위치 */
+  right: 15px;        /* 오른쪽에서 15px 떨어진 위치 */
+  width: 20px;
+  height: 20px;
   cursor: pointer;
   accent-color: #71EBBE;
-  margin-right: 12px; /* ✅ 카드와의 간격 확보 */
+  z-index: 10;        /* 다른 요소 위에 표시 */
+}
+
+/* 선택 모드 활성화 시 카드 패딩 조정 - 필요하면 사용 */
+.resume-card.selecting .card-content {
+  /* 체크박스를 위한 공간 미리 확보 - 필요하면 주석 해제 */
+  /* padding-right: 30px; */
 }
 
 .integrate-section {
@@ -780,6 +861,8 @@ onMounted(() => {
     gap: 12px;
     align-items: stretch;
   }
+
+
 
 
 
