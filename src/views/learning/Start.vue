@@ -2,8 +2,8 @@
   <div class="learning-progress container py-4">
     <div class="d-flex justify-content-between align-items-end mb-1">
       <div>
-        <h1 class="fw-bold fs-3 mb-1" style="color:#111111;">백엔드 개발자 학습 코칭</h1>
-        <p class="text-muted mb-0">취업 준비 · 주 {{ weeklyHours }}시간</p>
+        <div class="title">백엔드 개발자 학습 코칭</div>
+        <div class="subtitle">취업 준비 · 주 {{ weeklyHours }}시간</div>
       </div>
       <div class="fs-5">{{ overallProgress }}% 전체 진행률</div>
     </div>
@@ -47,7 +47,7 @@
         </div>
 
         <!-- 이번 주 학습 내용 -->
-        <div class="week-detail p-4 rounded-4 shadow-sm">
+        <div class="week-detail p-4 shadow-sm">
           <div class="d-flex justify-content-between align-items-center mb-3">
             <h6 class="fw-bold mb-0">이번 주 학습 내용 ({{ currentWeek }}주차)</h6>
 
@@ -58,9 +58,7 @@
             </div>
           </div>
 
-          <p class="text-muted small mb-4">
-            💡 각 항목을 클릭해서 학습 정리 노트를 작성하세요
-          </p>
+          <p class="text-muted small mb-4">💡 각 항목을 클릭해서 학습 정리 노트를 작성하세요</p>
 
           <!-- 일차별 카드 -->
           <div class="row g-3">
@@ -83,33 +81,25 @@
             </div>
           </div>
         </div>
-
-
       </div>
 
       <!-- 오른쪽 영역 (메모 입력) -->
       <div class="col-lg-4">
-        <div class="memo-box shadow-sm p-4 rounded-4">
+        <div class="memo-box shadow-sm p-4">
           <div v-if="selectedItem">
-            <h6 class="fw-bold mb-3">
-              📝 {{ selectedItem.title }} 학습 노트
-            </h6>
-            <p class="text-muted small mb-2">
-              학습한 내용을 자유롭게 작성하세요. AI가 내용을 검토해드립니다.
-            </p>
+            <h6 class="fw-bold mb-3">📝 {{ selectedItem.title }} 학습 노트</h6>
+            <p class="text-muted small mb-2">학습한 내용을 자유롭게 작성하세요. AI가 내용을 검토해드립니다.</p>
             <textarea v-model="memoContent" rows="18" class="form-control mb-3" placeholder="예: Session vs JWT 차이점 정리..."></textarea>
 
             <div class="d-flex justify-content-between align-items-center">
               <small class="text-muted">{{ memoContent.length }}/500자</small>
               <div>
                 <button class="btn btn-outline-secondary me-2" @click="cancelMemo">취소</button>
-                <button class="btn btn-mint" @click="submitMemo">
-                  ⚡ AI 검증 받기
-                </button>
+                <button class="btn btn-mint" @click="submitMemo">⚡ AI 검증 받기</button>
               </div>
             </div>
           </div>
-          <div v-else class="text-center text-muted py-5">
+          <div v-else class="text-center text-muted py-5 rounded-6">
             <p>왼쪽에서 학습 항목을 선택하면<br />여기에 정리 노트를 작성할 수 있습니다 ✍️</p>
           </div>
         </div>
@@ -217,8 +207,8 @@ function prevPage() {
 }
 
 
-const showWeekModal = ref(false); 
-const selectedWeek = ref(null); 
+const showWeekModal = ref(false);
+const selectedWeek = ref(null);
 
 function openWeekModal(week) {
   selectedWeek.value = week;
@@ -251,16 +241,16 @@ function submitMemo() {
 
 <style scoped>
 .learning-progress {
-  color: #111;
+  color: #111111;
 }
 
-/* 좌우 컬럼 */
 .memo-box {
-  background: #fff;
-  border: 1px solid #e5e7eb;
+  background-color: #FFFFFF;
+  border: 1px solid #E5E7EB;
   min-height: 600px;
   transition: 0.3s;
   margin-top: 64px;
+  border-radius: 6px;
 }
 
 .memo-box textarea {
@@ -268,103 +258,132 @@ function submitMemo() {
 }
 
 .week-card {
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
+  border: 1px solid #E5E7EB;
+  border-radius: 6px;
   padding: 14px 18px;
-  background: #ffffff;
+  background-color: #FFFFFF;
   margin-bottom: 10px;
   transition: all 0.2s ease;
 }
 
 .week-card:hover {
-  background-color: #f0fdf4;
+  background-color: #F0FDF4;
 }
 
 .week-icon {
-  font-size: 1.2rem;
-  color: #9ca3af;
+  font-size: 19.2px;
+  color: #9CA3AF;
 }
 
 .week-icon.complete {
-  color: #4cd3a3;
+  color: #4CD3A3;
 }
 
 .custom-progress {
   height: 8px;
-  border-radius: 4px;
-  background-color: #f3f4f6;
+  border-radius: 6px;
+  background-color: #F3F4F6;
 }
 
 .custom-progress .progress-bar {
-  border-radius: 4px;
+  border-radius: 6px;
   transition: width 0.3s ease;
 }
 
 .week-detail {
-  background: linear-gradient(135deg, #f0fdf4 0%, #f5f7ff 100%);
-  border: 1px solid #e0e7ff;
+  background: linear-gradient(135deg, #F0FDF4 0%, #F5F7FF 100%);
+  border: 1px solid #E0E7FF;
+  border-radius: 6px;
 }
 
 .day-card {
-  background: #fff;
-  border: 1px solid #e5e7eb;
+  background-color: #FFFFFF;
+  border: 1px solid #E5E7EB;
   padding: 16px;
   transition: 0.2s;
   cursor: pointer;
 }
 
 .day-card:hover {
-  background: #f8fafc;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  background-color: #F8FAFC;
+  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .day-card.active {
-  border-color: #71ebbe;
-  box-shadow: 0 0 0 3px rgba(113, 235, 190, 0.3);
+  border-color: #71EBBE;
+  box-shadow: 0px 0px 0px 3px rgba(113, 235, 190, 0.3);
 }
 
 .status-badge {
-  font-size: 0.85rem;
-  font-weight: 600;
+  font-size: 13.5px;
+  font-weight: 700;
   padding: 4px 8px;
   border-radius: 6px;
 }
 
 .status-badge.done {
-  background: #ecfdf5;
+  background-color: #ECFDF5;
   color: #059669;
 }
 
 .status-badge.ongoing {
-  background: #eef2ff;
-  color: #4f46e5;
+  background-color: #EEF2FF;
+  color: #4F46E5;
 }
 
 .status-badge.planned {
-  background: #f3f4f6;
-  color: #6b7280;
+  background-color: #F3F4F6;
+  color: #6B7280;
+}
+
+.btn-outline-secondary {
+  display: inline-flex;
+  align-items: center;
+  font-size: 13.5px;
+  font-weight: 500;
+  height: 37px;
+  border-radius: 6px;
+  background-color: #FFFFFF;
+  color: #374151;
+  border: 1px solid #D1D5DB;
 }
 
 .btn-mint {
   background-color: #A2F1D6;
+  border-radius: 6px;
+  font-size: 13.5px;
+  font-weight: 500;
+  height: 37px;
 }
 
 .page-btn {
   border: none;
   background: transparent;
-  font-size: 1.4rem;
-  color: #444;
+  font-size: 22.4px;
+  color: #444444;
   cursor: pointer;
-  padding: 0 6px;
+  padding: 0px 6px;
   transition: color 0.2s;
 }
 
 .page-btn:hover:not(:disabled) {
-  color: #00c896;
+  color: #00C896;
 }
 
 .page-btn:disabled {
-  color: #ccc;
+  color: #CCCCCC;
   cursor: default;
 }
+
+.title {
+  font-weight: 700;
+  font-size: 28px;
+}
+
+.subtitle {
+  color: #6C757D;
+  font-size: 16px;
+  margin-bottom: 0px;
+}
+
 </style>

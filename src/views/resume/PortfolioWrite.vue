@@ -1,45 +1,110 @@
 <template>
-  <div class="portfolio-coaching">
+  <div class="app-container">
+    <!-- 사이드바 -->
+    <SideBar/>
 
+    <!-- 메인 컨테이너 -->
     <div class="main-container">
-      <SideBar/>
-     
+      
+      <!-- 포트폴리오 폼 컨테이너 -->
+      <div class="resume-form-container">
+        
 
-      <!-- Main Content -->
-      <main class="content">
-        <!-- Page Title -->
-        <h1 class="page-title">서류 AI 코칭</h1>
-
-        <!-- Upload Section -->
+        <!-- 업로드 섹션 -->
         <div class="upload-section">
           <div class="upload-icon">📁</div>
-          <h2 class="upload-title">포트폴리오 코칭</h2>
-          <p class="upload-subtitle">포트폴리오나 링크나 파일을 업로드하면 AI가 전문적으로 리뷰해드립니다.</p>
-          
-          <div class="upload-types">
+          <div class="form-header">
+          <h1>포트폴리오 코칭</h1>
+          <p>포트폴리오나 링크나 파일을 업로드하면
+             AI가 전문적으로 리뷰해드립니다.</p>
+        </div>
+          <div class="upload-types"> 
             <div class="type-btn" :class="{ active: selectedType === 'link' }" @click="handleUpload">
-              <div class="type-icon">📤</div>
-              <div class="type-label">포트폴리오 올리기</div>
+              <div class="type-label">📤 포트폴리오 올리기</div>
+               <input type="file" id="fileInput" style="display: none">
             </div>
             
             <div class="type-btn" :class="{ active: selectedType === 'project' }" @click="router.push('/resume/portfolio/stepbystep')">
-              <div class="type-icon">📊</div>
-              <div class="type-label">포트폴리오 만들기</div>
+              <div class="type-label">📊 포트폴리오 가이드</div>
             </div>
           </div>
-
-          
         </div>
 
-  
-
-        <!-- Action Button -->
+        <!-- 액션 버튼 -->
         <div class="action-section">
           <button class="action-btn" @click="startAnalysis">
-            ✏️ 포트폴리오 첨삭받기
+            ✏️ 포트폴리오 피드백 받기
           </button>
         </div>
-      </main>
+      </div>
+    </div>
+
+    <!-- AI 코칭 패널 - 이력서 작성하기 페이지와 동일하게 추가 -->
+    <div class="ai-coaching-panel" v-if="showAICoaching">
+      <!-- AI 헤더 -->
+      <div class="ai-header">
+        <div class="ai-profile">
+          <div class="ai-avatar">🤖</div>
+          <div class="ai-info">
+            <span class="ai-name">AI 코치</span>
+            <span class="ai-desc">포트폴리오 코칭 전문가</span>
+          </div>
+        </div>
+        <button class="close-btn" @click="toggleAICoaching">×</button>
+      </div>
+
+      <!-- AI 상태 -->
+      <div class="ai-status">
+        <div class="status-indicator">
+          <div class="status-icon">🤖</div>
+          <span class="status-text">AI 코치 활성화</span>
+        </div>
+      </div>
+
+      <!-- 스크롤 콘텐츠 -->
+      <div class="ai-content">
+        <!-- 환영 메시지 -->
+        <div class="welcome-section">
+          <p>안녕하세요! 포트폴리오 작성을 도와 드릴 AI 코치입니다.</p>
+          <p>항상 더 나은 포트폴리오를 만들 수 있도록 도와드리겠습니다.
+          궁금한 점이 있으면 언제든지 물어보세요!</p>
+        </div>
+
+        <!-- 팁 섹션 -->
+        <div class="tips-section">
+          <div class="section-title">
+            <span class="icon">💡</span>
+            <span>포트폴리오 팁</span>
+          </div>
+          <div class="tips-content">
+            <h4>좋은 포트폴리오를 위한 핵심 포인트</h4>
+            <div class="checklist">
+              <div class="check-item">
+                <span class="check">✅</span>
+                <span>구체적인 기술 스택과 역할을 명시하세요.</span>
+              </div>
+              <div class="check-item">
+                <span class="check">✅</span>
+                <span>프로젝트의 문제 해결 과정을 보여주세요.</span>
+              </div>
+              <div class="check-item">
+                <span class="check">✅</span>
+                <span>실제 결과와 성과를 수치로 표현하세요.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 액션 버튼 -->
+        <div class="ai-actions">
+          <button class="ai-action-btn" @click="askAI">
+            💬 AI에게 질문하기
+          </button>
+          <button class="ai-action-btn" @click="getDetailedAnalysis">
+            📋 상세한 분석받기
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -238,162 +303,55 @@ function getCurrentTabName() {
 }
 </script>
 <style scoped>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-.portfolio-coaching {
-  
-  background: #F5F5F5;
+/* 전체 앱 컨테이너 */
+.app-container {
+  display: flex;
   min-height: 100vh;
+  background-color: #EFF0F1;
 }
 
-/* Header */
-.header {
-  background: #FFFFFF;
-  border-bottom: 1px solid #E5E5E5;
-  padding: 1rem 2rem;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 100;
-}
-
-.header-content {
-  max-width: 1600px;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  gap: 2rem;
-}
-
-.menu-icon {
-  font-size: 1.5rem;
-  cursor: pointer;
-  color: #666;
-}
-
-.nav-menu {
-  display: flex;
-  gap: 2rem;
-}
-
-.nav-item {
-  color: #333;
-  font-weight: 500;
-  cursor: pointer;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  transition: all 0.3s;
-}
-
-.nav-item:hover {
-  background: #F0F0F0;
-}
-
-/* Main Container */
+/* 메인 컨테이너 */
 .main-container {
-  display: flex;
-  margin-top: 0px;
-  min-height: calc(100vh - 80px);
-}
-
-/* Sidebar */
-.sidebar {
-  width: 250px;
-  background: #FFFFFF;
-  border-right: 1px solid #E5E5E5;
-  padding: 2rem 1rem;
-}
-
-.sidebar-menu {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.menu-item {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 1rem;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.3s;
-  color: #666;
-}
-
-.menu-item:hover {
-  background: #F8F9FA;
-}
-
-.menu-item.active {
-  background: #E3F2FD;
-  color: #1976D2;
-}
-
-.menu-item.active-portfolio {
-  background: linear-gradient(135deg, #71EBBE, #A2F1D6);
-  color: #000;
-  font-weight: 600;
-}
-
-.menu-icon {
-  font-size: 1.2rem;
-}
-
-/* Content */
-.content {
   flex: 1;
-  padding: 2rem 3rem;
+  padding: 40px;
+  max-width: calc(100vw - 200px - 400px); /* 사이드바와 AI패널 제외 */
 }
 
-.breadcrumb {
-  font-size: 0.9rem;
+/* 폼 컨테이너 */
+.resume-form-container {
+  background: #EAEBEC;
+  border-radius: 12px;
+  padding: 30px;
+  margin-bottom: 20px;
+  border-color: #a8a6a6;
+}
+
+.form-header h1 {
+  margin: 0 0 12px 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: #333;
+}
+
+.form-header p {
+  margin: 0 0 40px 0;
   color: #666;
-  margin-bottom: 1rem;
+  line-height: 1.6;
 }
 
-.page-title {
-  font-size: 2rem;
-  font-weight: bold;
-  color: #000;
-  margin-bottom: 2rem;
-  text-align: center;
-}
-
-/* Upload Section */
+/* 업로드 섹션 */
 .upload-section {
   background: #FFFFFF;
   border: 3px dashed #71EBBE;
   border-radius: 25px;
-  padding: 3rem;
+  padding: 24px;
   text-align: center;
   margin-bottom: 2rem;
-  max-width: 800px;
-  margin-left: auto;
-  margin-right: auto;
 }
 
 .upload-icon {
   font-size: 3rem;
   margin-bottom: 1rem;
-}
-
-.upload-title {
-  font-size: 1.5rem;
-  font-weight: bold;
-  margin-bottom: 0.5rem;
-  color: #000;
-}
-
-.upload-subtitle {
-  color: #666;
-  margin-bottom: 2rem;
-  font-size: 0.9rem;
 }
 
 .upload-types {
@@ -404,17 +362,16 @@ function getCurrentTabName() {
 }
 
 .type-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: #F8F9FA;
   border: 2px solid #E5E5E5;
-  padding: 1.5rem;
-  border-radius: 15px;
+  padding: 5px 12px;
+  border-radius: 10px;
   cursor: pointer;
   transition: all 0.3s;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-  min-width: 120px;
+  min-width: 180px;
 }
 
 .type-btn:hover {
@@ -429,150 +386,34 @@ function getCurrentTabName() {
   font-weight: 600;
 }
 
-.type-icon {
-  font-size: 1.5rem;
-}
-
 .type-label {
-  font-size: 0.85rem;
-  font-weight: 500;
+  font-size: 0.9rem;
+  font-weight: 700;
+
 }
 
-.upload-btn {
-  background: linear-gradient(135deg, #71EBBE, #A2F1D6);
-  color: #000;
-  padding: 1rem 2.5rem;
-  border: none;
-  border-radius: 25px;
-  font-weight: 600;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-.upload-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(113, 235, 190, 0.4);
-}
-
-/* Tab Navigation */
-.tab-nav {
-  display: flex;
-  gap: 0;
-  margin-bottom: 2rem;
-  background: #F8F9FA;
-  border-radius: 12px;
-  padding: 0.5rem;
-  max-width: 600px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.tab-item {
-  flex: 1;
-  padding: 1rem;
-  text-align: center;
-  cursor: pointer;
-  border-radius: 8px;
-  font-weight: 500;
-  color: #666;
-  transition: all 0.3s;
-}
-
-.tab-item:hover {
-  color: #000;
-}
-
-.tab-item.active {
-  background: #71EBBE;
-  color: #000;
-  font-weight: 600;
-}
-
-/* Review Grid */
-.review-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 3rem;
-}
-
-.review-card {
-  background: #FFFFFF;
-  border-radius: 20px;
-  padding: 2rem;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-  transition: all 0.3s;
-  cursor: pointer;
-  border: 2px solid transparent;
-}
-
-.review-card:hover {
-  transform: translateY(-5px);
-  border-color: #71EBBE;
-  box-shadow: 0 8px 30px rgba(113, 235, 190, 0.3);
-}
-
-.card-icon-wrapper {
-  width: 60px;
-  height: 60px;
-  background: linear-gradient(135deg, #F0FDF8, #A2F1D6);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 1.5rem;
-  font-size: 1.8rem;
-}
-
-.card-title {
-  font-size: 1.1rem;
-  font-weight: 600;
-  margin-bottom: 0.8rem;
-  color: #000;
-}
-
-.card-description {
-  font-size: 0.85rem;
-  line-height: 1.6;
-  color: #666;
-  margin-bottom: 1.5rem;
-}
-
-.rating-wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.rating-stars {
-  color: #71EBBE;
-  font-size: 1.1rem;
-}
-
-.rating-text {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #000;
-}
-
-/* Action Section */
+/* 액션 버튼 */
 .action-section {
-  text-align: center;
-  margin-top: 3rem;
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
 }
 
 .action-btn {
+  display: flex;
   background: linear-gradient(135deg, #71EBBE, #A2F1D6);
+  align-items: center;
+  height: 37px;
   color: #000;
   padding: 1.2rem 3rem;
   border: none;
-  border-radius: 25px;
-  font-weight: 600;
+  border-radius: 0.4rem;
+  font-weight: 700;
   font-size: 1.1rem;
   cursor: pointer;
   transition: all 0.3s;
   box-shadow: 0 4px 15px rgba(113, 235, 190, 0.3);
+  justify-content: center;
 }
 
 .action-btn:hover {
@@ -580,44 +421,95 @@ function getCurrentTabName() {
   box-shadow: 0 8px 30px rgba(113, 235, 190, 0.5);
 }
 
-/* Responsive Design */
-@media (max-width: 1024px) {
+/* AI 코칭 패널 */
+.ai-coaching-panel {
+  width: 380px;
+  background: #fff;
+  position: fixed;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  border-left: 1px solid #e5e5e5;
+  display: flex;
+  flex-direction: column;
+  z-index: 1000;
+}
+
+/* AI 헤더 */
+.ai-header {
+  background: #000;
+  color: white;
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ai-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ai-avatar {
+  font-size: 18px;
+}
+
+.ai-name {
+  font-weight: 600;
+  font-size: 14px;
+  display: block;
+}
+
+.ai-desc {
+  font-size: 11px;
+  color: #ccc;
+  display: block;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 4px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+}
+
+/* 나머지 AI 코칭 패널 스타일 */
+.ai-status, .ai-content, .tips-section, .ai-actions {
+  /* 이력서 작성하기 페이지의 스타일과 동일하게 적용 */
+}
+
+/* 반응형 설정 */
+@media (max-width: 1200px) {
+  .ai-coaching-panel {
+    display: none;
+  }
+  
   .main-container {
-    flex-direction: column;
-  }
-  
-  .sidebar {
-    width: 100%;
-    padding: 1rem;
-  }
-  
-  .sidebar-menu {
-    flex-direction: row;
-    overflow-x: auto;
-  }
-  
-  .content {
-    padding: 1.5rem;
-  }
-  
-  .review-grid {
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    max-width: calc(100vw - 200px);
   }
 }
 
 @media (max-width: 768px) {
+  .app-container {
+    flex-direction: column;
+  }
+  
+  .main-container {
+    max-width: 100%;
+    padding: 20px;
+  }
+  
   .upload-types {
     flex-direction: column;
-    align-items: center;
-  }
-  
-  .tab-nav {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-  
-  .review-grid {
-    grid-template-columns: 1fr;
   }
 }
 </style>

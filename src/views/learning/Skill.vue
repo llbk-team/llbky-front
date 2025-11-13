@@ -3,34 +3,26 @@
     <form @submit.prevent="generatePlan">
 
       <!-- 제목 -->
-      <div class="d-flex justify-content-between align-items-end mb-3">
+      <div class="d-flex justify-content-between align-items-end">
         <div>
-          <h1 class="fw-bold fs-3 mb-1" style="color:#111111;">AI 학습 설정</h1>
-          <p class="text-muted fs-6 mb-0">
-            목표 직무와 학습 목적을 선택하고 나만의 코칭을 시작해보세요!
-          </p>
+          <div class="title">AI 학습 설정</div>
+          <div class="subtitle mb-3">목표 직무와 학습 목적을 선택하고 나만의 코칭을 시작해보세요!</div>
         </div>
       </div>
 
       <section class="info-section">
-        <div class="info-box green-info">
-          좋아요! '백엔드 개발자'를 목표로 하고 있군요.
-          <br>
-          이제 강화하고 싶은 기술이나 부족한 역량을 선택해볼까요?
-        </div>
+        <div class="info-box green-info">좋아요! '백엔드 개발자'를 목표로 하고 있군요.<br>이제 강화하고 싶은 기술이나 부족한 역량을 선택해볼까요?</div>
         <div class="info-box yellow-info" @click="openResumeModal">
           <span>📄</span>
           <strong>이력서 분석 결과 불러오기</strong>
-          <p>분석 모듈에서 나온 JSON 데이터를 불러옵니다</p>
+          <p>분석 모듈에서 나온 데이터를 불러옵니다</p>
         </div>
       </section>
 
       <section class="main-content">
         <div class="content-column">
           <h3>부족 역량 선택</h3>
-          <div class="info-box green-info-light">
-            선택한 직무에 맞춰 추천한 기술 목록이에요
-          </div>
+          <div class="info-box green-info-light">선택한 직무에 맞춰 추천한 기술 목록이에요</div>
 
           <div class="skill-list-wrapper">
             <div class="checkbox-item" v-for="skill in recommendedSkills" :key="skill">
@@ -42,14 +34,10 @@
 
         <div class="content-column">
           <h3>관심 기술</h3>
-          <div class="info-box green-info-light">
-            새롭게 배우고 싶은 기술이 있다면 추가하세요
-          </div>
+          <div class="info-box green-info-light">새롭게 배우고 싶은 기술이 있다면 추가하세요</div>
           <div class="add-skill-form">
             <input type="text" v-model="newSkill" placeholder="새 기술 입력..." @keydown.enter.prevent="addSkill" class="skill-input">
-            <button type="button" @click="addSkill" class="add-button">
-              + 추가
-            </button>
+            <button @click="addSkill" class="btn add-button">+ 추가</button>
           </div>
           <ul class="added-skills-list">
             <li v-for="(skill, index) in formData.interestedSkills" :key="index">
@@ -62,24 +50,16 @@
         </div>
       </section>
 
-
-      <footer class="navigation-buttons">
-        <router-link :to="`/learning/goal`" class="btn btn-secondary">
-          ← 이전
-        </router-link>
-        <router-link :to="`/learning/roadmap`" class="btn btn-primary">
-          플랜 생성하기 ▶
-        </router-link>
-      </footer>
-
+      <div class="d-flex justify-content-between mt-4">
+        <router-link :to="`/learning/goal`" class="btn btn-secondary">← 이전</router-link>
+        <router-link :to="`/learning/roadmap`" class="btn btn-primary">플랜 생성하기 ▶</router-link>
+      </div>
     </form>
 
     <div class="modal-backdrop" v-if="showModal" @click.self="closeModal">
       <div class="modal-content">
         <h4 class="fw-bold mb-3">📄 이력서 분석 결과 선택</h4>
-        <p class="text-muted small mb-3">
-          아래 결과 중 하나를 선택하세요. (가상 데이터)
-        </p>
+        <p class="text-muted small mb-3">아래 결과 중 하나를 선택하세요. (가상 데이터)</p>
 
         <ul class="resume-list">
           <li v-for="(item, index) in mockResumes" :key="index" @click="selectResume(item)" class="resume-item">
@@ -88,10 +68,7 @@
             <p class="small text-muted">보완 필요: {{ item.weaknesses.join(', ') }}</p>
           </li>
         </ul>
-
-        <button class="btn btn-dark w-100 mt-3" @click="closeModal">
-          닫기
-        </button>
+        <button class="btn btn-dark w-100 mt-3" @click="closeModal">닫기</button>
       </div>
     </div>
 
@@ -103,7 +80,6 @@ import { ref, watch, onMounted } from "vue";
 import { useStore } from "vuex";
 
 const store = useStore();
-const skills = ["SQL", "Spring", "Docker", "AWS"];
 const selectedSkills = ref([]);
 
 onMounted(() => {
@@ -116,21 +92,16 @@ watch(selectedSkills, (newVal) => {
   store.dispatch("learning/updateProgress", newVal.length > 0 ? 100 : 50);
 });
 
-
-
 const formData = ref({
   lackingSkills: [],
   interestedSkills: [],
 });
 
-
 const recommendedSkills = ref([
   'SQL', 'Spring Security', 'REST API', 'JPA', 'AWS', 'Docker', 'Kubernetes', 'CI/CD', 'Linux'
 ]);
 
-
 const newSkill = ref('');
-
 
 function addSkill() {
   const skillToAdd = newSkill.value.trim();
@@ -143,8 +114,6 @@ function addSkill() {
 function removeSkill(index) {
   formData.value.interestedSkills.splice(index, 1);
 }
-
-
 
 const showModal = ref(false)
 const mockResumes = ref([
@@ -177,15 +146,11 @@ function selectResume(item) {
   alert(`✅ "${item.title}" 결과를 불러왔습니다!`)
 }
 
-
 function generatePlan() {
   console.log('플랜 생성 데이터:', formData.value);
   alert('플랜을 생성합니다!\n' + JSON.stringify(formData.value, null, 2));
 }
 
-function goToPrevious() {
-  console.log('이전 단계로 이동');
-}
 </script>
 
 <style scoped>
@@ -193,12 +158,12 @@ function goToPrevious() {
   max-width: 1000px;
   margin: 20px auto;
   padding: 24px;
-  background-color: #ffffff;
-  border-radius: 8px;
+  background-color: #FFFFFF;
+  border-radius: 6px;
 }
 
 .main-title {
-  font-size: 1.8rem;
+  font-size: 28.8px;
   font-weight: 700;
   margin-bottom: 24px;
 }
@@ -209,47 +174,47 @@ function goToPrevious() {
 
 .info-box {
   padding: 16px;
-  border-radius: 8px;
+  border-radius: 6px;
   margin-bottom: 12px;
-  font-size: 0.95rem;
+  font-size: 15.2px;
 }
 
 .green-info {
-  background-color: #f0fdf4;
+  background-color: #F0FDF4;
   color: #166534;
-  border: 1px solid #bbf7d0;
+  border: 1px solid #BBF7D0;
   line-height: 1.6;
 }
 
 .green-info-light {
-  background-color: #f8fcfb;
-  color: #333;
-  border: 1px solid #e0f3eb;
+  background-color: #F8FCFB;
+  color: #333333;
+  border: 1px solid #E0F3EB;
   padding: 12px 16px;
-  font-size: 0.875rem;
+  font-size: 14px;
 }
 
 .yellow-info {
-  background-color: #fffbeb;
-  color: #b45309;
-  border: 1px solid #fde68a;
+  background-color: #FFFBEB;
+  color: #B45309;
+  border: 1px solid #FDE68A;
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
 .yellow-info span {
-  font-size: 1.5rem;
+  font-size: 24px;
 }
 
 .yellow-info strong {
-  color: #78350f;
+  color: #78350F;
   font-weight: 600;
 }
 
 .yellow-info p {
   margin: 0;
-  font-size: 0.875rem;
+  font-size: 14px;
 }
 
 .main-content {
@@ -263,14 +228,14 @@ function goToPrevious() {
 }
 
 .content-column h3 {
-  font-size: 1.25rem;
+  font-size: 20px;
   font-weight: 600;
   margin-bottom: 12px;
 }
 
 .skill-list-wrapper {
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  border: 1px solid #E5E7EB;
+  border-radius: 6px;
   padding: 12px;
   max-height: 250px;
   overflow-y: auto;
@@ -280,12 +245,15 @@ function goToPrevious() {
 .checkbox-item {
   display: flex;
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
   padding: 10px 12px;
-  border: 1px solid #d1d5db;
+  border: 1px solid #EAEBEC;
   border-radius: 6px;
   cursor: pointer;
-  transition: background-color 0.2s, border-color 0.2s;
+  transition: 0.2s;
+  height: 37px;
+  font-size: 13.5px;
+  font-weight: 500;
 }
 
 .checkbox-item:last-child {
@@ -293,12 +261,12 @@ function goToPrevious() {
 }
 
 .checkbox-item:hover {
-  background-color: #f9fafb;
+  background-color: #F9FAFB;
 }
 
 .checkbox-item:has(input[type="checkbox"]:checked) {
-  background-color: #f0fdf4;
-  border-color: #10b981;
+  background-color: #F0FDF4;
+  border-color: #10B981;
 }
 
 .checkbox-item input[type="checkbox"] {
@@ -309,7 +277,7 @@ function goToPrevious() {
 }
 
 .checkbox-item label {
-  font-size: 1rem;
+  font-size: 16px;
   cursor: pointer;
   flex-grow: 1;
 }
@@ -323,15 +291,17 @@ function goToPrevious() {
 .skill-input {
   flex-grow: 1;
   padding: 10px 12px;
-  font-size: 1rem;
-  border: 1px solid #d1d5db;
+  font-size: 16px;
+  border: 1px solid #D1D5DB;
   border-radius: 6px;
 }
 
 .add-button {
-  padding: 0 16px;
-  font-size: 0.9rem;
-  font-weight: 600;
+  padding: 0px 16px;
+  font-size: 13.5px;
+  font-weight: 500;
+  height: 37px;
+  border-radius: 6px;
   background-color: #A2F1D6;
   border: none;
   border-radius: 6px;
@@ -354,23 +324,23 @@ function goToPrevious() {
   justify-content: space-between;
   align-items: center;
   padding: 8px 12px;
-  background-color: #f9fafb;
+  background-color: #F9FAFB;
   border-radius: 6px;
   margin-bottom: 8px;
-  font-size: 0.95rem;
+  font-size: 15.2px;
 }
 
 .remove-button {
   background: none;
   border: none;
-  color: #9ca3af;
-  font-size: 1.2rem;
+  color: #9CA3AF;
+  font-size: 19.2px;
   cursor: pointer;
-  padding: 0 4px;
+  padding: 0px 4px;
 }
 
 .remove-button:hover {
-  color: #ef4444;
+  color: #EF4444;
 }
 
 .navigation-buttons {
@@ -378,23 +348,22 @@ function goToPrevious() {
   justify-content: space-between;
   margin-top: 48px;
   padding-top: 24px;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid #E5E7EB;
 }
 
 .btn-primary,
 .btn-secondary {
-  padding: 12px 24px;
-  font-size: 1rem;
-  font-weight: 600;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+  display: inline-flex;
+  align-items: center;
+  font-size: 13.5px;
+  font-weight: 500;
+  height: 37px;
+  border-radius: 6px;
 }
 
 .btn-primary {
   background-color: #111827;
-  color: #ffffff;
+  color: #FFFFFF;
 }
 
 .btn-primary:hover {
@@ -402,13 +371,13 @@ function goToPrevious() {
 }
 
 .btn-secondary {
-  background-color: #ffffff;
+  background-color: #FFFFFF;
   color: #374151;
-  border: 1px solid #d1d5db;
+  border: 1px solid #D1D5DB;
 }
 
 .btn-secondary:hover {
-  background-color: #f9fafb;
+  background-color: #F9FAFB;
 }
 
 @media (max-width: 768px) {
@@ -424,11 +393,11 @@ function goToPrevious() {
 
 .modal-backdrop {
   position: fixed;
-  top: 0;
-  left: 0;
+  top: 0px;
+  left: 0px;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.35);
+  background-color: rgba(0, 0, 0, 0.35);
   backdrop-filter: blur(2px);
   display: flex;
   justify-content: center;
@@ -437,12 +406,12 @@ function goToPrevious() {
 }
 
 .modal-content {
-  background: #ffffff;
+  background-color: #FFFFFF;
   padding: 24px;
-  border-radius: 12px;
+  border-radius: 6px;
   width: 90%;
   max-width: 500px;
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15);
+  box-shadow: 0px 6px 24px rgba(0, 0, 0, 0.15);
   color: #111111;
   pointer-events: auto;
   z-index: 2100;
@@ -454,6 +423,17 @@ function goToPrevious() {
 }
 
 .yellow-info:hover {
-  background-color: #fef3c7;
+  background-color: #FEF3C7;
+}
+
+.title {
+  font-weight: 700;
+  font-size: 28px;
+}
+
+.subtitle {
+  color: #6C757D;
+  font-size: 16px;
+  margin-bottom: 0px;
 }
 </style>
