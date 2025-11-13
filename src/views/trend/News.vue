@@ -20,7 +20,7 @@
         <div class="tags">
           <div v-for="(k, i) in recentKeywords" :key="i" class="tag" @click="clickKeyword(k)">
             <span>#{{ k }}</span>
-            <i class="ri-close-circle-fill" @click.stop="deleteKeyword(k)" title="삭제"></i>
+            <span class="delete-icon" @click.stop="deleteKeyword(k)" title="삭제">❌</span>
           </div>
         </div>
       </div>
@@ -301,6 +301,7 @@ const openDetail = (item) => (selectedNews.value = item);
   width: 100vw;
   margin-left: calc(50% - 50vw);
 }
+
 .hero h2 {
   font-size: 28px;
   font-weight: 700;
@@ -313,6 +314,7 @@ const openDetail = (item) => (selectedNews.value = item);
   justify-content: center;
   gap: 10px;
 }
+
 .search-bar input {
   width: 440px;
   padding: 12px 18px;
@@ -322,6 +324,7 @@ const openDetail = (item) => (selectedNews.value = item);
   outline: none;
   font-size: 14px;
 }
+
 .search-bar button {
   background: #71ebbe;
   border: none;
@@ -339,12 +342,14 @@ const openDetail = (item) => (selectedNews.value = item);
   margin-top: 18px;
   text-align: center;
 }
+
 .recent-header {
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 10px;
 }
+
 .clear-all {
   background: none;
   border: none;
@@ -352,15 +357,18 @@ const openDetail = (item) => (selectedNews.value = item);
   font-size: 12px;
   cursor: pointer;
 }
+
 .clear-all:hover {
   color: #fff;
 }
+
 .recent-keywords .tags {
   display: inline-flex;
   flex-wrap: wrap;
   gap: 6px;
   margin-top: 6px;
 }
+
 .recent-keywords .tag {
   display: flex;
   align-items: center;
@@ -373,15 +381,18 @@ const openDetail = (item) => (selectedNews.value = item);
   cursor: pointer;
   transition: 0.2s;
 }
+
 .recent-keywords .tag:hover {
   background: #ddf3eb;
   color: #00c896;
 }
+
 .recent-keywords .tag i {
   font-size: 14px;
   color: #aaa;
   cursor: pointer;
 }
+
 .recent-keywords .tag i:hover {
   color: #ff6666;
 }
@@ -390,11 +401,13 @@ const openDetail = (item) => (selectedNews.value = item);
 .news-section {
   padding: 40px 80px 100px;
 }
+
 .news-section h3 {
   font-size: 28px;
   font-weight: 700;
   margin-bottom: 6px;
 }
+
 .news-section .desc {
   font-size: 16px;
   color: #6c757d;
@@ -405,6 +418,7 @@ const openDetail = (item) => (selectedNews.value = item);
   grid-template-columns: repeat(3, 1fr);
   gap: 28px;
 }
+
 .news-card {
   background: #ffffff;
   border-radius: 16px;
@@ -414,6 +428,7 @@ const openDetail = (item) => (selectedNews.value = item);
   transition: 0.2s;
   cursor: pointer;
 }
+
 .news-card:hover {
   transform: translateY(-3px);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
@@ -425,24 +440,29 @@ const openDetail = (item) => (selectedNews.value = item);
   display: flex;
   gap: 6px;
 }
+
 .tag {
   font-size: 11px;
   font-weight: 600;
   border-radius: 10px;
   padding: 3px 8px;
 }
+
 .tag.category {
   background: #eafff5;
   color: #00a877;
 }
+
 .tag.positive {
   background: #eafff5;
   color: #00c896;
 }
+
 .tag.neutral {
   background: #f5f5f5;
   color: #555;
 }
+
 .tag.negative {
   background: #ffecec;
   color: #e85b5b;
@@ -465,10 +485,12 @@ const openDetail = (item) => (selectedNews.value = item);
   line-height: 1.6;
   margin-bottom: 12px;
 }
+
 .summary-box ul {
   margin: 0;
   padding-left: 18px;
 }
+
 .summary-box li {
   list-style-type: disc;
   margin-bottom: 4px;
@@ -480,6 +502,7 @@ const openDetail = (item) => (selectedNews.value = item);
   gap: 6px;
   margin-bottom: 8px;
 }
+
 .keywords span {
   background: #f3f3f3;
   border-radius: 8px;
@@ -494,20 +517,24 @@ const openDetail = (item) => (selectedNews.value = item);
   gap: 10px;
   margin-bottom: 8px;
 }
+
 .bias-label {
   font-size: 12px;
   color: #666;
 }
+
 .bias-status {
   font-size: 12px;
   font-weight: 600;
   border-radius: 8px;
   padding: 3px 8px;
 }
+
 .biasYes {
   background: #ffecec;
   color: #e85b5b;
 }
+
 .biasNo {
   background: #f3f3f3;
   color: #555;
@@ -518,10 +545,12 @@ const openDetail = (item) => (selectedNews.value = item);
   align-items: center;
   gap: 8px;
 }
+
 .trust .label {
   font-size: 12px;
   color: #777;
 }
+
 .trust .bar {
   flex: 1;
   height: 6px;
@@ -529,17 +558,33 @@ const openDetail = (item) => (selectedNews.value = item);
   border-radius: 4px;
   overflow: hidden;
 }
+
 .trust .fill {
   height: 100%;
   background: #71ebbe;
 }
+
 .trust .score {
   font-weight: 700;
   font-size: 12px;
 }
+
 .source {
   font-size: 11.5px;
   color: #888;
   text-align: right;
 }
+
+.delete-icon {
+  font-size: 12px;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: 0.2s;
+}
+
+.delete-icon:hover {
+  opacity: 1;
+  color: #ff5b5b;
+}
+
 </style>
