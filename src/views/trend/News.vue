@@ -302,7 +302,7 @@ const openDetail = (item) => (selectedNews.value = item);
   margin-left: calc(50% - 50vw);
 }
 .hero h2 {
-  font-size: 26px;
+  font-size: 28px;
   font-weight: 700;
   margin-bottom: 28px;
   letter-spacing: -0.3px;
@@ -316,7 +316,8 @@ const openDetail = (item) => (selectedNews.value = item);
 .search-bar input {
   width: 440px;
   padding: 12px 18px;
-  border-radius: 25px;
+  height: 37px;
+  border-radius: 30px;
   border: none;
   outline: none;
   font-size: 14px;
@@ -325,10 +326,11 @@ const openDetail = (item) => (selectedNews.value = item);
   background: #71ebbe;
   border: none;
   color: #000;
+  height: 37px;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 13.5px;
   padding: 10px 22px;
-  border-radius: 25px;
+  border-radius: 30px;
   cursor: pointer;
 }
 
@@ -364,7 +366,7 @@ const openDetail = (item) => (selectedNews.value = item);
   align-items: center;
   gap: 5px;
   background: #f3f3f3;
-  border-radius: 8px;
+  border-radius: 30px;
   padding: 4px 10px;
   font-size: 12px;
   color: #333;
@@ -389,15 +391,13 @@ const openDetail = (item) => (selectedNews.value = item);
   padding: 40px 80px 100px;
 }
 .news-section h3 {
-  font-size: 20px;
+  font-size: 28px;
   font-weight: 700;
   margin-bottom: 6px;
 }
 .news-section .desc {
-  font-size: 14px;
-  color: #444;
-  line-height: 1.7;
-  margin-bottom: 24px;
+  font-size: 16px;
+  color: #6c757d;
 }
 
 .news-grid {

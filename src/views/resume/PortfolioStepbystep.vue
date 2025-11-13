@@ -3,7 +3,7 @@
     <div class="d-flex justify-content-between align-items-end mb-1">
       <div>
         <h1 class="fw-bold fs-3 mb-1" style="color:#111111;">포트폴리오 작성 도우미</h1>
-        <p class="text-muted mb-0">취업 준비 · 작성 진행률: {{ overallProgress }}%</p>
+        <p class="subtitle1">취업 준비 · 작성 진행률: {{ overallProgress }}%</p>
       </div>
       <div class="fs-5">{{ overallProgress }}% 전체 진행률</div>
     </div>
@@ -14,7 +14,7 @@
         <!-- 단계별 아코디언 -->
         <div class="mb-4 mt-4">
           <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="fw-semibold mb-0">포트폴리오 작성 단계</h5>
+            <h5 class="subtitle2">포트폴리오 작성 단계</h5>
             <span class="text-muted small">{{ currentStep }}단계 진행 중</span>
           </div>
 
@@ -96,11 +96,11 @@
                     <div class="d-flex justify-content-end">
                       <button class="btn btn-outline-secondary me-2" @click="cancelItemInput(itemIndex)">취소</button>
 
-                       <button class="btn btn-primary" @click="completeItemWithoutFeedback(itemIndex)">
+                       <button class="btn btn-dark" style="height: 37px;" @click="completeItemWithoutFeedback(itemIndex)">
                           {{ openStepIndex === 0 ? '완료하기' : '바로 완료하기' }}
                         </button>
                         <!-- 1단계(인덱스 0)가 아닐 때만 AI 피드백 버튼 표시 -->
-                        <button v-if="openStepIndex !== 0" class="btn btn-mint ms-2" @click="submitItemContent(itemIndex)">
+                        <button v-if="openStepIndex !== 0" class="btn btn-mint ms-2" style="height: 37px;" @click="submitItemContent(itemIndex)">
                           ⚡ AI 피드백 받기
                         </button>
                     </div>
@@ -111,20 +111,15 @@
                        v-if="openItemIndex === itemIndex && openStepIndex === index && showItemFeedback[itemIndex]">
                     <div class="d-flex justify-content-between align-items-center mb-2">
                       <h6 class="fw-bold mb-0">AI 피드백</h6>
-                      <button 
-                        v-if="!portfolioSteps[openStepIndex].items[openItemIndex].imageUpload" 
-                        class="btn btn-sm btn-outline-secondary" 
-                        @click="cancelItemFeedback(itemIndex)">
-                        수정하기
-                      </button>
+                      
                     </div>
                     <p class="feedback-text">{{ itemFeedbacks[itemIndex] }}</p>
                     <div class="d-flex justify-content-between">
                       <div class="feedback-score">
-                        <span class="badge bg-success me-1">강점 8점</span>
+                        <span class="badge bg-success me-1" >강점 8점</span>
                         <span class="badge bg-warning text-dark">개선점 2점</span>
                       </div>
-                      <button class="btn btn-sm btn-primary" @click="applyItemFeedback(itemIndex)">
+                      <button class="btn btn-primary" style="height: 37px;" @click="applyItemFeedback(itemIndex)">
                         피드백 반영하기
                       </button>
                     </div>
@@ -203,6 +198,7 @@ const overallProgress = ref(35);
 const currentStep = ref(1);
 
 // 포트폴리오 단계
+//LLM으로 공통적으로 사용할수 있는포트폴리오가 될수 있는지 확인할것
 const portfolioSteps = ref([
   {
     label: "1단계",
@@ -391,6 +387,21 @@ onMounted(() => {
   color: #111;
 }
 
+
+.subtitle1 {
+    color: #6c757d;
+    font-size: 1rem;
+    margin-bottom: 0px;
+    
+}
+.subtitle2 {
+    color: #6c757d;
+    font-size: 1rem;
+    margin-bottom: 0px;
+    font-weight: 700;
+}
+
+
 /* 아코디언 스타일 */
 .step-accordion {
   border-radius: 12px;
@@ -535,13 +546,15 @@ onMounted(() => {
 }
 
 .score-pill {
-  display: inline-block;
+  display: inline-flex; /* inline-block에서 inline-flex로 변경 */
+  align-items: center; /* 수직 중앙 정렬 추가 */
   padding: 4px 10px;
   font-size: 0.75rem;
   font-weight: 600;
-  border-radius: 20px;
+  border-radius: 10px;
+  height: 37px;
+  justify-content: center; /* 수평 중앙 정렬 - 기존 유지 */
 }
-
 .bg-success-light {
   background-color: #ecfdf5;
   color: #059669;

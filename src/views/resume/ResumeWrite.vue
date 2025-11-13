@@ -568,7 +568,7 @@ onMounted(() => {
 /* 메인 컨테이너 */
 .main-container {
   flex: 1;
-  padding: 0 20px 0 40px;
+  padding:40px;
   max-width: calc(100vw - 200px - 400px); /* 사이드바와 AI패널 제외 */
 }
 
@@ -660,7 +660,7 @@ onMounted(() => {
 }
 
 .section-content {
-  padding: 24px;
+  padding: 20px;
   background: #fff;
 }
 

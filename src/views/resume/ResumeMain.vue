@@ -14,7 +14,7 @@
               <div class="banner-icon">🎓</div>
               <div class="banner-text">
                 <h2>커리어를 관리해보세요!</h2>
-                <p>AI를 통한 이력서 분석부터 서류분석 빠르게 분석할 수 있어요!</p>
+                <p class="subtitle">AI를 통한 이력서 분석부터 서류분석 빠르게 분석할 수 있어요!</p>
               </div>
               <button class="banner-button" @click="$router.push('/resume/write')">
                 내 커리어 기록하러 가기
@@ -398,7 +398,7 @@ onMounted(() => {
 
 .greeting h1 {
   margin: 0;
-  font-size: 32px;
+  font-size: 1.75rem;
   font-weight: 700;
   color: #333;
 }
@@ -406,6 +406,11 @@ onMounted(() => {
 /* 배너 섹션 */
 .banner-section {
   margin-bottom: 40px;
+}
+
+.subtitle p{
+  color: #ffffff;
+  font-size: 1rem;
 }
 
 .banner-card {
@@ -433,7 +438,7 @@ onMounted(() => {
 
 .banner-text h2 {
   margin: 0 0 8px 0;
-  font-size: 24px;
+  font-size: 18px;
   font-weight: 700;
 }
 
@@ -447,7 +452,8 @@ onMounted(() => {
   background: white;
   color: #71EBBE;
   border: none;
-  padding: 14px 24px;
+  height: 37px;
+  padding: 10px 24px;
   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
@@ -481,7 +487,7 @@ onMounted(() => {
 
 .section-header h2 {
   margin: 0;
-  font-size: 20px;
+  font-size: 1rem;
   font-weight: 700;
   color: #333;
 }
@@ -560,7 +566,7 @@ onMounted(() => {
 .resume-card {
   background: white;
   border: 2px solid #f0f0f0;
-  border-radius: 12px;
+  border-radius: 10px;
   padding: 24px;
   cursor: pointer;
   transition: all 0.3s;
@@ -570,6 +576,7 @@ onMounted(() => {
   justify-content: center;
   position: relative;
   overflow: hidden;
+  margin-bottom: 12px;
 }
 
 .resume-card.selecting {
@@ -614,8 +621,8 @@ onMounted(() => {
 }
 
 .resume-icon {
-  font-size: 32px;
-  margin-bottom: 16px;
+  font-size: 24px;
+  margin-bottom: 2.5px;
   color: #71EBBE;
 }
 
@@ -626,16 +633,17 @@ onMounted(() => {
 }
 
 .resume-title {
-  margin: 0 0 8px 0;
-  font-size: 18px;
+  margin: 0 0 2px 1.5px;
+  font-size: 16px;
   font-weight: 700;
   color: #333;
 }
 
+
 .resume-description {
-  margin: 0 0 16px 0;
+  margin: 0 0 10px 1.5px;
   color: #666;
-  font-size: 14px;
+  font-size: 13px;
   line-height: 1.4;
   flex: 1;
 }

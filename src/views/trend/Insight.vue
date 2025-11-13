@@ -4,49 +4,44 @@
     <div class="header">
       <div class="title-section">
         <h2>AI 추천 인사이트</h2>
-        <p>뉴스·트렌드와 저장한 키워드를 분석해 제안하는 맞춤 직무 인사이트</p>
+        <p>AI가 최신 뉴스·트렌드·저장 키워드를 종합 분석해,
+          희망 직무를 중심으로 연관 직무와 기술 흐름을 제안합니다.</p>
       </div>
       <router-link to="/trend/saved" class="saved-btn">
         📑 내 키워드 보기 ({{ savedCount }})
       </router-link>
     </div>
 
-    <!-- 분석 완료 안내 -->
-    <div class="notice-box">
+    <!-- 💼 희망 직무 중심 성장 제안 -->
+    <div class="career-analysis-box">
       <p>
-        ✅ <strong>분석 완료</strong><br />
-        최근 뉴스 요약, 트렌드 데이터, 그리고 사용자의 <strong>저장 키워드</strong>를 함께 분석했습니다.<br />
-        아래의 결과는 AI가 <strong>희망 직무</strong>를 중심으로 <strong>연관 직무와 기술 흐름</strong>까지 확장 분석한 인사이트입니다.
+        <strong>희망 직무 중심 성장 제안</strong><br />
+        AI가 사용자의 <strong>희망 직무</strong>를 중심으로 최근 트렌드와
+        이력서·면접·학습 데이터를 함께 분석했습니다.<br />
+        아래는 시장 흐름과 현재 역량을 바탕으로 제안하는 성장 방향입니다.
       </p>
-    </div>
 
-    <!-- 📊 두 개의 가로 박스 (이유 + 고도화) -->
-    <div class="dual-info-box">
-      <!-- 왼쪽: 왜 다른 직무도 함께 보이나요 -->
-      <div class="context-box">
-        <p>
-          ℹ️ <strong>왜 다른 직무도 함께 보이나요?</strong><br />
-          회원가입 시 선택한 희망 직무를 기준으로, AI가 관련 산업의 뉴스와 트렌드 데이터를 종합 분석하여<br />
-          <strong>인접 직무</strong>나 <strong>전환 가능성이 높은 분야</strong>도 함께 제안합니다.<br />
-          이는 커리어 확장 가능성과 학습 방향성을 돕기 위한 추천입니다.
-        </p>
-      </div>
-
-      <!-- 오른쪽: 맞춤 분석 고도화 -->
-      <div class="personal-context-box">
-        <p>
-          🧠 <strong>맞춤 분석 고도화</strong><br />
-          AI는 사용자의 <strong>이력서</strong>·<strong>면접 피드백</strong>·<strong>학습 내역</strong>을 함께 분석하여
-          현재 역량과 시장 수요 간의 <strong>기술 격차(Skill Gap)</strong>를 파악합니다.<br />
-          이를 바탕으로 <strong>보완이 필요한 기술</strong>과
-          <strong>성장 방향</strong>을 함께 제안합니다.
-        </p>
-      </div>
+      <ul class="feedback-list">
+        <li>
+          <strong> 이력서 분석:</strong> 최근 업계에서는
+          <b>MLOps</b>와 <b>LLM 응용</b>이 핵심 키워드로 부상했습니다.
+          현재 이력서에는 관련 프로젝트 경험이 적게 나타나므로
+          모델 배포 및 운영 경험을 보완해보세요.
+        </li>
+        <li>
+          <strong> 면접 분석:</strong> 답변에서 프로젝트 성과나 수치를 구체적으로 제시하지 않은 경우가 있었습니다.
+          <b>정량적 결과 중심의 스토리텔링</b>을 추가하면 전문성이 강화됩니다.
+        </li>
+        <li>
+          <strong> 학습 데이터 분석:</strong> 현재 학습 내역은 Python 중심입니다.
+          최근 트렌드에 맞춰 <b>데이터 거버넌스</b>나 <b>LLM 파인튜닝</b> 과정을 함께 진행하면 좋습니다.
+        </li>
+      </ul>
     </div>
 
     <!-- 🤖 AI 추천 인사이트 -->
     <div class="recommend-section">
-      <h3>🤖 AI 추천 인사이트</h3>
+      <h3> AI 추천 인사이트</h3>
       <p class="sub-desc">
         최근 뉴스·트렌드 분석과 저장된 키워드를 바탕으로
         AI가 제안하는 연관 직무와 핵심 기술 키워드입니다.
@@ -79,31 +74,28 @@
       </div>
     </div>
 
-    <!-- 💼 희망 직무 중심 성장 제안 -->
-    <div class="career-analysis-box">
-      <p>
-        💼 <strong>희망 직무 중심 성장 제안</strong><br />
-        AI가 사용자의 <strong>희망 직무</strong>를 중심으로 최근 트렌드와
-        이력서·면접·학습 데이터를 함께 분석했습니다.<br />
-        아래는 시장 흐름과 현재 역량을 바탕으로 제안하는 성장 방향입니다.
-      </p>
+    <!-- 📊 두 개의 가로 박스 (이유 + 고도화) -->
+    <div class="dual-info-box">
+      <!-- 왼쪽: 왜 다른 직무도 함께 보이나요 -->
+      <div class="context-box">
+        <p>
+          ℹ️ <strong>왜 다른 직무도 함께 보이나요?</strong><br />
+          회원가입 시 선택한 희망 직무를 기준으로, AI가 관련 산업의 뉴스와 트렌드 데이터를 종합 분석하여<br />
+          <strong>인접 직무</strong>나 <strong>전환 가능성이 높은 분야</strong>도 함께 제안합니다.<br />
+          이는 커리어 확장 가능성과 학습 방향성을 돕기 위한 추천입니다.
+        </p>
+      </div>
 
-      <ul class="feedback-list">
-        <li>
-          <strong>📄 이력서 분석:</strong> 최근 업계에서는
-          <b>MLOps</b>와 <b>LLM 응용</b>이 핵심 키워드로 부상했습니다.
-          현재 이력서에는 관련 프로젝트 경험이 적게 나타나므로
-          모델 배포 및 운영 경험을 보완해보세요.
-        </li>
-        <li>
-          <strong>🎤 면접 분석:</strong> 답변에서 프로젝트 성과나 수치를 구체적으로 제시하지 않은 경우가 있었습니다.
-          <b>정량적 결과 중심의 스토리텔링</b>을 추가하면 전문성이 강화됩니다.
-        </li>
-        <li>
-          <strong>📚 학습 데이터 분석:</strong> 현재 학습 내역은 Python 중심입니다.
-          최근 트렌드에 맞춰 <b>데이터 거버넌스</b>나 <b>LLM 파인튜닝</b> 과정을 함께 진행하면 좋습니다.
-        </li>
-      </ul>
+      <!-- 오른쪽: 맞춤 분석 고도화 -->
+      <div class="personal-context-box">
+        <p>
+          🧠 <strong>맞춤 분석 고도화</strong><br />
+          AI는 사용자의 <strong>이력서</strong>·<strong>면접 피드백</strong>·<strong>학습 내역</strong>을 함께 분석하여
+          현재 역량과 시장 수요 간의 <strong>기술 격차(Skill Gap)</strong>를 파악합니다.<br />
+          이를 바탕으로 <strong>보완이 필요한 기술</strong>과
+          <strong>성장 방향</strong>을 함께 제안합니다.
+        </p>
+      </div>
     </div>
 
     <div class="hint-box">
@@ -177,7 +169,6 @@ const jobs = ref([
 
 <style scoped>
 .insight-page {
-  background: #f9faf9;
   padding: 40px 60px 60px 60px;
   color: #111;
   font-family: "NexonLv1Gothic", sans-serif;
@@ -195,23 +186,23 @@ const jobs = ref([
 }
 
 .title-section h2 {
-  font-size: 24px;
+  font-size: 28px;
   font-weight: 700;
 }
 
 .title-section p {
-  font-size: 14px;
-  color: #555;
-  margin-top: 4px;
+  font-size: 16px;
+  color: #6c757d;
 }
 
 .saved-btn {
   background: #00c896;
   color: #fff;
+  height: 37px;
   font-weight: 600;
-  font-size: 13px;
+  font-size: 13.5px;
   padding: 8px 16px;
-  border-radius: 8px;
+  border-radius: 6px;
   text-decoration: none;
   transition: 0.2s;
 }
@@ -220,22 +211,13 @@ const jobs = ref([
   background: #00b487;
 }
 
-/* Notice */
-.notice-box {
-  background: #e9f8f2;
-  border: 1px solid #a2f1d6;
-  border-radius: 12px;
-  padding: 18px 22px;
-  font-size: 14px;
-  margin-bottom: 20px;
-}
-
 /* Dual Info Section */
 .dual-info-box {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
-  margin-bottom: 30px;
+  margin-top: 30px;
+  margin-bottom: 20px;
 }
 
 .context-box,
@@ -297,6 +279,14 @@ const jobs = ref([
   transition: 0.2s;
 }
 
+.recommend-card h4 {
+  font-size: 19px;
+  font-weight: 700;   /* 굵기 강화 */
+  margin-bottom: 10px;
+  color: #111;
+}
+
+
 .recommend-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
@@ -316,6 +306,11 @@ const jobs = ref([
   border-radius: 10px;
   padding: 12px 16px;
   margin-bottom: 12px;
+}
+
+.trend-box p {
+  font-size: 13px;    /* 기존보다 작고 안정적인 크기 */
+  line-height: 1.55;
 }
 
 .trend-box h5,
@@ -372,11 +367,12 @@ const jobs = ref([
 
 /* Career Analysis Section */
 .career-analysis-box {
+  
   background: #f1f6ff;
   border: 1px solid #c7dafd;
   border-radius: 10px;
   padding: 20px;
-  margin-top: 36px;
+  margin-bottom: 20px;
   font-size: 13px;
   color: #333;
   line-height: 1.6;

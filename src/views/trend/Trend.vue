@@ -224,15 +224,14 @@ onMounted(async () => {
 
 /* Header */
 .page-title {
-  font-size: 26px;
+  font-size: 28px;
   font-weight: 700;
   color: #111;
   margin-bottom: 6px;
 }
 .page-subtitle {
-  color: #555;
-  font-size: 14px;
-  margin-bottom: 32px;
+  color: #6c757d;
+  font-size: 16px;
 }
 
 /* Summary Cards */
@@ -340,6 +339,11 @@ onMounted(async () => {
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
   padding: 22px 26px;
 }
+
+.card-header {
+  background: transparent !important;
+}
+
 .card-header h4 {
   font-size: 16px;
   font-weight: 700;
