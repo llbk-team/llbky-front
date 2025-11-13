@@ -9,13 +9,7 @@
 
     <!-- 🔹 키워드 수동 추가 입력창 -->
     <div class="add-keyword-box">
-      <input
-        v-model="newKeyword"
-        @keyup.enter="addKeyword"
-        type="text"
-        class="add-input"
-        placeholder="새 키워드를 입력하세요 (예: PyTorch, LangChain 등)"
-      />
+      <input v-model="newKeyword" @keyup.enter="addKeyword" type="text" class="add-input" placeholder="새 키워드를 입력하세요 (예: PyTorch, LangChain 등)" />
       <button class="add-btn" @click="addKeyword">추가</button>
     </div>
 
@@ -163,21 +157,24 @@ const clearAll = () => {
   flex-direction: column;
   align-items: flex-start;
   gap: 6px;
-  margin-bottom: 16px;
+  margin-bottom: 8px;
 }
+
 .back {
   color: #00c896;
   text-decoration: none;
   font-weight: 600;
   font-size: 14px;
 }
+
 .header h2 {
-  font-size: 22px;
+  font-size: 28px;
   font-weight: 700;
 }
+
 .subtitle {
-  font-size: 13px;
-  color: #666;
+  color: #6c757d;
+  font-size: 16px;
 }
 
 /* Add Keyword */
@@ -185,26 +182,32 @@ const clearAll = () => {
   display: flex;
   align-items: center;
   gap: 10px;
+  margin-top: -50px;
   margin-bottom: 24px;
 }
+
 .add-input {
-  flex: 1;
+  width: 500px;
+  height: 37px;
   border: 1px solid #ccc;
-  border-radius: 8px;
+  border-radius: 6px;
   padding: 8px 12px;
   font-size: 13px;
 }
+
 .add-btn {
   background: #00c896;
   color: #fff;
   border: none;
-  border-radius: 8px;
+  height: 37px;
+  border-radius: 6px;
   padding: 8px 16px;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
   transition: 0.2s;
 }
+
 .add-btn:hover {
   background: #00b487;
 }
@@ -215,25 +218,30 @@ const clearAll = () => {
   flex-direction: column;
   gap: 22px;
 }
+
 .category-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 8px;
 }
+
 .category-header h3 {
   font-size: 15px;
   font-weight: 700;
 }
+
 .category-header span {
   font-size: 12px;
   color: #666;
 }
+
 .keyword-list {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
 }
+
 .keyword-card {
   background: #fff;
   border: 1px solid #a2f1d6;
@@ -243,18 +251,22 @@ const clearAll = () => {
   font-size: 13px;
   transition: 0.2s;
 }
+
 .keyword-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
 }
+
 .keyword-card .top {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
+
 .word {
   font-weight: 600;
 }
+
 .delete-btn {
   background: none;
   border: none;
@@ -262,6 +274,7 @@ const clearAll = () => {
   opacity: 0.6;
   transition: 0.2s;
 }
+
 .delete-btn:hover {
   opacity: 1;
   color: #ff5b5b;
@@ -277,10 +290,12 @@ const clearAll = () => {
   padding: 20px;
   margin-top: 36px;
 }
+
 .stat p {
   font-size: 13px;
   color: #555;
 }
+
 .stat h3 {
   font-size: 17px;
   font-weight: 700;
@@ -292,6 +307,7 @@ const clearAll = () => {
   text-align: right;
   margin-top: 18px;
 }
+
 .clear-all-btn {
   background: #ff5b5b;
   color: white;
@@ -303,6 +319,7 @@ const clearAll = () => {
   cursor: pointer;
   transition: 0.2s;
 }
+
 .clear-all-btn:hover {
   background: #e64e4e;
 }
@@ -315,6 +332,7 @@ const clearAll = () => {
   font-size: 14px;
   font-weight: 500;
 }
+
 .empty-hint {
   font-size: 13px;
   color: #888;
@@ -328,6 +346,7 @@ const clearAll = () => {
   cursor: pointer;
   transition: 0.2s;
 }
+
 .close-icon:hover {
   color: #ff7875;
 }
