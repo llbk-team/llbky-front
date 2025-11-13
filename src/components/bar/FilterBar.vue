@@ -61,7 +61,7 @@ watch([period, sentiment, biasOnly, trustMin], () => {
   gap: 20px 32px;
   background: #ffffff;
   border: 1px solid #e5e5e5;
-  border-radius: 14px;
+  border-radius: 10px;
   padding: 14px 26px;
   margin: 30px 80px 20px;
 }
@@ -71,19 +71,20 @@ watch([period, sentiment, biasOnly, trustMin], () => {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 13px;
+  font-size: 13.5px;
   color: #333;
 }
 .filter-item label {
-  font-weight: 600;
+  font-weight: 700;
   color: #222;
 }
 
 /* select */
 .filter-item select {
+  height: 36px;
   padding: 6px 10px;
   border: 1px solid #ccc;
-  border-radius: 8px;
+  border-radius: 6px;
   background: #fdfdfd;
   font-size: 13px;
   transition: all 0.2s;

@@ -4,11 +4,15 @@
     <div class="header">
       <div class="title-section">
         <h2>AI 추천 인사이트</h2>
-        <p>AI가 최신 뉴스·트렌드·저장 키워드를 종합 분석해,
-          희망 직무를 중심으로 연관 직무와 기술 흐름을 제안합니다.</p>
+        <p>
+          AI가 최신 뉴스·트렌드·저장 키워드를 종합 분석해,
+          희망 직무를 중심으로 연관 직무와 기술 흐름을 제안합니다.
+        </p>
       </div>
+
+      <!-- 📂 이모지 적용 -->
       <router-link to="/trend/saved" class="saved-btn">
-        📑 내 키워드 보기 ({{ savedCount }})
+        📂 내 키워드 보기 ({{ savedCount }})
       </router-link>
     </div>
 
@@ -41,7 +45,8 @@
 
     <!-- 🤖 AI 추천 인사이트 -->
     <div class="recommend-section">
-      <h3> AI 추천 인사이트</h3>
+      <h3>🤖 AI 추천 인사이트</h3>
+
       <p class="sub-desc">
         최근 뉴스·트렌드 분석과 저장된 키워드를 바탕으로
         AI가 제안하는 연관 직무와 핵심 기술 키워드입니다.
@@ -53,54 +58,51 @@
           <p class="summary">{{ job.summary }}</p>
 
           <div class="trend-box">
-            <h5>📈 트렌드 요약</h5>
+            <h5>📊 트렌드 요약</h5>
             <p>{{ job.trendSummary }}</p>
           </div>
 
           <div class="keyword-box">
             <h5>💡 관련 키워드</h5>
             <div class="tags">
-              <button v-for="tag in job.tags" :key="tag" class="tag-btn" :class="{ saved: isSaved(tag) }" @click="toggleKeyword(tag)">
+              <button
+                v-for="tag in job.tags"
+                :key="tag"
+                class="tag-btn"
+                :class="{ saved: isSaved(tag) }"
+                @click="toggleKeyword(tag)"
+              >
                 {{ isSaved(tag) ? `✔ ${tag}` : tag }}
               </button>
-
             </div>
           </div>
 
-          <p class="note">
-            🔍 * 이 인사이트는 희망 직무 및 AI 분석 데이터를 기반으로 자동 생성되었습니다.
-          </p>
+          <p class="note">🔍 * 이 인사이트는 자동 생성된 추천입니다.</p>
         </div>
       </div>
     </div>
 
-    <!-- 📊 두 개의 가로 박스 (이유 + 고도화) -->
+    <!-- 📘 설명 박스 -->
     <div class="dual-info-box">
-      <!-- 왼쪽: 왜 다른 직무도 함께 보이나요 -->
+
       <div class="context-box">
         <p>
           ℹ️ <strong>왜 다른 직무도 함께 보이나요?</strong><br />
-          회원가입 시 선택한 희망 직무를 기준으로, AI가 관련 산업의 뉴스와 트렌드 데이터를 종합 분석하여<br />
-          <strong>인접 직무</strong>나 <strong>전환 가능성이 높은 분야</strong>도 함께 제안합니다.<br />
-          이는 커리어 확장 가능성과 학습 방향성을 돕기 위한 추천입니다.
+          AI가 희망 직무를 기준으로 연관 산업의 데이터들을 분석하여<br />
+          <strong>인접 직무</strong>와 <strong>확장 가능한 직무</strong>도 추천합니다.
         </p>
       </div>
 
-      <!-- 오른쪽: 맞춤 분석 고도화 -->
       <div class="personal-context-box">
         <p>
           🧠 <strong>맞춤 분석 고도화</strong><br />
-          AI는 사용자의 <strong>이력서</strong>·<strong>면접 피드백</strong>·<strong>학습 내역</strong>을 함께 분석하여
-          현재 역량과 시장 수요 간의 <strong>기술 격차(Skill Gap)</strong>를 파악합니다.<br />
-          이를 바탕으로 <strong>보완이 필요한 기술</strong>과
-          <strong>성장 방향</strong>을 함께 제안합니다.
+          이력서·면접·학습 데이터를 기반으로 기술 격차를 분석하고<br />
+          성장 방향을 제안합니다.
         </p>
       </div>
     </div>
 
-    <div class="hint-box">
-      💾 클릭한 키워드는 <strong>내 키워드</strong> 페이지에서 다시 확인할 수 있습니다.
-    </div>
+    <div class="hint-box">💾 클릭한 키워드는 저장됩니다.</div>
   </div>
 </template>
 
@@ -109,8 +111,6 @@ import { ref, onMounted } from "vue";
 
 const savedKeywords = ref([]);
 const savedCount = ref(0);
-
-// 저장된 희망 직무
 const userJob = ref(localStorage.getItem("user_job") || "AI 엔지니어");
 
 onMounted(() => {
@@ -119,49 +119,37 @@ onMounted(() => {
   savedCount.value = savedKeywords.value.length;
 });
 
-// 저장 여부 체크
 const isSaved = (tag) => savedKeywords.value.includes(tag);
 
-// ⭐ 저장/삭제 토글
 const toggleKeyword = (tag) => {
   const index = savedKeywords.value.indexOf(tag);
 
-  if (index === -1) {
-    // 추가
-    savedKeywords.value.push(tag);
-  } else {
-    // 삭제
-    savedKeywords.value.splice(index, 1);
-  }
+  if (index === -1) savedKeywords.value.push(tag);
+  else savedKeywords.value.splice(index, 1);
 
   localStorage.setItem("user_keywords", JSON.stringify(savedKeywords.value));
   savedCount.value = savedKeywords.value.length;
 };
 
-// 첫 번째 추천 직무 = 사용자 희망 직무
 const jobs = ref([
   {
     title: userJob.value,
-    summary: `${userJob.value} 직무는 최근 산업 트렌드에서 핵심 성장 분야로 분석되었습니다. 
-    데이터 기반 문제 해결 능력과 모델 운영(MLOps) 역량이 중요하게 평가되고 있습니다.`,
-    trendSummary: `최근 ${userJob.value} 관련 키워드로는 LLM, 모델 최적화, Python 자동화가 가장 많이 언급되었습니다. 
-    산업 전반에서 ${userJob.value} 수요가 빠르게 확산 중입니다.`,
+    summary: `${userJob.value} 직무는 최근 산업 트렌드에서 핵심 성장 분야로 분석되었습니다.`,
+    trendSummary: `최근 ${userJob.value} 관련 키워드로는 LLM, MLOps, Python 자동화가 가장 많이 언급되었습니다.`,
     tags: ["MLOps", "LLM", "Python", "AI Automation"],
   },
   {
     title: "클라우드 엔지니어",
     summary:
-      "기업의 클라우드 전환 속도가 빨라지며 AWS, Docker, Kubernetes 관련 기술 수요가 증가하고 있습니다.",
-    trendSummary:
-      "DevOps 자동화와 컨테이너 보안이 주요 키워드로 부상했습니다.",
+      "기업의 클라우드 전환 속도가 빨라지며 관련 기술 수요가 증가 중입니다.",
+    trendSummary: "DevOps 자동화, AWS, 보안이 주요 키워드입니다.",
     tags: ["AWS", "Kubernetes", "DevOps", "Docker"],
   },
   {
     title: "데이터 사이언티스트",
     summary:
-      "데이터 기반 예측과 생성형 AI의 융합이 활발히 진행되고 있으며, SQL과 머신러닝 역량이 핵심으로 꼽힙니다.",
-    trendSummary:
-      "Pandas, SQL, 머신러닝 기술이 여전히 높은 검색량을 유지하고 있습니다.",
+      "데이터 기반 예측과 생성형 AI 적용이 활발한 분야입니다.",
+    trendSummary: "Pandas, SQL, 머신러닝 기술이 꾸준한 관심을 받고 있습니다.",
     tags: ["SQL", "Pandas", "Machine Learning", "Visualization"],
   },
 ]);
@@ -372,7 +360,7 @@ const jobs = ref([
   border: 1px solid #c7dafd;
   border-radius: 10px;
   padding: 20px;
-  margin-bottom: 20px;
+  margin-bottom: 40px;
   font-size: 13px;
   color: #333;
   line-height: 1.6;

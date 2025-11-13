@@ -1,43 +1,60 @@
 <template>
   <div class="saved-page">
-    <!-- 상단 -->
+
+    <!-- 헤더 -->
     <div class="header">
       <router-link to="/trend/insight" class="back">← 돌아가기</router-link>
       <h2>내 키워드 저장소</h2>
-      <p class="subtitle">AI 인사이트에서 저장한 키워드 또는 직접 추가한 키워드를 확인하세요.</p>
+      <p class="subtitle">AI 인사이트에서 저장한 키워드 목록입니다.</p>
     </div>
 
-    <!-- 🔹 키워드 수동 추가 입력창 -->
+    <!-- 키워드 추가 -->
     <div class="add-keyword-box">
-      <input v-model="newKeyword" @keyup.enter="addKeyword" type="text" class="add-input" placeholder="새 키워드를 입력하세요 (예: PyTorch, LangChain 등)" />
+      <input v-model="newKeyword"
+             @keyup.enter="addKeyword"
+             type="text"
+             class="add-input"
+             placeholder="새 키워드를 입력하세요" />
+
       <button class="add-btn" @click="addKeyword">추가</button>
     </div>
 
-    <!-- 키워드 리스트 -->
-    <div v-if="Object.keys(filteredKeywords).length > 0" class="keyword-container">
-      <div class="category" v-for="(group, category) in filteredKeywords" :key="category">
+    <!-- 카테고리 -->
+    <div v-if="Object.keys(filteredKeywords).length > 0"
+         class="keyword-container">
+      <div class="category"
+           v-for="(group, category) in filteredKeywords"
+           :key="category">
+
         <div class="category-header">
           <h3>{{ category }}</h3>
           <span>{{ group.length }}개</span>
         </div>
+
         <div class="keyword-list">
-          <div class="keyword-card" v-for="(k, i) in group" :key="i">
+          <div class="keyword-card"
+               v-for="(k, i) in group"
+               :key="i">
+
             <div class="top">
               <span class="word">{{ k }}</span>
+
+              <!-- 삭제 버튼 이모지 -->
               <button class="delete-btn" @click="deleteKeyword(k)">
-                <i class="ri-close-circle-fill close-icon"></i>
+                ❌
               </button>
             </div>
+
             <small>{{ today }}</small>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 비어있을 때 -->
+    <!-- 저장 없음 -->
     <div v-else class="empty">
       <p>저장된 키워드가 없습니다 😢</p>
-      <p class="empty-hint">AI 인사이트 페이지에서 관심 키워드를 추가해보세요!</p>
+      <p class="empty-hint">AI 인사이트 페이지에서 키워드를 추가하세요!</p>
     </div>
 
     <!-- 통계 -->
@@ -56,12 +73,13 @@
       </div>
     </div>
 
-    <!-- 전체 삭제 버튼 -->
+    <!-- 전체 삭제 -->
     <div class="actions" v-if="keywords.length > 0">
       <button class="clear-all-btn" @click="clearAll">전체 삭제</button>
     </div>
   </div>
 </template>
+
 
 <script setup>
 import { ref, computed, onMounted } from "vue";
@@ -182,7 +200,7 @@ const clearAll = () => {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-top: -50px;
+  margin-top: -40px;
   margin-bottom: 24px;
 }
 
