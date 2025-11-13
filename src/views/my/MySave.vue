@@ -1,108 +1,98 @@
 <template>
-  <section class="report-save-page">
+  <section class="save-wrapper">
+    <!-- HEADER -->
     <header class="page-header">
       <h2>저장된 리포트</h2>
       <p>저장된 리포트를 선택하여 성장 추이를 비교하세요</p>
     </header>
 
-    <div class="report-container">
-      <!-- ✅ 좌측: 리포트 목록 -->
-      <aside class="report-list">
-        <h3>리포트 목록</h3>
-        <ul>
-          <li v-for="(report, i) in reports" :key="i" :class="{ active: selectedIds.includes(report.id) }"
-            @click="toggleSelect(report)">
-            <div class="report-item">
-              <div class="item-info">
+    <div class="layout">
+      <!-- LEFT PANEL -->
+      <aside class="left-panel">
+        <div class="left-header">
+          <h3>리포트 목록</h3>
+
+          <div class="header-actions">
+            <!-- 🔄 초기화 아이콘 -->
+            <i class="ri-loop-right-fill reset-icon" @click="resetSelection"></i>
+
+            <!-- 비교 버튼 -->
+            <button class="compare-btn" :disabled="selectedIds.length !== 2" @click="startCompare">선택된 리포트 비교하기</button>
+          </div>
+        </div>
+
+        <!-- 리포트 카드 리스트 -->
+        <ul class="report-list">
+          <li
+            v-for="report in reports"
+            :key="report.id"
+            :class="{
+              'preview-active': previewId === report.id,
+              'checked-active': selectedIds.includes(report.id),
+            }"
+          >
+            <div class="report-card" @click="selectPreview(report)">
+              <div class="left-info">
                 <h4>{{ report.title }}</h4>
-                <p>{{ formatDate(report.created_at) }}</p>
+                <p>{{ report.memo }}</p>
+                <span class="date">{{ formatDate(report.date) }}</span>
               </div>
-              <input type="checkbox" :value="report.id" v-model="selectedIds" @click.stop />
+
+              <input type="checkbox" :checked="selectedIds.includes(report.id)" :disabled="!selectedIds.includes(report.id) && selectedIds.length >= 2" @click.stop="toggleCheckbox(report.id)" />
             </div>
           </li>
         </ul>
-
-        <!-- ✅ 비교 버튼 -->
-        <button class="compare-btn" :disabled="selectedIds.length !== 2" @click="compareSelected">
-          선택 리포트 비교
-        </button>
       </aside>
 
-      <!-- ✅ 중앙: 비교 결과 -->
-      <main class="report-detail">
-        <template v-if="selectedReports.length === 2">
-          <h3>리포트 비교</h3>
-          <p class="date">
-            {{ selectedReports[0].title }} vs {{ selectedReports[1].title }}
-          </p>
+      <!-- CENTER PANEL -->
+      <main class="center-panel">
+        <!-- 아무 선택 없음 -->
+        <div v-if="!previewId && !isComparing" class="center-empty">
+          <p>리포트 목록에서 비교할 리포트를 선택해주세요.</p>
+        </div>
 
-          <!-- 종합 점수 비교 -->
-          <div class="score-box">
-            <h4>종합 점수 비교</h4>
-            <p class="score">
-              {{ selectedReports[0].score }} → {{ selectedReports[1].score }}
-              <span class="growth" :class="growthDiff > 0 ? 'plus' : 'minus'">
-                {{ growthDiff > 0 ? '+' : '' }}{{ growthDiff }}%
-              </span>
-            </p>
-            <p class="compare-text">
-              {{ selectedReports[0].title }} 대비
-              {{ growthDiff > 0 ? '상승' : '하락' }}한 결과입니다
-            </p>
-          </div>
+        <!-- 미리보기 -->
+        <ReportPreview v-else-if="previewId && !isComparing" :report="preview" />
 
-          <!-- ✅ 비교 차트 -->
-          <div class="chart-section">
-            <canvas id="compareChart"></canvas>
-          </div>
-
-          <!-- ✅ AI 비교 요약 -->
-          <div class="ai-summary-box">
-            <h4>AI 비교 요약</h4>
-            <p>{{ aiSummary }}</p>
-          </div>
-        </template>
-
-        <!-- ⚠️ 선택 안 했을 때 -->
-        <template v-else>
-          <div class="empty-state">
-            <p>비교할 리포트를 선택해주세요.</p>
-          </div>
-        </template>
+        <!-- 비교 화면 -->
+        <ReportCompare v-else-if="isComparing" :reports="compareReports" />
       </main>
 
-      <!-- ✅ 우측: 주요 성과 + 전체 통계 + 내보내기 -->
-      <aside class="report-insight">
-        <div class="insight-section">
-          <h3>주요 성과</h3>
-          <div class="insight-card" v-for="(item, i) in insights" :key="i">
-            <i :class="item.icon"></i>
-            <div>
-              <strong>{{ item.title }}</strong>
-              <p>{{ item.desc }}</p>
-            </div>
+      <!-- RIGHT PANEL -->
+      <aside class="right-panel">
+        <div class="box">
+          <h4>주요 성과</h4>
+
+          <div class="result-card">
+            <span>✔ 지속적인 성장</span>
+            <p>최근 3개월 평균 5% 상승</p>
+          </div>
+
+          <div class="result-card">
+            <span>✔ 이력서 완성도</span>
+            <p>문장 구조 흐름 개선</p>
           </div>
         </div>
 
-        <div class="report-summary">
+        <div class="box stats">
           <h4>전체 통계</h4>
-          <ul>
-            <li>저장된 리포트 <strong>{{ reports.length }}개</strong></li>
-            <li>
-              평균 성장률
-              <strong :class="avgGrowth > 0 ? 'plus' : 'minus'">
-                {{ avgGrowth > 0 ? '+' : '' }}{{ avgGrowth }}%
-              </strong>
-            </li>
-            <li>최고 점수 <strong>{{ maxScore }}</strong></li>
-          </ul>
-        </div>
 
-        <div class="export-section">
-          <h3>리포트 내보내기</h3>
-          <button class="export-btn">PDF 다운로드</button>
-          <button class="export-btn">Markdown 내보내기</button>
-          <button class="export-btn">이메일로 전송</button>
+          <ul class="stats-list">
+            <li>
+              <span class="label">저장된 리포트</span>
+              <span class="value">{{ reports.length }}개</span>
+            </li>
+
+            <li>
+              <span class="label">평균 성장률</span>
+              <span class="value">+5.5%</span>
+            </li>
+
+            <li>
+              <span class="label">최고 점수</span>
+              <span class="value">90</span>
+            </li>
+          </ul>
         </div>
       </aside>
     </div>
@@ -110,422 +100,342 @@
 </template>
 
 <script setup>
-import { ref, nextTick } from "vue";
-import Chart from "chart.js/auto";
+import { ref, computed } from "vue";
+import ReportPreview from "./report/ReportPreview.vue";
+import ReportCompare from "./report/ReportCompare.vue";
 
-/* -----------------------------
-   📊 더미 리포트 데이터
------------------------------- */
 const reports = ref([
-  { id: 1, title: "11월 종합 성장 리포트", created_at: "2025-11-11", score: 83, growth: 5, data: [85, 80, 90, 78] },
-  { id: 2, title: "10월 종합 성장 리포트", created_at: "2025-10-31", score: 79, growth: 4, data: [80, 75, 87, 74] },
-  { id: 3, title: "면접 집중 분석", created_at: "2025-10-25", score: 74, growth: -2, data: [72, 70, 78, 68] },
-  { id: 4, title: "9월 종합 리포트", created_at: "2025-09-30", score: 76, growth: 6, data: [78, 72, 84, 70] },
+  { id: 1, title: "카카오 면접 대비", memo: "이력서 작성 후 모의 면접 진행", date: "2025-11-15", chartData: {} },
+  { id: 2, title: "구글 면접 대비", memo: "구글 코딩 테스트 대비 및 모의 면접 비교", date: "2025-11-15", chartData: {} },
+  { id: 3, title: "redis 학습", memo: "이번 주는 redis에 대해 학습함", date: "2025-11-15", chartData: {} },
+  { id: 4, title: "포트폴리오 코칭", memo: "모르겠어요", date: "2025-11-15", chartData: {} },
 ]);
 
-/* -----------------------------
-   📈 상태값
------------------------------- */
-const selectedIds = ref([]);
-const selectedReports = ref([]);
-const avgGrowth = ref(5.5);
-const maxScore = ref(90);
-const growthDiff = ref(0);
-const aiSummary = ref("");
-let chartInstance = null;
+/* 상태 */
+const previewId = ref(null); // 클릭해서 보고 있는 리포트
+const selectedIds = ref([]); // 체크된 리포트 (항상 0~2개)
+const compareIds = ref([]); // 실제 비교에 사용 중인 리포트 2개
+const isComparing = ref(false); // 중앙 패널이 비교 모드인지 여부
 
-/* -----------------------------
-   📊 주요 성과
------------------------------- */
-const insights = ref([
-  { icon: "ri-bar-chart-line", title: "지속적인 성장", desc: "최근 3개월 평균 5% 상승" },
-  { icon: "ri-file-text-line", title: "이력서 완성도", desc: "문장 구조와 키워드 사용 개선" },
-]);
+/* 현재 미리보기 리포트 */
+const preview = computed(() => reports.value.find((r) => r.id === previewId.value));
 
-/* -----------------------------
-   ✅ 선택 토글
------------------------------- */
-function toggleSelect(report) {
-  if (selectedIds.value.includes(report.id)) {
-    selectedIds.value = selectedIds.value.filter((id) => id !== report.id);
-  } else if (selectedIds.value.length < 2) {
-    selectedIds.value.push(report.id);
+/* 현재 비교에 사용 중인 리포트들 */
+const compareReports = computed(() => reports.value.filter((r) => compareIds.value.includes(r.id)));
+
+/* ----------------- FUNCTIONS ----------------- */
+
+/** 카드 클릭 → 항상 미리보기. 비교 중이면 비교 모드 종료. */
+function selectPreview(report) {
+  if (isComparing.value) {
+    isComparing.value = false;
+    compareIds.value = [];
+  }
+  previewId.value = report.id;
+}
+
+/** 체크박스 토글 → 최대 2개까지만 허용 */
+function toggleCheckbox(id) {
+  // 비교 모드였다면 비교 종료 후 새 선택 시작
+  if (isComparing.value) {
+    isComparing.value = false;
+    compareIds.value = [];
+  }
+
+  if (selectedIds.value.includes(id)) {
+    selectedIds.value = selectedIds.value.filter((v) => v !== id);
+  } else {
+    if (selectedIds.value.length >= 2) return; // 2개 초과는 무시
+    selectedIds.value.push(id);
   }
 }
 
-/* -----------------------------
-   ✅ 비교 실행
------------------------------- */
-function compareSelected() {
-  selectedReports.value = reports.value.filter((r) =>
-    selectedIds.value.includes(r.id)
-  );
-  renderCompareChart();
-  generateAISummary();
+/** 선택 리포트 비교하기 버튼 클릭 */
+// function startCompare() {
+//   if (selectedIds.value.length !== 2) return;
+
+//   // 지금 선택된 두 개를 비교 대상으로 고정
+//   compareIds.value = [...selectedIds.value];
+
+//   // 비교 모드로 전환
+//   isComparing.value = true;
+//   previewId.value = null;
+
+//   // 체크박스 초기화 (요구사항 3번)
+//   selectedIds.value = [];
+// }
+
+function startCompare() {
+  isComparing.value = true;
+  previewId.value = null;
+  // selectedIds 초기화 안 함!
 }
 
-/* -----------------------------
-   ✅ 비교 차트 렌더링
------------------------------- */
-function renderCompareChart() {
-  nextTick(() => {
-    const ctx = document.getElementById("compareChart");
-    if (!ctx) return;
-    if (chartInstance) chartInstance.destroy();
-
-    const labels = ["이력서", "면접", "학습", "트렌드"];
-    const [r1, r2] = selectedReports.value;
-
-    chartInstance = new Chart(ctx, {
-      type: "bar",
-      data: {
-        labels,
-        datasets: [
-          {
-            label: r1.title,
-            data: r1.data,
-            backgroundColor: "rgba(234,235,236,0.6)",
-            borderColor: "#ccc",
-            borderRadius: 6,
-          },
-          {
-            label: r2.title,
-            data: r2.data,
-            backgroundColor: "rgba(113,235,190,0.4)",
-            borderColor: "#71EBBE",
-            borderRadius: 6,
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        plugins: { legend: { position: "bottom" } },
-        scales: { y: { beginAtZero: true, max: 100 } },
-      },
-    });
-  });
+function formatDate(date) {
+  return new Date(date).toLocaleDateString("ko-KR");
 }
 
-/* -----------------------------
-   ✅ AI 요약 비교 문장 생성
------------------------------- */
-function generateAISummary() {
-  const [r1, r2] = selectedReports.value;
-  if (!r1 || !r2) return;
-
-  const diff = (r2.score - r1.score).toFixed(1);
-  growthDiff.value = diff;
-
-  const improved = [];
-  const declined = [];
-
-  r2.data.forEach((v, i) => {
-    const label = ["이력서", "면접", "학습", "트렌드"][i];
-    if (v > r1.data[i]) improved.push(label);
-    else if (v < r1.data[i]) declined.push(label);
-  });
-
-  aiSummary.value = `
-    ${r2.title}는 ${r1.title} 대비 평균 ${diff > 0 ? "+" + diff : diff}% ${diff > 0 ? "상승" : "하락"}했습니다.
-    향상된 항목: ${improved.length ? improved.join(", ") : "없음"}.
-    개선이 필요한 항목: ${declined.length ? declined.join(", ") : "없음"}.
-  `;
+function resetSelection() {
+  selectedIds.value = [];
+  compareIds.value = [];
+  previewId.value = null;
+  isComparing.value = false;
 }
 
-/* -----------------------------
-   ✅ 날짜 포맷
------------------------------- */
-function formatDate(dateStr) {
-  return new Date(dateStr).toLocaleDateString("ko-KR");
-}
 </script>
 
-
-
 <style scoped>
-.report-save-page {
-  background: #fff;
-  min-height: 100vh;
-  padding: 40px 60px;
-  color: #111;
+/* 전체 */
+.save-wrapper {
+  padding: 20px 60px;
 }
 
-.page-header {
-  margin-bottom: 24px;
-}
-
-
-.compare-btn {
-  width: 100%;
-  margin-top: 14px;
-  background: #71ebbe;
-  color: #000;
-  font-weight: 600;
-  border: none;
-  border-radius: 8px;
-  padding: 8px;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.compare-btn:disabled {
-  background: #eaebec;
-  cursor: not-allowed;
-}
-
-
+/* HEADER */
 .page-header h2 {
-  font-size: 22px;
+  font-size: 28px;
   font-weight: 700;
-  margin-bottom: 6px;
 }
 
 .page-header p {
-  font-size: 13px;
+  font-size: 15px;
   color: #666;
 }
 
-/* -------------------- */
-/* 전체 레이아웃        */
-/* -------------------- */
-.report-container {
+/* GRID LAYOUT */
+.layout {
+  margin-top: 20px;
   display: grid;
-  grid-template-columns: 1fr 2.3fr 1.1fr;
-  gap: 20px;
+  grid-template-columns: 530px 790px 460px;
+  gap: 15px;
 }
 
-/* -------------------- */
-/* 좌측 리포트 목록      */
-/* -------------------- */
-.report-list {
-  background: #f9f9f9;
-  border-radius: 10px;
-  padding: 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.report-list h3 {
-  font-size: 16px;
-  margin-bottom: 14px;
-}
-
-.report-list ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.report-list li {
-  background: #ffffff;
-  border: 1px solid #e5e5e5;
-  border-radius: 8px;
-  padding: 10px 12px;
-  margin-bottom: 10px;
+.reset-icon {
+  font-size: 20px;
   cursor: pointer;
-  transition: 0.2s;
+  color: #555;
 }
 
-.report-list li.active {
-  border-color: #71ebbe;
-  background: #ddf3eb;
+.reset-icon:hover {
+  color: #71ebbe;
 }
 
-.report-item {
+/* LEFT PANEL */
+.left-panel {
+  background: #fafafa;
+  border-radius: 10px;
+  padding: 25px;
+}
+
+.left-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.item-info h4 {
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.item-info p {
-  font-size: 12px;
-  color: #777;
-}
-
-.growth {
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.growth.plus {
-  color: #2cb67d;
-}
-
-.growth.minus {
-  color: #ef4444;
-}
-
-/* -------------------- */
-/* 통계 요약 박스        */
-/* -------------------- */
-.report-summary {
-  background: #fff;
-  border-radius: 8px;
-  padding: 14px;
-  font-size: 13px;
-  margin-top: 20px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-}
-
-.report-summary h4 {
-  font-size: 14px;
-  font-weight: 600;
-  margin-bottom: 8px;
-}
-
-.report-summary ul {
-  list-style: none;
-  padding: 0;
-}
-
-.report-summary li {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 4px;
-}
-
-.report-summary strong {
-  font-weight: 700;
-}
-
-/* -------------------- */
-/* 중앙 리포트 상세 영역 */
-/* -------------------- */
-.report-detail {
-  background: #ffffff;
-  border-radius: 10px;
-  padding: 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-}
-
-.report-detail h3 {
+.left-header h3 {
   font-size: 18px;
-  font-weight: 600;
-  margin-bottom: 4px;
-}
-
-.report-detail .date {
-  font-size: 12px;
-  color: #777;
-  margin-bottom: 20px;
-}
-
-/* 종합 점수 */
-.score-box {
-  background: #f9fafb;
-  border-radius: 10px;
-  text-align: center;
-  padding: 20px;
-  margin-bottom: 20px;
-}
-
-.score {
-  font-size: 42px;
   font-weight: 700;
-  margin: 4px 0;
+  margin-top: 10px;
 }
 
-.compare-text {
-  font-size: 13px;
-  color: #666;
-}
-
-/* 차트 영역 */
-.chart-section {
-  margin-top: 20px;
-}
-
-/* -------------------- */
-/* 우측 주요 성과 영역   */
-/* -------------------- */
-.report-insight {
-  background: #ffffff;
-  border-radius: 10px;
-  padding: 20px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-}
-
-.insight-section h3 {
-  font-size: 16px;
-  font-weight: 600;
-  margin-bottom: 12px;
-}
-
-.insight-card {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  margin-bottom: 10px;
-  background: #f9fafb;
-  padding: 10px;
-  border-radius: 8px;
-}
-
-.insight-card i {
-  font-size: 20px;
-  color: #71ebbe;
-}
-
-.insight-card strong {
-  font-size: 13px;
-}
-
-.insight-card p {
-  font-size: 12px;
-  color: #666;
-}
-
-/* 내보내기 */
-.export-section {
-  margin-top: 24px;
-}
-
-.export-section h3 {
-  font-size: 15px;
-  font-weight: 600;
-  margin-bottom: 10px;
-}
-
-.export-btn {
-  width: 100%;
-  background: #f1f2f3;
-  border: none;
+.compare-btn {
+  width: 160px;
+  height: 37px;
+  background: #000;
+  color: #fff;
   border-radius: 6px;
-  padding: 10px;
-  margin-bottom: 8px;
-  text-align: left;
   font-size: 13px;
-  color: #111;
-  cursor: pointer;
+  border: none;
+}
+
+.compare-btn:disabled {
+  background: #ccc;
+}
+
+/* 활성화된 경우에만 hover */
+.compare-btn:not(:disabled):hover {
+  background: #71ebbe;
+  color: #fff;
   transition: 0.2s;
 }
 
-.export-btn:hover {
-  background: #a2f1d6;
+/* Report List */
+.report-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 15px;
 }
 
-.ai-summary-box {
-  background: #f9fafb;
+.report-list li {
+  margin-bottom: 10px;
+}
+
+.report-card {
+  width: 480px;
+  height: 95px;
+  background: #fff;
+  border: 1px solid #eee;
   border-radius: 10px;
-  padding: 16px 20px;
-  margin-top: 20px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  padding: 14px;
+  display: flex;
+  justify-content: space-between;
+  cursor: pointer;
 }
 
-.ai-summary-box h4 {
+.left-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px; /* 최소 간격 */
+}
+
+.left-info h4 {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.2; /* 글자간 간격 압축 */
+  margin: 0;
+}
+
+.left-info p {
   font-size: 14px;
-  font-weight: 600;
-  margin-bottom: 6px;
+  color: #444;
+  line-height: 1.5; /* 줄 간격 최소화 */
+  margin: 0;
+}
+
+.left-info .date {
+  font-size: 11px;
+  color: #888;
+  margin-top: 10px; /* 날짜는 살짝 띄우기 */
+  line-height: 1;
+}
+
+/* CENTER PANEL */
+.center-panel {
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  padding: 30px;
+  text-align: center;
+  font-size: 13px;
+}
+
+.center-empty {
+  margin-top: 250px;
+  color: #777;
+}
+
+/* 패널 전체 */
+.right-panel {
+  width: 100%;
+  background: #fff;
+  border-radius: 10px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px; /* 주요성과 ↔ 전체통계 사이 간격 */
+}
+
+/* ------- 주요 성과 ------- */
+.right-panel .box > h4 {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 5px;
   color: #111;
 }
 
-.ai-summary-box p {
+.right-panel .result-card {
+  background: #f7f7f7;
+  border-radius: 10px;
+  padding: 15px 20px;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 16px; /* 카드 사이 간격 */
+}
+
+.result-card span {
+  font-size: 15px;
+  font-weight: 700;
+  color: #111;
+}
+
+.result-card p {
   font-size: 13px;
-  color: #444;
-  line-height: 1.6;
+  color: #555;
+  margin: 0;
+}
+
+/* 전체 통계 박스 */
+.box.stats {
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  width: 100%;
+  display: block;
+}
+
+/* 제목 */
+.box.stats h4 {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #e5e5e5; /* 이미지처럼 아래 라인 */
+  padding-bottom: 10px;
+  text-align: left;
+}
+
+/* 리스트 */
+.stats-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  row-gap: 14px;
+}
+
+/* 각 줄 */
+.stats-list li {
+  display: grid;
+  grid-template-columns: 1fr auto; /* 왼쪽 텍스트 / 오른쪽 숫자 */
+  align-items: center;
+  width: 100%;
+}
+
+/* 왼쪽 텍스트 */
+.stats-list .label {
+  font-size: 14px;
+  color: #111;
+  font-weight: 400;
+  text-align: left;
+}
+
+/* 오른쪽 값 */
+.stats-list .value {
+  font-size: 16px;
+  font-weight: 700;
+  color: #111;
+  text-align: right;
+}
+
+/* 클릭한 리포트 (테두리 강조) */
+.preview-active .report-card {
+  border: 2px solid #71ebbe;
+  background: #fff;
+}
+
+/* 체크된 리포트 (스타일은 그대로, 체크박스만 색 표시) */
+.checked-active .report-card {
+  /* 카드 스타일은 기본값 유지 */
+}
+
+input[type="checkbox"]:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 </style>
