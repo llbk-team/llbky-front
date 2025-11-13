@@ -5,8 +5,8 @@
       <section class="col-lg-5 bg-black text-white rounded-4 p-4 shadow-sm">
         <!-- 제목 -->
         <div class="mb-4">
-          <h3 class="fw-bold mb-0">OOO 님의</h3>
-          <h1 class="fw-bolder text-mint mt-0">AI 면접 리포트</h1>
+          <h3 class="fw-bold mb-0">김병현님의</h3>
+          <h1 class="text-mint">AI 면접 리포트</h1>
         </div>
 
         <!-- 면접 정보 -->
@@ -102,14 +102,17 @@
         <!-- 종합 평가 -->
         <div class="card border-mint p-4 mb-4">
           <h4 class="fw-bold mb-2 text-dark">종합 평가</h4>
-          <div class="d-flex justify-content-between align-items-center mb-2">
-            <div class="w-100 me-3">
-              <div class="progress" style="height: 8px;">
-                <div class="progress-bar bg-mint" role="progressbar" style="width: 85%;"></div>
-              </div>
-              <small class="text-muted">언어 82/100 &nbsp;•&nbsp; 비언어 88/100</small>
+          <div class="score-row">
+            <div class="score-top">
+              <h4 class="fw-bold text-dark mb-0">85/100점</h4>
             </div>
-            <h4 class="fw-bold text-dark mb-0">85/100점</h4>
+
+            <div class="progress mb-1" style="height: 8px;">
+              <div class="progress-bar bg-mint" role="progressbar" style="width: 85%;"></div>
+            </div>
+
+            <small class="text-muted">언어 82/100 • 비언어 88/100</small>
+
           </div>
         </div>
 
@@ -181,6 +184,33 @@ const filteredFeedback = computed(() => {
 </script>
 
 <style scoped>
+/* 큰 제목 */
+h1, h2, h3 {
+  font-size: 28px !important;
+  font-weight: 700 !important;
+}
+h1.text-mint {
+  font-size: 40px !important;
+  line-height: 1.1;
+}
+
+/* 섹션 제목 */
+h4, h5 {
+  font-size: 18px !important;
+  font-weight: 700 !important;
+}
+
+/* 일반 텍스트 */
+p, span, li, div, strong {
+  font-size: 14px !important;
+}
+
+/* small */
+small,
+.text-muted.small {
+  font-size: 12px !important;
+}
+
 .report-detail {
   background-color: #0b0b0b;
   min-height: 100vh;
@@ -208,6 +238,43 @@ const filteredFeedback = computed(() => {
   background-color: #71ebbe !important;
   color: #000 !important;
 }
+/* 버튼 기본 규격만 통일 */
+.btn {
+  width: 130px !important;
+  height: 37px !important;
+  font-size: 13.5px !important;
+  font-weight: 500 !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 !important;
+}
+
+/* 둥근 버튼만 둥글게 유지 */
+.btn.rounded-pill {
+  border-radius: 30px !important;
+}
+
+/* 작은 버튼도 동일 규격 */
+.btn-sm {
+  width: 130px !important;
+  height: 37px !important;
+  font-size: 13.5px !important;
+  font-weight: 500 !important;
+  border-radius: 30px !important;
+}
+
+/* 긴 문구만 자동 확장 (색은 그대로) */
+.btn-auto {
+  width: auto !important;
+  min-width: 130px !important;
+  padding-left: 20px !important;
+  padding-right: 20px !important;
+  height: 37px !important;
+  font-size: 13.5px !important;
+  font-weight: 500 !important;
+}
+
 
 /* 질문 선택 */
 .question-item.active {
@@ -225,4 +292,17 @@ const filteredFeedback = computed(() => {
 /* 오디오 */
 audio::-webkit-media-controls-panel { background-color: transparent; }
 audio { border-radius: 6px; }
+
+.score-box {
+  white-space: nowrap;   /* 줄바꿈 절대 X */
+  font-size: 20px;       /* 기존 느낌 유지하면서 정렬 */
+  display: flex;
+  align-items: center;   /* 세로 정렬 */
+}
+.score-top {
+  display: flex;
+  justify-content: flex-end; /* 오른쪽 정렬 */
+  margin-bottom: 4px;
+}
+
 </style>

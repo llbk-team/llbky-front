@@ -31,9 +31,9 @@
           </div>
 
           <!-- 면접 팁 -->
-          <div class="bg-success bg-opacity-10 p-3 rounded-3 mt-3">
-            <h6 class="fw-bold text-success mb-2">💡 면접 팁</h6>
-            <ul class="text-muted small mb-0 ps-3">
+          <div class="tip-box">
+            <h6 class="fw-bold mb-2">💡 면접 팁</h6>
+            <ul class="mb-0 ps-3">
               <li>구체적인 사례와 수치를 포함하세요.</li>
               <li>답변은 1분 내외로 요약하세요.</li>
               <li>STAR 기법(상황-과제-행동-결과)을 활용하세요.</li>
@@ -70,12 +70,12 @@
           <div class="position-relative mb-4">
             <!-- 왼쪽: 이전 질문 -->
             <button
-              class="btn btn-link p-0 text-muted small position-absolute start-0 top-50 translate-middle-y"
+              class="btn btn-link p-0 text-muted small position-absolute start-0 top-50 translate-middle-y prev-question-btn"
               :disabled="current <= 1"
               @click="goPrevQuestion"
               style="text-decoration: none; font-size: 0.85rem;"
             >
-              <span class="me-1">&lt;</span> 이전 질문으로 돌아가기
+              <span class="me-2">&lt;</span> 이전 질문
             </button>
 
             <!-- 가운데: 제목 (절대 중앙 고정) -->
@@ -101,12 +101,13 @@
           </div>
 
           <!-- 상태 표시 -->
-          <div class="bg-white rounded-3 p-3 text-center border">
+          <div class="bg-white rounded-3 p-3 text-center border status-box">
             <div v-if="isRecording" class="text-success fw-bold">
               {{ mode === 'video' ? '🎥 녹화 중...' : '🎙️ 녹음 중...' }}
               <br />
               <small class="text-muted">{{ formatTime(recordTime) }}</small>
             </div>
+
             <div v-else class="text-muted small">
               아직 녹음/녹화를 시작하지 않았습니다.
             </div>
@@ -115,7 +116,7 @@
           <!-- 녹음/녹화 버튼 -->
           <div class="d-flex justify-content-center mt-3">
             <button
-              class="btn fw-medium px-4 py-2"
+              class="btn fw-medium px-4 py-2 record-btn"
               :class="isRecording ? 'btn-danger text-white' : 'btn-mint text-dark'"
               @click="toggleRecording"
             >
@@ -285,6 +286,86 @@ onUnmounted(() => clearInterval(timer));
 </script>
 
 <style scoped>
+/* -------------------------
+   🔹 제목 / 부제 폰트 통일
+-------------------------- */
+
+/* 상단 큰 제목 */
+h3.fw-bold {
+  font-size: 1.75rem !important;
+  font-weight: 700 !important;
+}
+
+/* 설명 텍스트 */
+p.small,
+.text-muted.small,
+label,
+small,
+span,
+div.small
+
+/* 질문 번호 */
+.fw-semibold,
+.fw-bold {
+  font-weight: 700 !important;
+}
+
+
+/* -------------------------
+   🔹 버튼 규격 통일
+-------------------------- */
+
+.btn {
+  height: 37px !important;
+  font-size: 13.5px !important;
+  font-weight: 500 !important;
+  display: inline-flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  padding: 0 16px !important;
+  letter-spacing: 0 !important;
+}
+
+/* 기본 버튼 너비(130px), 풀사이즈 버튼은 따로 유지 */
+.btn:not(.w-50):not(.w-100):not(.rounded-circle) {
+  width: 130px !important;
+}
+
+/* pill 버튼 */
+.btn.rounded-pill {
+  border-radius: 30px !important;
+}
+
+/* 기본 라운드는 네모(6px)—기존 px 유지 */
+.btn {
+  border-radius: 6px !important;
+}
+
+/* 녹화/녹음 버튼(크기 유지해야 하므로 width 제외) */
+.record-btn {
+  width: auto !important;
+}
+
+/* ‘이전 질문으로 돌아가기’ 링크 버튼 크기 깨지지 않도록 예외 처리 */
+.btn-link {
+  width: auto !important;
+  height: auto !important;
+  padding: 0 !important;
+  font-size: 0.85rem !important;
+}
+
+
+/* -------------------------
+   🔹 모드 선택 버튼도 규격 맞추기
+-------------------------- */
+
+.mode-btn {
+  height: 37px !important;
+  font-size: 13.5px !important;
+  font-weight: 500 !important;
+  border-radius: 6px !important;
+}
+
 /* 🔹 민트 색상 통일 */
 .bg-mint,
 .progress-bar.bg-mint {
@@ -335,10 +416,19 @@ onUnmounted(() => clearInterval(timer));
   background-color: #e45454 !important;
 }
 
+.status-box {
+  min-height: 85px !important; /* 두 줄 기준 고정 */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
 /* 미리보기 박스 */
 .preview-box {
   height: 320px;
   background-color: #0e1111 !important;
+  font-weight: 100;
   color: #fff;
 }
 .preview-box i {
@@ -347,4 +437,29 @@ onUnmounted(() => clearInterval(timer));
 .preview-box p {
   line-height: 1.4;
 }
+.prev-question-btn {
+  left: -8px !important; /* 더 왼쪽으로 당기기 */
+  padding-left: 0 !important;
+  margin-left: 0 !important;
+}
+
+.tip-box {
+  background: #e9f8f2;
+  border: 1px solid #a2f1d6;
+  border-radius: 12px;
+  padding: 18px 22px;
+  font-size: 10px;
+  margin-top: 20px;
+}
+
+.tip-box h6 {
+  color: #008b6a;  /* 분석 완료 박스 톤에 맞춰 자연스러운 녹색 */
+}
+
+.tip-box ul li {
+  color: #555;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
 </style>

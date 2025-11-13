@@ -3,10 +3,10 @@
     <!-- 헤더 -->
     <div class="d-flex justify-content-between align-items-center mb-4">
       <div>
-        <h3 class="fw-bold mb-1">면접 리포트</h3>
-        <p class="text-muted small mb-0">예상 질문 / 면접 이력 확인 및 상세 조회</p>
+        <h3 class="fw-bold mb-1 title">면접 리포트</h3>
+        <p class="text-muted mb-0 subtitle">예상 질문 / 면접 이력 확인 및 상세 조회</p>
       </div>
-      <button class="btn btn-mint rounded-pill px-3 py-2 fw-medium shadow-sm"
+      <button class="btn btn-mint rounded-pill btn-auto shadow-sm"
         @click="$router.push('/interview/mock')">
         ▶️ 모의 면접 시작하기
       </button>
@@ -137,7 +137,7 @@
               <small class="text-muted">{{ h.questionCount }}개 질문</small>
             </div>
             <button
-            class="btn btn-outline-secondary btn-sm rounded-pill fw-medium px-3 py-1"
+            class="btn btn-outline-secondary rounded-pill px-4 btn-auto"
               @click="$router.push(`/interview/report/${i}`)"
             >
               📄 리포트 보기
@@ -182,7 +182,7 @@
           </button>
          <!-- 리포트로 이동 버튼 -->
           <button
-            class="btn btn-mint rounded-pill px-4"
+            class="btn btn-mint btn-outline-secondary btn-sm rounded-pill px-4 fw-medium btn-auto"
             @click="goToReport(selectedQuestion)"
           >
             📄 리포트로 이동
@@ -276,6 +276,46 @@ const histories = ref([
 </script>
 
 <style scoped>
+.title {
+    font-weight: 700;
+    font-size: 28px;
+}
+
+.subtitle {
+  color: #6c757d;
+  font-size: 16px;
+}
+
+/* 탭 버튼 */
+.d-flex.bg-light .btn {
+    font-size: 14px;
+}
+
+/* 섹션 제목 */
+h5.fw-bold {
+    font-size: 18px;
+}
+
+/* 목록 폰트 크기 */
+.border.rounded-3 span,
+.border.rounded-3 p {
+    font-size: 14px;
+}
+
+/* small 통일 */
+small,
+.text-muted.small {
+    font-size: 12px !important;
+}
+
+/* 모달 */
+.modal-content-custom h5 {
+    font-size: 18px;
+}
+.modal-content-custom button {
+    font-size: 14px;
+}
+
 .btn-mint {
   background-color: #71ebbe !important;
   color: #000 !important;
@@ -291,6 +331,57 @@ const histories = ref([
 }
 .bg-mint {
   background-color: #71ebbe !important;
+}
+/* 버튼 공통 규격 */
+.btn {
+  width: 130px;
+  height: 37px;
+  font-size: 13.5px !important;
+  font-weight: 500 !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* 라운드형 버튼 */
+.btn.rounded-pill {
+  border-radius: 30px !important;
+}
+
+/* 네모형 버튼 */
+.btn.square {
+  border-radius: 6px !important;
+}
+
+/* 기존 mint 버튼 색상 유지 */
+.btn-mint {
+  background-color: #71ebbe !important;
+  color: #000 !important;
+  border: none !important;
+}
+
+/* 아웃라인 mint */
+.btn-outline-mint {
+  border: 1px solid #71ebbe !important;
+  color: #000 !important;
+}
+
+/* 작은 버튼(답변보기, 전체보기 등)도 동일 규격 적용 */
+.btn-sm {
+  width: 130px !important;
+  height: 37px !important;
+  font-size: 13.5px !important;
+  border-radius: 30px !important;
+}
+/* 문구 긴 버튼 전용 */
+.btn-auto {
+  width: auto !important;       /* 글자만큼 자동 확장 */
+  min-width: 130px !important;  /* 최소 너비는 동일 */
+  padding-left: 20px !important;
+  padding-right: 20px !important; /* 너무 붙지 않게 */
+  height: 37px !important;
+  font-size: 13.5px !important;
+  font-weight: 500 !important;
 }
 .modal-backdrop {
   position: fixed;
