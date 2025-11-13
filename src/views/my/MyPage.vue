@@ -1,7 +1,7 @@
 <template>
   <div class="mypage-wrapper">
     <div class="mypage-grid">
-      <!-- 왼쪽: 프로필 (자기 길이만큼) -->
+      <!-- 왼쪽: 프로필 -->
       <ProfileSection class="profile-section" />
 
       <!-- 중앙: 레이더 -->
@@ -28,6 +28,7 @@ import LogList from "./report/LogList.vue";
 </script>
 
 <style scoped>
+/* 전체 배경 */
 .mypage-wrapper {
   display: flex;
   justify-content: center;
@@ -35,7 +36,9 @@ import LogList from "./report/LogList.vue";
   background-color: #f1f2f3;
 }
 
-/* ✅ 핵심 레이아웃 설정 */
+/* ===========================
+   기본 GRID 레이아웃
+   =========================== */
 .mypage-grid {
   display: grid;
   grid-template-areas:
@@ -43,22 +46,18 @@ import LogList from "./report/LogList.vue";
     "profile heatmap heatmap"
     "profile loglist loglist";
   grid-template-columns: 400px 1fr 600px;
-  /* 중앙-오른쪽 두 칸은 동일 높이, 왼쪽은 자동 높이 */
-  grid-auto-rows: auto;
-  align-items: start;
   gap: 20px;
-  align-items: stretch;
   padding: 20px;
   width: 100%;
-  max-width: 1700px;
+  max-width: 1600px;
   box-sizing: border-box;
   margin-bottom: 50px;
 }
 
-/* ✅ grid 배치 영역 지정 (기존 디자인 유지) */
+/* 영역 매핑 */
 .profile-section {
   grid-area: profile;
-  align-self: start; /* 프로필은 자기 내용 높이만큼만 */
+  align-self: start;
 }
 
 .radar-section {
@@ -71,11 +70,66 @@ import LogList from "./report/LogList.vue";
 
 .heatmap-section {
   grid-area: heatmap;
-  grid-column: 2 / 4; /* 중앙~오른쪽 폭 전체 사용 */
+  grid-column: 2 / 4;
 }
 
 .loglist-section {
   grid-area: loglist;
-  grid-column: 2 / 4; /* 중앙~오른쪽 폭 전체 사용 */
+  grid-column: 2 / 4;
+}
+
+
+/* ===========================
+   반응형 설정
+   =========================== */
+
+/* 1400px 이하 → 오른쪽 mentoring이 아래로 내려감 */
+@media (max-width: 1400px) {
+  .mypage-grid {
+    grid-template-areas:
+      "profile radar"
+      "profile mentoring"
+      "heatmap heatmap"
+      "loglist loglist";
+    grid-template-columns: 350px 1fr;
+  }
+}
+
+/* 1200px 이하 → Profile이 위로 오고 2단 구성 */
+@media (max-width: 1200px) {
+  .mypage-grid {
+    grid-template-areas:
+      "profile profile"
+      "radar mentoring"
+      "heatmap heatmap"
+      "loglist loglist";
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* 992px 이하 → 1열 구조 */
+@media (max-width: 992px) {
+  .mypage-grid {
+    grid-template-areas:
+      "profile"
+      "radar"
+      "mentoring"
+      "heatmap"
+      "loglist";
+    grid-template-columns: 1fr;
+  }
+
+  .heatmap-section,
+  .loglist-section {
+    grid-column: 1 / 2 !important;
+  }
+}
+
+/* 600px 이하 → 모바일 최적화 */
+@media (max-width: 600px) {
+  .mypage-grid {
+    gap: 15px;
+    padding: 15px;
+  }
 }
 </style>
