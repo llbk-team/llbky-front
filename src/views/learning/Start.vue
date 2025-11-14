@@ -234,7 +234,7 @@ function cancelMemo() {
 }
 
 function submitMemo() {
-  alert(`"${selectedItem.value.title}" 메모가 제출되었습니다!`);
+  alert(`"${selectedItem.value.title}"주제에 맞는 내용입니다`);
   memoContent.value = "";
 }
 </script>
