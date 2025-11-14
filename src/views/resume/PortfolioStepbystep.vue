@@ -199,7 +199,7 @@
       <button class="btn btn-mint w-100 py-3 fw-bold"  :class="isAllComplete ? 'btn-mint' : 'btn-outline-secondary'"
       @click="router.push('/resume/portfolio/write')">
         <i class="bi bi-check-circle me-2"></i>
-        포트폴리오 등록하기
+        포트폴리오 파일올리기
       </button>
     </div>
   
