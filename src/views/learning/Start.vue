@@ -85,11 +85,24 @@
 
       <!-- 오른쪽 영역 (메모 입력) -->
       <div class="col-lg-4">
+
+        <!-- 스톱워치 -->
+        <div class="timer-box shadow-sm p-3" style="margin-top: 65px;">
+          <div class="d-flex justify-content-between align-items-center">
+            <h6 class="fw-bold">⏱ 학습 타이머</h6>
+            <span class="timer-display">{{ formattedTime }}</span>
+          </div>
+          <div class="d-flex mt-1">
+            <button class="btn btn-sm btn-mint me-2" @click="startTimer" :disabled="timerRunning">▶︎</button>
+            <button class="btn btn-sm btn-outline-secondary me-2" @click="pauseTimer" :disabled="!timerRunning">⏸︎</button>
+          </div>
+        </div>
+
         <div class="memo-box shadow-sm p-4">
           <div v-if="selectedItem">
             <h6 class="fw-bold mb-3">📝 {{ selectedItem.title }} 학습 노트</h6>
             <p class="text-muted small mb-2">학습한 내용을 자유롭게 작성하세요. AI가 내용을 검토해드립니다.</p>
-            <textarea v-model="memoContent" rows="18" class="form-control mb-3" placeholder="예: Session vs JWT 차이점 정리..."></textarea>
+            <textarea v-model="memoContent" rows="14" class="form-control mb-3" placeholder="예: Session vs JWT 차이점 정리..."></textarea>
 
             <div class="d-flex justify-content-between align-items-center">
               <small class="text-muted">{{ memoContent.length }}/500자</small>
@@ -237,6 +250,35 @@ function submitMemo() {
   alert(`"${selectedItem.value.title}"주제에 맞는 내용입니다`);
   memoContent.value = "";
 }
+
+// -----------------------
+// ⏱ 타이머 로직
+// -----------------------
+const timer = ref(0);           // 총 시간(초)
+const timerRunning = ref(false);
+let timerInterval = null;
+
+const formattedTime = computed(() => {
+  const h = String(Math.floor(timer.value / 3600)).padStart(2, "0");
+  const m = String(Math.floor((timer.value % 3600) / 60)).padStart(2, "0");
+  const s = String(timer.value % 60).padStart(2, "0");
+  return `${h}:${m}:${s}`;
+});
+
+function startTimer() {
+  if (timerRunning.value) return;
+  timerRunning.value = true;
+
+  timerInterval = setInterval(() => {
+    timer.value++;
+  }, 1000);
+}
+
+function pauseTimer() {
+  timerRunning.value = false;
+  clearInterval(timerInterval);
+}
+
 </script>
 
 <style scoped>
@@ -247,9 +289,9 @@ function submitMemo() {
 .memo-box {
   background-color: #FFFFFF;
   border: 1px solid #E5E7EB;
-  min-height: 600px;
+  min-height: 550px;
   transition: 0.3s;
-  margin-top: 64px;
+  margin-top: 10px;
   border-radius: 6px;
 }
 
@@ -386,4 +428,15 @@ function submitMemo() {
   margin-bottom: 0px;
 }
 
+.timer-box {
+  background-color: #ffffff;
+  border: 1px solid #E5E7EB;
+  border-radius: 6px;
+}
+
+.timer-display {
+  font-size: 20px;
+  font-weight: 700;
+  color: #00C896;
+}
 </style>
