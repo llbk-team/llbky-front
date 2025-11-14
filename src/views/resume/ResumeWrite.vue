@@ -272,7 +272,7 @@
             💬 AI에게 질문하기
           </button>
           <button class="ai-action-btn" @click="getDetailedAnalysis">
-            📋 상세한 분석받기
+            📋 관련 키워드
           </button>
         </div>
       </div>
