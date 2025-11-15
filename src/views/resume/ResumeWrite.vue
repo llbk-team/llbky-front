@@ -56,15 +56,7 @@
                 @input="onInputChange('email', $event.target.value)"
               />
             </div>
-            <div class="form-group">
-              <label>프로젝트 링크(깃허브)</label>
-              <input 
-                type="url" 
-                v-model="resumeData.github" 
-                placeholder="https://github.com/username"
-                @input="onInputChange('github', $event.target.value)"
-              />
-            </div>
+            
           </div>
         </div>
 
@@ -117,6 +109,130 @@
             <button type="button" class="add-btn" @click="addEducation">+ 교육사항 추가하기</button>
           </div>
         </div>
+
+        <!-- 경력 -->
+        <div class="form-section" :class="{ 'expanded': sections.career, 'active': sections.career }">
+          <div class="section-header" @click="toggleSection('career')">
+            <div class="section-info">
+              <h3>경력</h3>
+              <span class="section-desc">회사 정보, 담당업무</span>
+            </div>
+            <button class="toggle-btn" :class="{ 'active': sections.career }">
+              {{ sections.career ? '×' : '+' }}
+            </button>
+          </div>
+          
+          <div class="section-content" v-show="sections.career">
+            <!-- 경력 목록 -->
+            <div v-for="(career, index) in resumeData.careers" :key="index" class="career-item">
+              <div class="career-header">
+                <h4>경력 {{ index + 1 }}</h4>
+                <button 
+                  v-if="resumeData.careers.length > 1" 
+                  @click="removeCareer(index)" 
+                  class="btn btn-danger btn-sm"
+                >
+                  삭제
+                </button>
+              </div>
+              
+              <div class="form-grid">
+                <div class="form-group">
+                  <label>회사명 *</label>
+                  <input 
+                    type="text" 
+                    v-model="career.company" 
+                    placeholder="회사명을 입력하세요"
+                    @input="onCareerInputChange(index, 'company', $event.target.value)"
+                  />
+                </div>
+                <div class="form-group">
+                  <label>직무 *</label>
+                  <input 
+                    type="text" 
+                    v-model="career.position" 
+                    placeholder="개발자, 기획자 등"
+                    @input="onCareerInputChange(index, 'position', $event.target.value)"
+                  />
+                </div>
+              </div>
+              
+              <div class="form-grid">
+                <div class="form-group">
+                  <label>입사년월 *</label>
+                  <input 
+                    type="month" 
+                    v-model="career.startDate" 
+                    @input="onCareerInputChange(index, 'startDate', $event.target.value)"
+                  />
+                </div>
+                <div class="form-group">
+                  <label>퇴사년월</label>
+                  <input 
+                    type="month" 
+                    v-model="career.endDate" 
+                    :disabled="career.isCurrent"
+                    @input="onCareerInputChange(index, 'endDate', $event.target.value)"
+                  />
+                  <div class="form-check mt-2">
+                    <input 
+                      type="checkbox" 
+                      :id="`current-${index}`" 
+                      v-model="career.isCurrent"
+                      @change="onCareerCurrentChange(index)"
+                      class="form-check-input"
+                    />
+                    <label :for="`current-${index}`" class="form-check-label">
+                      현재 재직중
+                    </label>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="form-grid">
+                <div class="form-group">
+                  <label>근무부서</label>
+                  <input 
+                    type="text" 
+                    v-model="career.department" 
+                    placeholder="개발팀, 기획팀 등"
+                    @input="onCareerInputChange(index, 'department', $event.target.value)"
+                  />
+                </div>
+                <div class="form-group">
+                  <label>직급/직책</label>
+                  <input 
+                    type="text" 
+                    v-model="career.rank" 
+                    placeholder="사원, 대리, 팀장 등"
+                    @input="onCareerInputChange(index, 'rank', $event.target.value)"
+                  />
+                </div>
+              </div>
+              
+              <div class="form-group mb-4">
+                <label>담당업무</label>
+                <textarea 
+                  v-model="career.responsibilities" 
+                  placeholder="담당했던 주요 업무를 입력하세요"
+                  rows="4"
+                  @input="onCareerInputChange(index, 'responsibilities', $event.target.value)"
+                ></textarea>
+              </div>
+            </div>
+            
+            <!-- 경력 추가 버튼 -->
+            <div class="add-career-btn-container">
+              <button @click="addCareer" class="btn btn-outline-primary">
+                + 경력 추가
+              </button>
+            </div>
+          </div>
+        </div>
+
+
+
+
 
         <!-- 스킬 -->
         <div class="form-section" :class="{ 'expanded': sections.skills, 'active': sections.skills }">
@@ -287,6 +403,63 @@ import { useRouter } from 'vue-router'
 
 const router = useRouter()
 
+
+// 섹션 토글 함수
+const toggleSection = (section) => {
+  sections[section] = !sections[section]
+}
+
+// 기본 정보 입력 변경 함수
+const onInputChange = (field, value) => {
+  resumeData[field] = value
+  console.log(`${field} 변경됨:`, value)
+  // TODO: API 호출이나 유효성 검사 로직 추가 가능
+}
+
+// 경력 입력 변경 함수
+const onCareerInputChange = (index, field, value) => {
+  resumeData.careers[index][field] = value
+  console.log(`경력 ${index + 1} ${field} 변경됨:`, value)
+  // TODO: API 호출이나 유효성 검사 로직 추가 가능
+}
+
+// 현재 재직중 체크박스 변경 함수
+const onCareerCurrentChange = (index) => {
+  if (resumeData.careers[index].isCurrent) {
+    resumeData.careers[index].endDate = ''
+    console.log(`경력 ${index + 1}: 현재 재직중으로 설정됨`)
+  }
+}
+
+// 경력 추가 함수
+const addCareer = () => {
+  const newCareer = {
+    company: '',
+    position: '',
+    startDate: '',
+    endDate: '',
+    department: '',
+    rank: '',
+    responsibilities: '',
+    isCurrent: false
+  }
+  
+  resumeData.careers.push(newCareer)
+  console.log('새로운 경력이 추가됨:', newCareer)
+}
+
+// 경력 삭제 함수
+const removeCareer = (index) => {
+  if (resumeData.careers.length > 1) {
+    const removedCareer = resumeData.careers[index]
+    resumeData.careers.splice(index, 1)
+    console.log(`경력 ${index + 1} 삭제됨:`, removedCareer)
+  } else {
+    console.warn('마지막 경력은 삭제할 수 없습니다.')
+  }
+}
+
+
 // AI 코칭 패널 표시 상태
 const showAICoaching = ref(true)
 
@@ -316,6 +489,21 @@ const resumeData = reactive({
       endDate: ''
     }
   ],
+  // 경력 정보
+  careers: [
+    {
+      company: '',
+      position: '',
+      startDate: '',
+      endDate: '',
+      department: '',
+      rank: '',
+      responsibilities: '',
+      isCurrent: false
+    }
+  ],
+
+
   skills: [
     { name: '' }
   ],
@@ -334,16 +522,9 @@ const resumeData = reactive({
   ]
 })
 
-// 섹션 토글
-const toggleSection = (section) => {
-  sections[section] = !sections[section]
-}
 
-// 입력 변화 감지
-const onInputChange = async (field, value) => {
-  console.log(`${field} 변경됨:`, value)
-  await requestRealtimeCoaching(field, value)
-}
+
+
 
 // 실시간 AI 코칭 요청
 const requestRealtimeCoaching = async (field, value) => {
@@ -545,6 +726,57 @@ onMounted(() => {
   background-color: #EFF0F1;
   
 }
+.career-item {
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  background-color: #f8f9fa;
+}
+
+.career-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.career-header h4 {
+  margin: 0;
+  color: #495057;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.add-career-btn-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.form-check {
+  display: flex;
+  align-items: center;
+}
+
+.form-check-input {
+  margin-right: 8px;
+}
+
+.form-check-label {
+  margin: 0;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+
 
 .menu-item {
   padding: 12px 20px;
