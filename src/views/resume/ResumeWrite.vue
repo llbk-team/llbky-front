@@ -245,13 +245,13 @@
               {{ sections.skills ? '×' : '+' }}
             </button>
           </div>
-          
+
           <div class="section-content" v-show="sections.skills">
             <div class="skills-grid">
               <div v-for="(skill, index) in resumeData.skills" :key="index" class="skill-item">
-                <input 
-                  type="text" 
-                  v-model="skill.name" 
+                <input
+                  type="text"
+                  v-model="skill.name"
                   placeholder="기술 스택 입력"
                   @input="onInputChange('skills', resumeData.skills)"
                 />
@@ -259,6 +259,65 @@
               </div>
             </div>
             <button type="button" class="add-btn" @click="addSkill">+ 스킬 추가하기</button>
+          </div>
+        </div>
+
+        <!-- 활동 -->
+        <div class="form-section" :class="{ 'expanded': sections.activities, 'active': sections.activities }">
+          <div class="section-header" @click="toggleSection('activities')">
+            <div class="section-info">
+              <h3>활동</h3>
+              <span class="section-desc">대외활동, 동아리, 봉사활동 등을 추가하세요</span>
+            </div>
+            <button class="toggle-btn" :class="{ 'active': sections.activities }">
+              {{ sections.activities ? '×' : '+' }}
+            </button>
+          </div>
+
+          <div class="section-content" v-show="sections.activities">
+            <div v-for="(activity, index) in resumeData.activities" :key="index" class="activity-item">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label>활동명</label>
+                  <input
+                    type="text"
+                    v-model="activity.name"
+                    placeholder="예: 대학생 IT 동아리"
+                    @input="onInputChange('activities', resumeData.activities)"
+                  />
+                </div>
+                <div class="form-group">
+                  <label>기관/단체</label>
+                  <input
+                    type="text"
+                    v-model="activity.organization"
+                    placeholder="예: 학교명, 기관명"
+                    @input="onInputChange('activities', resumeData.activities)"
+                  />
+                </div>
+              </div>
+              <div class="form-grid">
+                <div class="form-group">
+                  <label>시작일</label>
+                  <input type="month" v-model="activity.startDate" />
+                </div>
+                <div class="form-group">
+                  <label>종료일</label>
+                  <input type="month" v-model="activity.endDate" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label>활동 내용</label>
+                <textarea
+                  v-model="activity.description"
+                  placeholder="활동에서 수행한 주요 역할과 성과를 입력하세요"
+                  rows="3"
+                  @input="onInputChange('activities', resumeData.activities)"
+                ></textarea>
+              </div>
+              <button type="button" class="remove-btn" @click="removeActivity(index)" v-if="resumeData.activities.length > 1">삭제</button>
+            </div>
+            <button type="button" class="add-btn" @click="addActivity">+ 활동 추가하기</button>
           </div>
         </div>
 
@@ -467,7 +526,9 @@ const showAICoaching = ref(true)
 const sections = reactive({
   basic: true,
   education: false,
+  career: false,
   skills: false,
+  activities: false,
   certificates: false,
   introduction: false
 })
@@ -506,6 +567,15 @@ const resumeData = reactive({
 
   skills: [
     { name: '' }
+  ],
+  activities: [
+    {
+      name: '',
+      organization: '',
+      startDate: '',
+      endDate: '',
+      description: ''
+    }
   ],
   certificates: [
     {
@@ -595,6 +665,23 @@ const addSkill = () => {
 const removeSkill = (index) => {
   if (resumeData.skills.length > 1) {
     resumeData.skills.splice(index, 1)
+  }
+}
+
+// 활동 관련
+const addActivity = () => {
+  resumeData.activities.push({
+    name: '',
+    organization: '',
+    startDate: '',
+    endDate: '',
+    description: ''
+  })
+}
+
+const removeActivity = (index) => {
+  if (resumeData.activities.length > 1) {
+    resumeData.activities.splice(index, 1)
   }
 }
 
@@ -974,6 +1061,7 @@ textarea {
 
 /* 개별 아이템 */
 .education-item,
+.activity-item,
 .cert-item,
 .intro-item {
   border: 1px solid #f0f0f0;
