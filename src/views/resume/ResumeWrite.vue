@@ -1,17 +1,17 @@
 <template>
   <div class="app-container">
     <!-- 사이드바 -->
-   <SideBar/>
+    <SideBar />
 
     <!-- 메인 컨테이너 -->
     <div class="main-container">
-      
+
       <!-- 이력서 작성 폼 -->
       <div class="resume-form-container">
         <div class="form-header">
           <h1>이력서 작성하기</h1>
           <p>단순한 정보를 입력하여보면 자동으로 양식에 맞게 내용까지 추천받을 수 있습니다.<br>
-          자세한 이력서를 경력의 빛을 낼 수 있도록 작성해보세요.</p>
+            자세한 이력서를 경력의 빛을 낼 수 있도록 작성해보세요.</p>
         </div>
 
         <!-- 기본 정보 -->
@@ -25,38 +25,26 @@
               {{ sections.basic ? '×' : '+' }}
             </button>
           </div>
-          
+
           <div class="section-content" v-show="sections.basic">
             <div class="form-grid">
               <div class="form-group">
                 <label>이름 *</label>
-                <input 
-                  type="text" 
-                  v-model="resumeData.name" 
-                  placeholder="이름을 입력하세요"
-                  @input="onInputChange('name', $event.target.value)"
-                />
+                <input type="text" v-model="resumeData.name" placeholder="이름을 입력하세요"
+                  @input="onInputChange('name', $event.target.value)" />
               </div>
               <div class="form-group">
                 <label>연락처 *</label>
-                <input 
-                  type="tel" 
-                  v-model="resumeData.phone" 
-                  placeholder="010-0000-0000"
-                  @input="onInputChange('phone', $event.target.value)"
-                />
+                <input type="tel" v-model="resumeData.phone" placeholder="010-0000-0000"
+                  @input="onInputChange('phone', $event.target.value)" />
               </div>
             </div>
             <div class="form-group mb-4">
               <label>이메일 *</label>
-              <input 
-                type="email" 
-                v-model="resumeData.email" 
-                placeholder="example@email.com"
-                @input="onInputChange('email', $event.target.value)"
-              />
+              <input type="email" v-model="resumeData.email" placeholder="example@email.com"
+                @input="onInputChange('email', $event.target.value)" />
             </div>
-            
+
           </div>
         </div>
 
@@ -71,27 +59,19 @@
               {{ sections.education ? '×' : '+' }}
             </button>
           </div>
-          
+
           <div class="section-content" v-show="sections.education">
             <div v-for="(education, index) in resumeData.educations" :key="index" class="education-item">
               <div class="form-grid">
                 <div class="form-group">
                   <label>교육기관명</label>
-                  <input 
-                    type="text" 
-                    v-model="education.school" 
-                    placeholder="대학교/고등학교"
-                    @input="onInputChange('education', resumeData.educations)"
-                  />
+                  <input type="text" v-model="education.school" placeholder="대학교/고등학교"
+                    @input="onInputChange('education', resumeData.educations)" />
                 </div>
                 <div class="form-group">
                   <label>전공/계열</label>
-                  <input 
-                    type="text" 
-                    v-model="education.major" 
-                    placeholder="컴퓨터공학과"
-                    @input="onInputChange('education', resumeData.educations)"
-                  />
+                  <input type="text" v-model="education.major" placeholder="컴퓨터공학과"
+                    @input="onInputChange('education', resumeData.educations)" />
                 </div>
               </div>
               <div class="form-grid">
@@ -104,7 +84,8 @@
                   <input type="month" v-model="education.endDate" />
                 </div>
               </div>
-              <button type="button" class="remove-btn" @click="removeEducation(index)" v-if="resumeData.educations.length > 1">삭제</button>
+              <button type="button" class="remove-btn" @click="removeEducation(index)"
+                v-if="resumeData.educations.length > 1">삭제</button>
             </div>
             <button type="button" class="add-btn" @click="addEducation">+ 교육사항 추가하기</button>
           </div>
@@ -121,106 +102,67 @@
               {{ sections.career ? '×' : '+' }}
             </button>
           </div>
-          
+
           <div class="section-content" v-show="sections.career">
             <!-- 경력 목록 -->
             <div v-for="(career, index) in resumeData.careers" :key="index" class="career-item">
               <div class="career-header">
                 <h4>경력 {{ index + 1 }}</h4>
-                <button 
-                  v-if="resumeData.careers.length > 1" 
-                  @click="removeCareer(index)" 
-                  class="btn btn-danger btn-sm"
-                >
-                  삭제
-                </button>
+
+                <!-- 버튼 영역 -->
+                <div class="career-actions">
+                  <!-- 피드백 받기 버튼 -->
+                  <button class="btn btn-outline-success btn-sm" @click="getSectionFeedback('career', index)">
+                    피드백 받기
+                  </button>
+                  <button v-if="resumeData.careers.length > 1" @click="removeCareer(index)"
+                    class="btn btn-danger btn-sm">
+                    삭제
+                  </button>
+
+                </div>
               </div>
-              
+
               <div class="form-grid">
                 <div class="form-group">
                   <label>회사명 *</label>
-                  <input 
-                    type="text" 
-                    v-model="career.company" 
-                    placeholder="회사명을 입력하세요"
-                    @input="onCareerInputChange(index, 'company', $event.target.value)"
-                  />
+                  <input type="text" v-model="career.company" placeholder="회사명을 입력하세요"
+                    @input="onCareerInputChange(index, 'company', $event.target.value)" />
                 </div>
                 <div class="form-group">
                   <label>직무 *</label>
-                  <input 
-                    type="text" 
-                    v-model="career.position" 
-                    placeholder="개발자, 기획자 등"
-                    @input="onCareerInputChange(index, 'position', $event.target.value)"
-                  />
+                  <input type="text" v-model="career.position" placeholder="개발자, 기획자 등"
+                    @input="onCareerInputChange(index, 'position', $event.target.value)" />
                 </div>
               </div>
-              
+
               <div class="form-grid">
                 <div class="form-group">
                   <label>입사년월 *</label>
-                  <input 
-                    type="month" 
-                    v-model="career.startDate" 
-                    @input="onCareerInputChange(index, 'startDate', $event.target.value)"
-                  />
+                  <input type="month" v-model="career.startDate"
+                    @input="onCareerInputChange(index, 'startDate', $event.target.value)" />
                 </div>
                 <div class="form-group">
                   <label>퇴사년월</label>
-                  <input 
-                    type="month" 
-                    v-model="career.endDate" 
-                    :disabled="career.isCurrent"
-                    @input="onCareerInputChange(index, 'endDate', $event.target.value)"
-                  />
+                  <input type="month" v-model="career.endDate" :disabled="career.isCurrent"
+                    @input="onCareerInputChange(index, 'endDate', $event.target.value)" />
                   <div class="form-check mt-2">
-                    <input 
-                      type="checkbox" 
-                      :id="`current-${index}`" 
-                      v-model="career.isCurrent"
-                      @change="onCareerCurrentChange(index)"
-                      class="form-check-input"
-                    />
+                    <input type="checkbox" :id="`current-${index}`" v-model="career.isCurrent"
+                      @change="onCareerCurrentChange(index)" class="form-check-input" />
                     <label :for="`current-${index}`" class="form-check-label">
                       현재 재직중
                     </label>
                   </div>
                 </div>
               </div>
-              
-              <div class="form-grid">
-                <div class="form-group">
-                  <label>근무부서</label>
-                  <input 
-                    type="text" 
-                    v-model="career.department" 
-                    placeholder="개발팀, 기획팀 등"
-                    @input="onCareerInputChange(index, 'department', $event.target.value)"
-                  />
-                </div>
-                <div class="form-group">
-                  <label>직급/직책</label>
-                  <input 
-                    type="text" 
-                    v-model="career.rank" 
-                    placeholder="사원, 대리, 팀장 등"
-                    @input="onCareerInputChange(index, 'rank', $event.target.value)"
-                  />
-                </div>
-              </div>
-              
+
               <div class="form-group mb-4">
                 <label>담당업무</label>
-                <textarea 
-                  v-model="career.responsibilities" 
-                  placeholder="담당했던 주요 업무를 입력하세요"
-                  rows="4"
-                  @input="onCareerInputChange(index, 'responsibilities', $event.target.value)"
-                ></textarea>
+                <textarea v-model="career.responsibilities" placeholder="담당했던 주요 업무를 입력하세요" rows="4"
+                  @input="onCareerInputChange(index, 'responsibilities', $event.target.value)"></textarea>
               </div>
             </div>
-            
+
             <!-- 경력 추가 버튼 -->
             <div class="add-career-btn-container">
               <button @click="addCareer" class="btn btn-outline-primary">
@@ -232,6 +174,98 @@
 
 
 
+        <!-- 활동 -->
+<div class="form-section" :class="{ 'expanded': sections.activities, 'active': sections.activities }">
+  <div class="section-header" @click="toggleSection('activities')">
+    <div class="section-info">
+      <h3>활동</h3>
+      <span class="section-desc">대외활동, 동아리, 봉사활동 등을 추가하세요</span>
+    </div>
+    <button class="toggle-btn" :class="{ 'active': sections.activities }">
+      {{ sections.activities ? '×' : '+' }}
+    </button>
+  </div>
+
+  <div class="section-content" v-show="sections.activities">
+    
+    <div v-for="(activity, index) in resumeData.activities" :key="index" class="career-item">
+      
+      <!-- 🔥 경력과 동일한 HEADER 구조 적용 -->
+      <div class="career-header">
+        <h4>활동 {{ index + 1 }}</h4>
+
+        <div class="career-actions">
+          <button 
+            class="btn btn-outline-success btn-sm"
+            @click="getSectionFeedback('activity', index)"
+          >
+            피드백 받기
+          </button>
+          <button 
+            v-if="resumeData.activities.length > 1" 
+            @click="removeActivity(index)" 
+            class="btn btn-danger btn-sm"
+          >
+            삭제
+          </button>
+
+        </div>
+      </div>
+
+      <!-- 🔥 경력과 동일한 2열 form-grid 구조 -->
+      <div class="form-grid">
+        <div class="form-group">
+          <label>활동명</label>
+          <input 
+            type="text"
+            v-model="activity.name"
+            placeholder="예: 대학생 IT 동아리"
+            @input="onInputChange('activities', resumeData.activities)"
+          />
+        </div>
+
+        <div class="form-group">
+          <label>기관/단체</label>
+          <input 
+            type="text"
+            v-model="activity.organization"
+            placeholder="예: 학교명, 기관명"
+            @input="onInputChange('activities', resumeData.activities)"
+          />
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label>시작일</label>
+          <input type="month" v-model="activity.startDate" />
+        </div>
+        <div class="form-group">
+          <label>종료일</label>
+          <input type="month" v-model="activity.endDate" />
+        </div>
+      </div>
+
+      <div class="form-group mb-4">
+        <label>활동 내용</label>
+        <textarea
+          v-model="activity.description"
+          placeholder="활동에서 수행한 주요 역할과 성과를 입력하세요"
+          rows="4"
+          @input="onInputChange('activities', resumeData.activities)"
+        ></textarea>
+      </div>
+    </div>
+
+    <!-- 활동 추가 -->
+    <div class="add-career-btn-container">
+      <button @click="addActivity" class="btn btn-outline-primary">
+        + 활동 추가하기
+      </button>
+    </div>
+
+  </div>
+</div>
 
 
         <!-- 스킬 -->
@@ -249,75 +283,13 @@
           <div class="section-content" v-show="sections.skills">
             <div class="skills-grid">
               <div v-for="(skill, index) in resumeData.skills" :key="index" class="skill-item">
-                <input
-                  type="text"
-                  v-model="skill.name"
-                  placeholder="기술 스택 입력"
-                  @input="onInputChange('skills', resumeData.skills)"
-                />
-                <button class="remove-skill-btn" @click="removeSkill(index)" v-if="resumeData.skills.length > 1">×</button>
+                <input type="text" v-model="skill.name" placeholder="기술 스택 입력"
+                  @input="onInputChange('skills', resumeData.skills)" />
+                <button class="remove-skill-btn" @click="removeSkill(index)"
+                  v-if="resumeData.skills.length > 1">×</button>
               </div>
             </div>
             <button type="button" class="add-btn" @click="addSkill">+ 스킬 추가하기</button>
-          </div>
-        </div>
-
-        <!-- 활동 -->
-        <div class="form-section" :class="{ 'expanded': sections.activities, 'active': sections.activities }">
-          <div class="section-header" @click="toggleSection('activities')">
-            <div class="section-info">
-              <h3>활동</h3>
-              <span class="section-desc">대외활동, 동아리, 봉사활동 등을 추가하세요</span>
-            </div>
-            <button class="toggle-btn" :class="{ 'active': sections.activities }">
-              {{ sections.activities ? '×' : '+' }}
-            </button>
-          </div>
-
-          <div class="section-content" v-show="sections.activities">
-            <div v-for="(activity, index) in resumeData.activities" :key="index" class="activity-item">
-              <div class="form-grid">
-                <div class="form-group">
-                  <label>활동명</label>
-                  <input
-                    type="text"
-                    v-model="activity.name"
-                    placeholder="예: 대학생 IT 동아리"
-                    @input="onInputChange('activities', resumeData.activities)"
-                  />
-                </div>
-                <div class="form-group">
-                  <label>기관/단체</label>
-                  <input
-                    type="text"
-                    v-model="activity.organization"
-                    placeholder="예: 학교명, 기관명"
-                    @input="onInputChange('activities', resumeData.activities)"
-                  />
-                </div>
-              </div>
-              <div class="form-grid">
-                <div class="form-group">
-                  <label>시작일</label>
-                  <input type="month" v-model="activity.startDate" />
-                </div>
-                <div class="form-group">
-                  <label>종료일</label>
-                  <input type="month" v-model="activity.endDate" />
-                </div>
-              </div>
-              <div class="form-group">
-                <label>활동 내용</label>
-                <textarea
-                  v-model="activity.description"
-                  placeholder="활동에서 수행한 주요 역할과 성과를 입력하세요"
-                  rows="3"
-                  @input="onInputChange('activities', resumeData.activities)"
-                ></textarea>
-              </div>
-              <button type="button" class="remove-btn" @click="removeActivity(index)" v-if="resumeData.activities.length > 1">삭제</button>
-            </div>
-            <button type="button" class="add-btn" @click="addActivity">+ 활동 추가하기</button>
           </div>
         </div>
 
@@ -332,17 +304,13 @@
               {{ sections.certificates ? '×' : '+' }}
             </button>
           </div>
-          
+
           <div class="section-content" v-show="sections.certificates">
             <div v-for="(cert, index) in resumeData.certificates" :key="index" class="cert-item">
               <div class="form-grid">
                 <div class="form-group">
                   <label>자격증명</label>
-                  <input 
-                    type="text" 
-                    v-model="cert.name" 
-                    placeholder="정보처리기사"
-                  />
+                  <input type="text" v-model="cert.name" placeholder="정보처리기사" />
                 </div>
                 <div class="form-group">
                   <label>취득년도</label>
@@ -351,13 +319,10 @@
               </div>
               <div class="form-group">
                 <label>발급기관</label>
-                <input 
-                  type="text" 
-                  v-model="cert.issuer" 
-                  placeholder="한국산업인력공단"
-                />
+                <input type="text" v-model="cert.issuer" placeholder="한국산업인력공단" />
               </div>
-              <button class="remove-btn" @click="removeCertificate(index)" v-if="resumeData.certificates.length > 1">삭제</button>
+              <button class="remove-btn" @click="removeCertificate(index)"
+                v-if="resumeData.certificates.length > 1">삭제</button>
             </div>
             <button type="button" class="add-btn" @click="addCertificate">+ 자격증 추가하기</button>
           </div>
@@ -399,7 +364,7 @@
         <div class="welcome-section">
           <p>안녕하세요! 이력서 작성을 도와 드릴 AI 코치입니다.</p>
           <p>항상 더 나은 이력서를 만들 수 있도록 도와드리겠습니다.
-          궁금한 점이 있으면 언제든지 물어보세요!</p>
+            궁금한 점이 있으면 언제든지 물어보세요!</p>
         </div>
 
         <!-- 적성 팁 -->
@@ -443,9 +408,7 @@
 
         <!-- 액션 버튼 -->
         <div class="ai-actions">
-          <button class="ai-action-btn" @click="askAI">
-            💬 AI에게 질문하기
-          </button>
+          <!-- 질문 버튼 완전 삭제됨 -->
           <button class="ai-action-btn" @click="getDetailedAnalysis">
             📋 관련 키워드
           </button>
@@ -455,13 +418,13 @@
   </div>
 </template>
 
+
 <script setup>
 import SideBar from '@/components/sidebar/SideBar.vue'
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
-
 
 // 섹션 토글 함수
 const toggleSection = (section) => {
@@ -471,28 +434,22 @@ const toggleSection = (section) => {
 // 기본 정보 입력 변경 함수
 const onInputChange = (field, value) => {
   resumeData[field] = value
-  console.log(`${field} 변경됨:`, value)
-  // TODO: API 호출이나 유효성 검사 로직 추가 가능
 }
 
 // 경력 입력 변경 함수
 const onCareerInputChange = (index, field, value) => {
   resumeData.careers[index][field] = value
-  console.log(`경력 ${index + 1} ${field} 변경됨:`, value)
-  // TODO: API 호출이나 유효성 검사 로직 추가 가능
 }
 
-// 현재 재직중 체크박스 변경 함수
 const onCareerCurrentChange = (index) => {
   if (resumeData.careers[index].isCurrent) {
     resumeData.careers[index].endDate = ''
-    console.log(`경력 ${index + 1}: 현재 재직중으로 설정됨`)
   }
 }
 
-// 경력 추가 함수
+// 경력 추가
 const addCareer = () => {
-  const newCareer = {
+  resumeData.careers.push({
     company: '',
     position: '',
     startDate: '',
@@ -501,25 +458,17 @@ const addCareer = () => {
     rank: '',
     responsibilities: '',
     isCurrent: false
-  }
-  
-  resumeData.careers.push(newCareer)
-  console.log('새로운 경력이 추가됨:', newCareer)
+  })
 }
 
-// 경력 삭제 함수
+// 경력 삭제
 const removeCareer = (index) => {
   if (resumeData.careers.length > 1) {
-    const removedCareer = resumeData.careers[index]
     resumeData.careers.splice(index, 1)
-    console.log(`경력 ${index + 1} 삭제됨:`, removedCareer)
-  } else {
-    console.warn('마지막 경력은 삭제할 수 없습니다.')
   }
 }
 
-
-// AI 코칭 패널 표시 상태
+// AI 코칭 패널
 const showAICoaching = ref(true)
 
 // 섹션 확장 상태
@@ -543,14 +492,8 @@ const resumeData = reactive({
   email: '',
   github: '',
   educations: [
-    {
-      school: '',
-      major: '',
-      startDate: '',
-      endDate: ''
-    }
+    { school: '', major: '', startDate: '', endDate: '' }
   ],
-  // 경력 정보
   careers: [
     {
       company: '',
@@ -563,11 +506,7 @@ const resumeData = reactive({
       isCurrent: false
     }
   ],
-
-
-  skills: [
-    { name: '' }
-  ],
+  skills: [{ name: '' }],
   activities: [
     {
       name: '',
@@ -578,93 +517,42 @@ const resumeData = reactive({
     }
   ],
   certificates: [
-    {
-      name: '',
-      date: '',
-      issuer: ''
-    }
-  ],
-  introductions: [
-    { title: '지원 동기', content: '' },
-    { title: '성장 경험', content: '' },
-    { title: '직무 역량', content: '' },
-    { title: '입사 후 포부', content: '' }
+    { name: '', date: '', issuer: '' }
   ]
 })
 
 
+// 🔥🔥 특정 섹션 피드백 생성 (프런트 기반)
+const getSectionFeedback = (section, index) => {
+  let msg = ''
 
+  if (section === 'career') {
+    const c = resumeData.careers[index]
+    msg = `경력 ${index + 1} 분석: '${c.company || '회사명 미입력'}' 회사에서의 역할을 더 구체적으로 적어보세요. 성과는 수치로 표현하면 좋습니다.`
+  }
 
+  if (section === 'activity') {
+    const a = resumeData.activities[index]
+    msg = `활동 ${index + 1} 분석: '${a.name || '활동명 미입력'}' 활동에서 맡았던 역할과 성과를 정량적으로 작성해보면 더 좋습니다.`
+  }
 
-// 실시간 AI 코칭 요청
-const requestRealtimeCoaching = async (field, value) => {
-  try {
-    const response = await fetch('http://localhost:8081/api/resume/coaching/realtime', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        field: field,
-        value: value,
-        resumeData: resumeData
-      })
-    })
-    
-    if (response.ok) {
-      const result = await response.json()
-      console.log('실시간 코칭 결과:', result)
-      
-      if (result.feedback) {
-        aiFeedback.value.unshift({
-          type: result.type || 'tip',
-          message: result.feedback,
-          timestamp: new Date()
-        })
-        
-        if (aiFeedback.value.length > 5) {
-          aiFeedback.value.pop()
-        }
-      }
-    }
-  } catch (error) {
-    console.error('실시간 코칭 요청 실패:', error)
+  aiFeedback.value.unshift({
+    type: 'tip',
+    message: msg,
+    timestamp: new Date()
+  })
+
+  if (aiFeedback.value.length > 10) {
+    aiFeedback.value.pop()
   }
 }
 
-// 피드백 아이콘 반환
+// 피드백 아이콘
 const getFeedbackIcon = (type) => {
   switch (type) {
     case 'positive': return '👍'
     case 'warning': return '⚠️'
     default: return '💡'
-  }
-}
-
-// 교육사항 관련
-const addEducation = () => {
-  resumeData.educations.push({
-    school: '',
-    major: '',
-    startDate: '',
-    endDate: ''
-  })
-}
-
-const removeEducation = (index) => {
-  if (resumeData.educations.length > 1) {
-    resumeData.educations.splice(index, 1)
-  }
-}
-
-// 스킬 관련
-const addSkill = () => {
-  resumeData.skills.push({ name: '' })
-}
-
-const removeSkill = (index) => {
-  if (resumeData.skills.length > 1) {
-    resumeData.skills.splice(index, 1)
   }
 }
 
@@ -685,12 +573,37 @@ const removeActivity = (index) => {
   }
 }
 
-// 자격증 관련
+// 스킬 관련
+const addSkill = () => {
+  resumeData.skills.push({ name: '' })
+}
+
+const removeSkill = (index) => {
+  if (resumeData.skills.length > 1) {
+    resumeData.skills.splice(index, 1)
+  }
+}
+
+// 교육 삭제 / 추가
+const addEducation = () => {
+  resumeData.educations.push({
+    school: '',
+    major: '',
+    startDate: '',
+    endDate: ''
+  })
+}
+
+const removeEducation = (index) => {
+  if (resumeData.educations.length > 1) {
+    resumeData.educations.splice(index, 1)
+  }
+}
+
+// 자격증
 const addCertificate = () => {
   resumeData.certificates.push({
-    name: '',
-    date: '',
-    issuer: ''
+    name: '', date: '', issuer: ''
   })
 }
 
@@ -700,102 +613,22 @@ const removeCertificate = (index) => {
   }
 }
 
-// 자기소개 관련
-const addIntroduction = () => {
-  resumeData.introductions.push({
-    title: '',
-    content: ''
+// 상세 분석(더미)
+const getDetailedAnalysis = () => {
+  aiFeedback.value.unshift({
+    type: 'tip',
+    message: '키워드 기반 상세 이력서 분석 기능은 준비 중입니다.',
+    timestamp: new Date()
   })
 }
 
-const removeIntroduction = (index) => {
-  if (resumeData.introductions.length > 1) {
-    resumeData.introductions.splice(index, 1)
-  }
-}
-
-// AI 코칭 패널 토글
-const toggleAICoaching = () => {
-  showAICoaching.value = !showAICoaching.value
-}
-
-// AI에게 질문하기
-const askAI = async () => {
-  const question = prompt('AI 코치에게 질문하세요:')
-  if (question) {
-    try {
-      const response = await fetch('http://localhost:8081/api/resume/coaching/ask', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          question: question,
-          resumeData: resumeData
-        })
-      })
-      
-      if (response.ok) {
-        const result = await response.json()
-        alert(`AI 코치 답변: ${result.answer}`)
-      }
-    } catch (error) {
-      console.error('AI 질문 요청 실패:', error)
-    }
-  }
-}
-
-// 상세한 분석받기
-const getDetailedAnalysis = async () => {
-  try {
-    const response = await fetch('http://localhost:8081/api/resume/coaching/detailed', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(resumeData)
-    })
-    
-    if (response.ok) {
-      const result = await response.json()
-      console.log('상세 분석 결과:', result)
-    }
-  } catch (error) {
-    console.error('상세 분석 요청 실패:', error)
-  }
-
-
-  
-}
-
-// 이력서 미리보기
+// 미리보기
 const previewResume = () => {
   console.log('이력서 미리보기:', resumeData)
 }
 
-// 이력서 저장
-const submitResume = async () => {
-  // try {
-  //   const response = await fetch('http://localhost:8081/api/resume', {
-  //     method: 'POST',
-  //     headers: {
-  //       'Content-Type': 'application/json'
-  //     },
-  //     body: JSON.stringify(resumeData)
-  //   })
-    
-  //   if (response.ok) {
-  //     const result = await response.json()
-  //     console.log('이력서 저장 성공:', result)
-  //     alert('이력서가 성공적으로 저장되었습니다!')
-  //     router.push('/resume')
-  //   } else {
-  //     alert('이력서 저장에 실패했습니다.')
-  //   }
-  // } catch (error) {
-  //   console.error('이력서 저장 실패:', error)
-  //   alert('이력서 저장 중 오류가 발생했습니다.')
-  // }
+// 저장
+const submitResume = () => {
   alert('작성완료되었습니다.');
   router.push(`/resume/list`);
 }
@@ -805,14 +638,16 @@ onMounted(() => {
 })
 </script>
 
+
 <style scoped>
 /* 전체 앱 컨테이너 */
 .app-container {
   display: flex;
   min-height: 100vh;
   background-color: #EFF0F1;
-  
+
 }
+
 .career-item {
   border: 1px solid #e9ecef;
   border-radius: 8px;
@@ -828,6 +663,12 @@ onMounted(() => {
   margin-bottom: 20px;
   padding-bottom: 10px;
   border-bottom: 1px solid #dee2e6;
+}
+
+.career-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .career-header h4 {
@@ -887,8 +728,9 @@ textarea {
 /* 메인 컨테이너 */
 .main-container {
   flex: 1;
-  padding:40px;
-  max-width: calc(100vw - 200px - 400px); /* 사이드바와 AI패널 제외 */
+  padding: 40px;
+  max-width: calc(100vw - 200px - 400px);
+  /* 사이드바와 AI패널 제외 */
 }
 
 
@@ -1377,7 +1219,7 @@ textarea {
   .ai-coaching-panel {
     display: none;
   }
-  
+
   .main-container {
     max-width: calc(100vw - 200px);
   }
@@ -1387,21 +1229,21 @@ textarea {
   .app-container {
     flex-direction: column;
   }
-  
+
   .sidebar {
     width: 100%;
     height: auto;
   }
-  
+
   .main-container {
     max-width: 100%;
     padding: 20px;
   }
-  
+
   .form-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .skills-grid {
     grid-template-columns: 1fr;
   }

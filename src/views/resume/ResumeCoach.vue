@@ -44,7 +44,7 @@
                     {{ resumeData.skills }}
                   </div>
                 </div>
-                
+
                 <!-- 수정 모드인 경우: 입력 폼 -->
                 <div v-else>
                   <div class="section">
@@ -81,7 +81,8 @@
                       <label class="form-label">주요 업무 및 성과</label>
                       <div v-for="(achievement, index) in editData.career.achievements" :key="index" class="mb-2">
                         <div class="d-flex gap-2">
-                          <textarea class="form-control" rows="2" v-model="editData.career.achievements[index]"></textarea>
+                          <textarea class="form-control" rows="2"
+                            v-model="editData.career.achievements[index]"></textarea>
                           <button class="btn btn-sm btn-outline-danger" @click="removeAchievement(index)">
                             <i class="bi bi-trash"></i>
                           </button>
@@ -135,7 +136,7 @@
                     </p>
                   </div>
                 </div>
-                
+
               </div>
 
               <!-- ✅ 규격화된 형식 (standard) -->
@@ -198,29 +199,31 @@
                     </tbody>
                   </table>
                 </div>
-                
+
                 <!-- 수정 모드인 경우: 편집 가능한 테이블 -->
-                
+
               </div>
             </div>
 
             <!-- 오른쪽: AI 첨삭 제안 (1/3) -->
             <div class="edit-card">
-              <h2>✏️AI 첨삭 제안</h2>
+              <h2>✏️AI 제안</h2>
 
-              <p class="edit-label ms-1">경력사항 개선 제안</p>
+              <p class="edit-label ms-1">자소서 · 포트폴리오 맞춤 제안</p>
 
+              <!-- 자소서 제안 -->
               <div class="before">
-                <strong>수정 전:</strong><br>
-                Spring Boot 기반 전자상거래 플랫폼 개발 및 운영
+                <strong>자소서에서 강조하면 좋은 내용:</strong><br>
+                팀 프로젝트에서 맡은 역할과 기여도를 구체적으로 서술하면 좋습니다.
               </div>
 
+              <!-- 포트폴리오 제안 -->
               <div class="after">
-                <strong>수정 후:</strong><br>
-                Spring Boot API 개발 및 운영, 5명 개발 리드 역할 수행
+                <strong>포트폴리오 추가 제안:</strong><br>
+                REST API 개발 과정과 성능 개선 경험을 정리한 기술 문서를 포함하면 좋습니다.
               </div>
               <div class="d-flex gap-4 mb-4 justify-content-end">
-                <button class="btn btn-sm btn-dark "> AI 피드백 반영</button>
+                <button class="btn btn-sm btn-dark ">예시 보기</button>
               </div>
             </div>
           </div>
@@ -254,34 +257,37 @@
               </div>
 
               <!-- ✅ 이력서 형식 선택 버튼들 -->
-               <div class="d-flex flex-column gap-3 mb-4 align-items-center">
-                  <div class="subtitle2">이력서 형식 선택</div>
-                  <div class="text-muted small">
-                    원하는 이력서 형식을 선택하면 자동으로 변환됩니다
-                  </div>
+              <div class="d-flex flex-column gap-3 mb-4 align-items-center">
+                <div class="subtitle2">이력서 형식 선택</div>
+                <div class="text-muted small">
+                  원하는 이력서 형식을 선택하면 자동으로 변환됩니다
+                </div>
               </div>
               <div class="d-flex gap-4 mb-4 justify-content-center">
                 <!-- 줄글 형식 이력서 버튼 -->
-                <button class="btn btn-resume-format" :class="{ active: resumeFormat === 'text' }" data-bs-toggle="modal" data-bs-target="#textFormatModal">
+                <button class="btn btn-resume-format" :class="{ active: resumeFormat === 'text' }"
+                  data-bs-toggle="modal" data-bs-target="#textFormatModal">
                   <div class="format-title">줄글 형식 이력서</div>
-                  
+
                 </button>
 
                 <!-- 규격화된 이력서 버튼 -->
-                <button class="btn btn-resume-format" :class="{ active: resumeFormat === 'standard' }" data-bs-toggle="modal" data-bs-target="#standardFormatModal">
-                  
+                <button class="btn btn-resume-format" :class="{ active: resumeFormat === 'standard' }"
+                  data-bs-toggle="modal" data-bs-target="#standardFormatModal">
+
                   <div class="format-title">표준 양식 형식</div>
-                 
+
                 </button>
               </div>
 
               <!-- 하단 버튼 -->
               <div class="d-flex gap-3 justify-content-center">
-                <button class="btn btn-outline-secondary fw-medium btn-lg btn-fixed-width" @click="$router.push('/resume/list')">
+                <button class="btn btn-outline-secondary fw-medium btn-lg btn-fixed-width"
+                  @click="$router.push('/resume/list')">
                   리포트 생성
                 </button>
 
-                
+
               </div>
             </div>
           </div>
@@ -292,7 +298,8 @@
     </div>
 
     <!-- ✅ 줄글 형식 이력서 모달 -->
-    <div class="modal fade" id="textFormatModal" tabindex="-1" aria-labelledby="textFormatModalLabel" aria-hidden="true">
+    <div class="modal fade" id="textFormatModal" tabindex="-1" aria-labelledby="textFormatModalLabel"
+      aria-hidden="true">
       <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
           <div class="modal-header">
@@ -314,7 +321,8 @@
     </div>
 
     <!-- ✅ 규격화된 이력서 모달 -->
-    <div class="modal fade" id="standardFormatModal" tabindex="-1" aria-labelledby="standardFormatModalLabel" aria-hidden="true">
+    <div class="modal fade" id="standardFormatModal" tabindex="-1" aria-labelledby="standardFormatModalLabel"
+      aria-hidden="true">
       <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
           <div class="modal-header">
@@ -383,11 +391,11 @@ const editData = ref({
 onMounted(() => {
   // 줄글 형식 텍스트 필드 초기화
   editData.value.basicInfoText = `저는 ${resumeData.value.name}이며, ${resumeData.value.email}으로 연락 가능합니다. 전화번호는 ${resumeData.value.phone}입니다.`;
-  
+
   editData.value.careerText = `${resumeData.value.career.company}에서 ${resumeData.value.career.position}으로 ${resumeData.value.career.period} 근무하였습니다.`;
-  
+
   editData.value.achievementsText = `주요 업무로는 Spring Boot 기반 전자상거래 플랫폼을 개발하고 운영하였으며, MSA 아키텍처 전환 프로젝트를 리드하여 응답속도를 50% 개선하는 성과를 달성했습니다. 또한 Redis 캐싱을 도입하여 DB 부하를 40% 감소시켰습니다.`;
-  
+
   editData.value.skillsText = `${resumeData.value.skills}에 대한 실무 경험을 보유하고 있으며, 이를 활용하여 다양한 프로젝트를 성공적으로 수행하였습니다.`;
 });
 
@@ -517,20 +525,23 @@ const applyStandardFormat = () => {
 
 
 .title {
-    font-weight: 700;
-    font-size: 1.75rem; /* 28px */
-    margin-bottom: 15px;
+  font-weight: 700;
+  font-size: 1.75rem;
+  /* 28px */
+  margin-bottom: 15px;
 }
 
 .subtitle2 {
-    font-weight: 600;
-    font-size: 1.375rem; /* 22px */
-    color: #333;
+  font-weight: 600;
+  font-size: 1.375rem;
+  /* 22px */
+  color: #333;
 }
 
 .subtitle {
-    color: #6c757d;
-    font-size: 1rem; /* 16px */
+  color: #6c757d;
+  font-size: 1rem;
+  /* 16px */
 }
 
 
@@ -813,11 +824,11 @@ const applyStandardFormat = () => {
 }
 
 .format-title {
-  
+
   font-size: 18px;
   font-weight: 700;
   color: #000;
-  
+
 }
 
 

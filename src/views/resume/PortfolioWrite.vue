@@ -110,9 +110,9 @@
 </template>
 
 <script setup>
+import SideBar from '@/components/sidebar/SideBar.vue'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import SideBar from '@/components/sidebar/SideBar.vue'
 
 
 // Router 사용
