@@ -147,6 +147,7 @@ import portfolioLogic  from "../../utils/resumeMain"
 const { portfolioList } = portfolioLogic.usePortfolioList();
 
 
+import resumeApi from '@/apis/resume';
 
 const router = useRouter()
 
@@ -165,27 +166,36 @@ const toggleSelectMode = () => {
 // 사용자 정보
 const userName = ref('김병현')
 
-// 이력서 리스트 데이터
-const resumeList = ref([
-  {
-    id: 1,
-    title: '엔전 이력서',
-    description: '백엔드 엔지니어 지원용',
-    updatedAt: '2024.03.15'
-  },
-  {
-    id: 2,
-    title: '행정 2',
-    description: '프론트엔드 개발자 지원용',
-    updatedAt: '2024.03.10'
-  },
-  {
-    id: 3,
-    title: '행정들',
-    description: '풀스택 개발자 지원용',
-    updatedAt: '2024.03.08'
+const resumeList = ref([]);
+
+
+const fetchResumeList = async () => {
+  try {
+    const res = await resumeApi.list(1);  // memberId = 1
+    resumeList.value = res.data.map(item => ({
+      id: item.resumeId,
+      title: item.title,
+      description: extractDescription(item), // JSONB → 요약 문자열
+      updatedAt: item.updatedAt?.substring(0, 10)
+    }));
+  } catch (err) {
+    console.error("이력서 리스트 조회 실패:", err);
   }
-])
+};
+
+function extractDescription(item) {
+  try {
+    const career = JSON.parse(item.careerInfo);
+    if (Array.isArray(career) && career.length > 0) {
+      return career[0].description || "-";
+    }
+    return "-";
+  } catch {
+    return "-";
+  }
+}
+
+
 
 // 이력서 상세 페이지로 이동 (서류코칭 페이지)
 const goToResumeDetail = (resumeId) => {
@@ -244,14 +254,20 @@ const confirmDelete = () => {
 }
 
 // 선택된 항목 삭제 함수
-const deleteSelectedItems = () => {
-  // 이력서 삭제
-  if (selectedResumes.value.length > 0) {
-    resumeList.value = resumeList.value.filter(item => !selectedResumes.value.includes(item.id))
-    console.log(`이력서 ID:${selectedResumes.value.join(', ')} 삭제됨`)
-    selectedResumes.value = []
+const deleteSelectedItems = async () => {
+  for (const id of selectedResumes.value) {
+    try {
+      await resumeApi.remove(id);
+    } catch (err) {
+      console.error("삭제 실패:", err);
+    }
   }
 
+  await fetchResumeList(); // 삭제 후 다시 리스트 로딩
+  selectedResumes.value = [];
+};
+
+  
   // 자기소개서 삭제
   if (selectedCovers.value.length > 0) {
     coverLetterList.value = coverLetterList.value.filter(item => !selectedCovers.value.includes(item.id))
@@ -265,7 +281,7 @@ const deleteSelectedItems = () => {
     console.log(`포트폴리오 ID:${selectedPortfolios.value.join(', ')} 삭제됨`)
     selectedPortfolios.value = []
   }
-}
+
 
 // const createIntegratedDocument = () => {
 //   if (!selectedResume.value || !selectedCover.value ) {
@@ -291,27 +307,6 @@ const deleteSelectedItems = () => {
 // }
 
 
-// API 호출로 이력서 리스트 조회
-const fetchResumeList = async () => {
-  try {
-    // localhost:8081/api/resume 호출
-    const response = await fetch('http://localhost:8081/api/resume', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })
-
-    if (response.ok) {
-      const data = await response.json()
-      if (data.success && data.resumeList) {
-        resumeList.value = data.resumeList
-      }
-    }
-  } catch (error) {
-    console.error('이력서 리스트 조회 실패:', error)
-  }
-}
 
 // 자기소개서 리스트 (정적 데이터)
 const coverLetterList = ref([
