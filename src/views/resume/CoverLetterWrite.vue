@@ -1,3 +1,4 @@
+<!-- 자소서 작성 페이지 컴포넌트 -->
 <template>
   <div class="app-container">
     <!-- 사이드바 -->
@@ -46,7 +47,7 @@
 
         <!-- 버튼 -->
         <div class="action-buttons">
-          <button class="save-btn" @click="router.push('/resume/list')">
+          <button class="save-btn" @click="saveCoverLetter">
             📄 작성 완료
           </button>
         </div>
@@ -113,25 +114,15 @@
 </template>
 
 <script setup>
-import SideBar from '@/components/sidebar/SideBar.vue'
-import router from '@/router'
-import { reactive } from 'vue'
+import SideBar from '@/components/sidebar/SideBar.vue';
+import coverletterWrite from '@/utils/coverletterWrite';
 
-const introFields = reactive({
-  '지원 동기': '',
-  '성장 경험': '',
-  '직무 역량': '',
-  '입사 후 포부': ''
-})
-
-const sections = reactive({
-  '지원 동기': true,
-  '성장 경험': false,
-  '직무 역량': false,
-  '입사 후 포부': false
-})
-
-const toggleSection = (key) => (sections[key] = !sections[key])
+const {
+  introFields,
+  sections,
+  toggleSection,
+  saveCoverLetter
+} = coverletterWrite.useCoverletterWrite();
 </script>
 
 <style scoped>
