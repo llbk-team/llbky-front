@@ -70,6 +70,46 @@ function getRealtimeCoaching(coachingRequest) {
   return axios.post("/api/portfolio-guide/coaching", coachingRequest);
 }
 
+/**
+ * 실시간 피드백 API (간단 버전 - 회원 정보 없이)
+ * @param {Object} feedbackRequest - inputFieldType, userInput, currentStep, jobGroup, jobRole, careerYears
+ */
+function getRealtimeFeedback(feedbackRequest) {
+  return axios.post("/api/portfolio-guide/feedback", feedbackRequest);
+}
+
+/**
+ * 가이드 단일 조회
+ * @param {Number} guideId - 가이드 ID
+ */
+function getGuideById(guideId) {
+  return axios.get(`/api/portfolio-guide/${guideId}`);
+}
+
+/**
+ * 회원별 가이드 목록 조회
+ * @param {Number} memberId - 회원 ID
+ */
+function getGuidesByMember(memberId) {
+  return axios.get(`/api/portfolio-guide/member/${memberId}`);
+}
+
+/**
+ * 가이드의 AI 피드백 조회
+ * @param {Number} guideId - 가이드 ID
+ */
+function getGuideFeedback(guideId) {
+  return axios.get(`/api/portfolio-guide/${guideId}/feedback`);
+}
+
+/**
+ * 테스트 예시 API (간단 버전 - Postman 테스트용)
+ * @param {Object} testRequest - userInput, inputFieldType(선택)
+ */
+function getTestExample(testRequest) {
+  return axios.post("/api/portfolio-guide/test-example", testRequest);
+}
+
 export default {
   // 표준 데이터 조회
   getAllStandards,
@@ -79,7 +119,14 @@ export default {
   getStandardByName,
   getStandardsByMinWeight,
   getStandardsCount,
-  
+
   // 코칭
-  getRealtimeCoaching
+  getRealtimeCoaching,
+  getRealtimeFeedback,
+  getTestExample,
+
+  // 가이드 조회
+  getGuideById,
+  getGuidesByMember,
+  getGuideFeedback
 };
