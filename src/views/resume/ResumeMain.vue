@@ -28,23 +28,16 @@
         <div class="resume-section">
           <div class="section-header d-flex justify-content-between align-items-center">
             <h2>내 이력서 리스트</h2>
-            
+
             <div class="d-flex align-items-center">
-              <button 
-                class="btn btn-primary select-btn me-3" 
-                @click="toggleSelectMode" 
-                :class="{ 'active': isSelecting }">
+              <button class="btn btn-primary select-btn me-3" @click="toggleSelectMode" :class="{ 'active': isSelecting }">
                 {{ isSelecting ? '취소' : '선택하기' }}
               </button>
 
-              <button 
-                v-if="isSelecting" 
-                class="btn btn-danger delete-btn" 
-                @click="confirmDelete"
-                :disabled="!hasSelectedItems">
+              <button v-if="isSelecting" class="btn btn-danger delete-btn" @click="confirmDelete" :disabled="!hasSelectedItems">
                 삭제하기
               </button>
-              
+
               <span class="ai-suggestion">✨ AI 이력서 작성</span>
             </div>
           </div>
@@ -58,20 +51,10 @@
             </div>
 
             <!-- 기존 이력서 카드 -->
-            <div 
-              v-for="resume in resumeList" 
-              :key="resume.id" 
-              class="resume-card"
-              :class="{ selecting: isSelecting }">
-              
+            <div v-for="resume in resumeList" :key="resume.id" class="resume-card" :class="{ selecting: isSelecting }">
+
               <!-- 체크박스 - position absolute 적용 -->
-              <input 
-                v-if="isSelecting"
-                type="checkbox" 
-                class="select-checkbox"
-                :checked="selectedResumes === resume.id"
-                @change="selectResume(resume.id)"
-              />
+              <input v-if="isSelecting" type="checkbox" class="select-checkbox" :checked="selectedResumes === resume.id" @change="selectResume(resume.id)" />
               <div class="card-content" @click="goToResumeDetail(resume.id)">
                 <div class="resume-icon">📄</div>
                 <div class="resume-info">
@@ -104,19 +87,8 @@
               </div>
             </div>
 
-            <div
-              v-for="cover in coverLetterList"
-              :key="cover.id"
-              class="resume-card"
-              :class="{ selecting: isSelecting }"
-            >
-               <input 
-                  v-if="isSelecting"
-                  type="checkbox" 
-                  class="select-checkbox"
-                  :checked="selectedCovers === cover.id"
-                  @change="selectCover(cover.id)"
-                />
+            <div v-for="cover in coverLetterList" :key="cover.id" class="resume-card" :class="{ selecting: isSelecting }">
+              <input v-if="isSelecting" type="checkbox" class="select-checkbox" :checked="selectedCovers === cover.id" @change="selectCover(cover.id)" />
               <div class="card-content" @click="goToCoverDetail(cover.id)">
                 <div class="resume-icon">🖋️</div>
                 <div class="resume-info">
@@ -148,30 +120,17 @@
               </div>
             </div>
 
-            <div 
-              v-for="portfolio in resumeList" 
-              :key="portfolio.id" 
-              class="resume-card"
-              :class="{ selecting: isSelecting }"
-            >
-              <input 
-                v-if="isSelecting"
-                type="checkbox" 
-                class="select-checkbox"
-                :checked="selectedPortfolios === portfolio.id"
-                @change="selectPortfolio(portfolio.id)"
-              />
-              <div class="card-content" @click="goToPortfolioDetail(portfolio.id)">
+            <div v-for="portfolio in portfolioList" :key="portfolio.portfolioId" class="resume-card">
+              <div class="card-content" @click="goToPortfolioDetail(portfolio.portfolioId)">
                 <div class="resume-icon">🎨</div>
-                <div class="resume-info">
-                  <h3 class="resume-title">{{ portfolio.title }}</h3>
-                  <p class="resume-description">{{ portfolio.description }}</p>
-                  <div class="resume-meta">
-                    <span class="update-date">📅 최종 수정: {{ portfolio.updatedAt }}</span>
-                  </div>
+                <h3 class="resume-title">{{ portfolio.title }}</h3>
+                <div class="resume-meta">
+                  <span class="update-date">📅 {{ portfolio.updatedAt }}</span>
                 </div>
               </div>
             </div>
+
+
           </div>
         </div>
       </div>
@@ -183,6 +142,11 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import portfolioLogic  from "../../utils/resumeMain"
+
+const { portfolioList } = portfolioLogic.usePortfolioList();
+
+
 
 const router = useRouter()
 
@@ -210,7 +174,7 @@ const resumeList = ref([
     updatedAt: '2024.03.15'
   },
   {
-    id: 2, 
+    id: 2,
     title: '행정 2',
     description: '프론트엔드 개발자 지원용',
     updatedAt: '2024.03.10'
@@ -218,7 +182,7 @@ const resumeList = ref([
   {
     id: 3,
     title: '행정들',
-    description: '풀스택 개발자 지원용', 
+    description: '풀스택 개발자 지원용',
     updatedAt: '2024.03.08'
   }
 ])
@@ -239,9 +203,9 @@ const selectedPortfolios = ref([])
 
 // 선택 항목이 있는지 확인하는 computed 속성
 const hasSelectedItems = computed(() => {
-  return selectedResumes.value.length > 0 || 
-         selectedCovers.value.length > 0 || 
-         selectedPortfolios.value.length > 0
+  return selectedResumes.value.length > 0 ||
+    selectedCovers.value.length > 0 ||
+    selectedPortfolios.value.length > 0
 })
 
 // 선택 토글 함수 예시 (이력서)
@@ -256,24 +220,16 @@ const selectResume = (id) => {
   }
 }
 const selectCover = (id) => {
-   const index = selectedCovers.value.indexOf(id)
-   if (index === -1) {
-    selectedCovers.value.push(id)  
-   }else{
+  const index = selectedCovers.value.indexOf(id)
+  if (index === -1) {
+    selectedCovers.value.push(id)
+  } else {
     selectedCovers.value.splice(index, 1)
-   }
- 
+  }
+
 }
 
-const selectPortfolio = (id) => {
-   const index = selectedPortfolios.value.indexOf(id)
-   if (index === -1) {
-    selectedPortfolios.value.push(id)  
-   }else{
-    selectedPortfolios.value.splice(index, 1)
-   }
- 
-}
+
 
 
 
@@ -281,7 +237,7 @@ const selectPortfolio = (id) => {
 const confirmDelete = () => {
   // 선택된 항목이 없으면 실행하지 않음
   if (!hasSelectedItems.value) return
-  
+
   if (confirm('정말로 선택한 항목을 삭제하시겠습니까?')) {
     deleteSelectedItems()
   }
@@ -295,14 +251,14 @@ const deleteSelectedItems = () => {
     console.log(`이력서 ID:${selectedResumes.value.join(', ')} 삭제됨`)
     selectedResumes.value = []
   }
-  
+
   // 자기소개서 삭제
   if (selectedCovers.value.length > 0) {
     coverLetterList.value = coverLetterList.value.filter(item => !selectedCovers.value.includes(item.id))
     console.log(`자기소개서 ID:${selectedCovers.value.join(', ')} 삭제됨`)
     selectedCovers.value = []
   }
-  
+
   // 포트폴리오 삭제
   if (selectedPortfolios.value.length > 0) {
     // 포트폴리오 삭제 로직
@@ -345,7 +301,7 @@ const fetchResumeList = async () => {
         'Content-Type': 'application/json'
       }
     })
-    
+
     if (response.ok) {
       const data = await response.json()
       if (data.success && data.resumeList) {
@@ -387,7 +343,7 @@ const fetchUserInfo = async () => {
         'Content-Type': 'application/json'
       }
     })
-    
+
     if (response.ok) {
       const data = await response.json()
       if (data.success && data.user) {
@@ -405,467 +361,4 @@ onMounted(() => {
 })
 </script>
 
-<style scoped>
-.resume-main {
-  min-height: 100vh;
-  background: #f8f9fa;
- 
-}
-
-.main-container {
-  display: flex;
-  min-height: 100vh;
-}
-.delete-btn {
-  background-color: #ff6b6b;
-  border: none;
-  color: white;
-  padding: 8px 16px;
-  border-radius: 6px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.delete-btn:hover {
-  background-color: #fa5252;
-}
-
-.delete-btn:disabled {
-  background-color: #ffc9c9;
-  cursor: not-allowed;
-}
-
-
-
-
-
-/* 메인 콘텐츠 */
-.main-content {
-  flex: 1;
-  padding: 40px;
-}
-
-.select-toggle-btn {
-  background: #71EBBE; /* 동일한 녹색 */
-  color: white;
-  border: none;
-  padding: 14px 24px;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  font-size: 14px;
-  transition: all 0.3s;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-
-  /* 위치 조정 */
-  margin-left: 200px; /* 왼쪽으로 이동 */
-}
-
-
-
-
-
-/* 인사말 */
-.greeting {
-  margin-bottom: 30px;
-}
-
-.greeting h1 {
-  margin: 0;
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: #333;
-}
-
-/* 배너 섹션 */
-.banner-section {
-  margin-bottom: 40px;
-}
-
-.subtitle p{
-  color: #ffffff;
-  font-size: 1rem;
-}
-
-.banner-card {
-  background: linear-gradient(135deg, #71EBBE 0%, #5BC7A7 100%);
-  border-radius: 16px;
-  padding: 30px;
-  color: white;
-  box-shadow: 0 8px 32px rgba(113, 235, 190, 0.3);
-}
-
-.banner-content {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-}
-
-.banner-icon {
-  font-size: 48px;
-}
-
-.banner-text {
-  flex: 1;
-}
-
-.banner-text h2 {
-  margin: 0 0 8px 0;
-  font-size: 18px;
-  font-weight: 700;
-}
-
-.banner-text p {
-  margin: 0;
-  font-size: 16px;
-  opacity: 0.9;
-}
-
-.banner-button {
-  background: white;
-  color: #71EBBE;
-  border: none;
-  height: 37px;
-  padding: 10px 24px;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  font-size: 14px;
-  transition: all 0.3s;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
-}
-
-.banner-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-}
-
-/* 이력서 섹션 */
-.resume-section {
-  background: white;
-  margin-top: 15px;
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-}
-
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.section-header h2 {
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 700;
-  color: #333;
-}
-.section-header.compact {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.left-group {
-  display: flex;
-  align-items: center;
-  gap: 10px; /* 제목과 버튼 간 최소 간격 */
-}
-
-.left-group h2 {
-  margin: 0;
-  font-size: 20px;
-  font-weight: 700;
-  color: #333;
-  line-height: 1;
-}
-
-/* 버튼 살짝 작게 맞춤 */
-.select-toggle-btn,
-.integrate-button.small {
-  background: #71EBBE;
-  color: white;
-  border: none;
-  padding: 6px 14px; /* 작게 조정 */
-  border-radius: 6px;
-  font-weight: 600;
-  cursor: pointer;
-  font-size: 13px;
-  transition: all 0.2s;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08);
-  margin-left: 0; /* 혹시 기존에 남아있으면 꼭 0으로 */
-}
-
-/* 통합 버튼만 색 다르게 */
-.integrate-button.small {
-  background: #5BC7A7;
-}
-
-/* hover 효과 */
-.select-toggle-btn:hover,
-.integrate-button.small:hover {
-  transform: translateY(-2px);
-}
-
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.ai-suggestion {
-  color: #71EBBE;
-  font-size: 14px;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-/* 이력서 그리드 */
-.resume-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
-  gap: 20px;
-}
-
-.resume-card {
-  background: white;
-  border: 2px solid #f0f0f0;
-  border-radius: 10px;
-  padding: 24px;
-  cursor: pointer;
-  transition: all 0.3s;
-  min-height: 160px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  position: relative; /* 이 부분이 중요합니다 */
-  overflow: hidden;
-  margin-bottom: 12px;
-}
-.resume-card.selecting {
-  border-color: #71EBBE;
-  box-shadow: 0 0 0 2px rgba(113, 235, 190, 0.3);
-}
-
-.resume-card:hover {
-  border-color: #71EBBE;
-  transform: translateY(-4px);
-  box-shadow: 0 12px 32px rgba(113, 235, 190, 0.15);
-}
-
-/* 새 이력서 추가 카드 */
-.resume-card.add-card {
-  border-style: dashed;
-  border-color: #71EBBE;
-  background: linear-gradient(135deg, rgba(113, 235, 190, 0.05) 0%, rgba(91, 199, 167, 0.05) 100%);
-}
-
-.add-card .card-content {
-  text-align: center;
-  color: #71EBBE;
-}
-
-.add-icon {
-  font-size: 48px;
-  margin-bottom: 12px;
-  font-weight: 300;
-}
-
-.add-text {
-  font-weight: 600;
-  font-size: 16px;
-}
-
-/* 기존 이력서 카드 */
-.resume-card:not(.add-card) .card-content {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
-.resume-icon {
-  font-size: 24px;
-  margin-bottom: 2.5px;
-  color: #71EBBE;
-}
-
-.resume-info {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.resume-title {
-  margin: 0 0 2px 1.5px;
-  font-size: 16px;
-  font-weight: 700;
-  color: #333;
-}
-
-
-.resume-description {
-  margin: 0 0 10px 1.5px;
-  color: #666;
-  font-size: 13px;
-  line-height: 1.4;
-  flex: 1;
-}
-
-.resume-meta {
-  margin-top: auto;
-}
-
-.update-date {
-  color: #999;
-  font-size: 12px;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-/* 체크박스 스타일 수정 */
-.select-checkbox {
-  position: absolute; /* 절대 위치로 설정 */
-  top: 15px;          /* 상단에서 15px 떨어진 위치 */
-  right: 15px;        /* 오른쪽에서 15px 떨어진 위치 */
-  width: 20px;
-  height: 20px;
-  cursor: pointer;
-  accent-color: #71EBBE;
-  z-index: 10;        /* 다른 요소 위에 표시 */
-}
-
-/* 선택 모드 활성화 시 카드 패딩 조정 - 필요하면 사용 */
-.resume-card.selecting .card-content {
-  /* 체크박스를 위한 공간 미리 확보 - 필요하면 주석 해제 */
-  /* padding-right: 30px; */
-}
-
-.integrate-section {
-  display: flex;
-  justify-content: center;
-  margin-top: 30px; /* 기존 40px에서 30px로 수정 */
-
-}
-
-.integrate-button {
-  background: #71EBBE; /* background-color에서 background로 변경 */
-  color: white;
-  border: none;
-  padding: 14px 24px; /* banner-button과 동일한 패딩 */
-  border-radius: 8px;  /* banner-button과 동일한 radius */
-  font-weight: 600;
-  cursor: pointer;
-  font-size: 14px;     /* banner-button과 동일한 크기 */
-  transition: all 0.3s;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.1); /* banner-button과 동일한 그림자 */
-
-}
-
-.integrate-button:hover {
-   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-
-}
-
-.integrate-button:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
-  box-shadow: none;
-}
-
-
-
-/* 반응형 */
-@media (max-width: 768px) {
-  .main-container {
-    flex-direction: column;
-  }
-  
-  .sidebar {
-    width: 100%;
-    padding: 16px 0;
-  }
-  
-  .sidebar-menu {
-    display: flex;
-    overflow-x: auto;
-    padding: 0 16px;
-    gap: 8px;
-  }
-  
-  .menu-item {
-    white-space: nowrap;
-    padding: 8px 16px;
-    border-radius: 20px;
-  }
-  
-  .menu-item.active {
-    background: #71EBBE;
-    color: white;
-    border-right: none;
-  }
-  
-  .main-content {
-    padding: 20px;
-  }
-  
-  .greeting h1 {
-    font-size: 24px;
-  }
-  
-  .banner-content {
-    flex-direction: column;
-    text-align: center;
-  }
-  
-  .banner-text h2 {
-    font-size: 20px;
-  }
-  
-  .resume-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 480px) {
-  .main-content {
-    padding: 16px;
-  }
-  
-  .banner-card {
-    padding: 20px;
-  }
-  
-  .banner-text h2 {
-    font-size: 18px;
-  }
-  
-  .resume-section {
-    padding: 16px;
-  }
-  
-  .section-header {
-    flex-direction: column;
-    gap: 12px;
-    align-items: stretch;
-  }
-
-
-
-
-
-
-}
-</style>
+<style src="@/assets/css/resumeMain.css"></style>

@@ -51,6 +51,7 @@ function getWritingStyles(coverletterId, section) {
  */
 function applyWritingStyles(coverletterId, memberId, section, newContent) {
   return axios.put("/coverletter/detail/styles/apply", newContent, {
+    headers: { "Content-Type": "text/plain", },
     params: { coverletterId, memberId, section }
   });
 }
