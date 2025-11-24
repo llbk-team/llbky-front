@@ -469,35 +469,11 @@ function portfolioStepbystep() {
             if (response.data) {
                 console.log('✅ 저장된 피드백 조회 성공:', response.data);
 
-                // 저장된 피드백을 UI에 표시
+                // 저장된 피드백 (JSON 객체)를 UI에 표시
                 const savedFeedback = response.data;
 
-                // 피드백 텍스트 생성
-                let feedbackText = '';
-
-                if (savedFeedback.coachingMessage) {
-                    feedbackText = savedFeedback.coachingMessage;
-                }
-
-                // 점수 추가
-                if (savedFeedback.appropriatenessScore) {
-                    feedbackText = `[점수: ${savedFeedback.appropriatenessScore}점]\n\n${feedbackText}`;
-                }
-
-                // 제안사항 추가
-                if (savedFeedback.suggestions && Array.isArray(savedFeedback.suggestions)) {
-                    feedbackText += '\n\n📌 개선 제안:\n' + savedFeedback.suggestions.map(s => `• ${s}`).join('\n');
-                }
-
-                // 다음 단계 가이드 추가
-                if (savedFeedback.nextStepGuide) {
-                    feedbackText += '\n\n🎯 다음 단계:\n' + savedFeedback.nextStepGuide;
-                }
-
-                // 예시 추가
-                if (savedFeedback.examples && Array.isArray(savedFeedback.examples)) {
-                    feedbackText += '\n\n💡 작성 예시:\n' + savedFeedback.examples.map(e => `"${e}"`).join('\n\n');
-                }
+                // 프론트엔드에서 피드백 텍스트 렌더링
+                const feedbackText = formatFeedbackAsText(savedFeedback);
 
                 // 현재 단계에 피드백 표시 (임시로 첫 번째 항목에 표시)
                 if (portfolioSteps.value.length > 0 && portfolioSteps.value[0].items.length > 0) {
@@ -510,6 +486,62 @@ function portfolioStepbystep() {
             console.error('❌ 저장된 피드백 조회 실패:', error);
             return null;
         }
+    };
+
+    /**
+     * 백엔드에서 받은 피드백 JSON 데이터를 읽기 쉬운 텍스트로 변환
+     * 프론트엔드에서 UI 렌더링을 담당
+     * @param {Object} feedback - PortfolioGuideResult 객체
+     * @returns {string} 포맷된 피드백 텍스트
+     */
+    const formatFeedbackAsText = (feedback) => {
+        if (!feedback) {
+            return "저장된 피드백이 없습니다.";
+        }
+
+        let text = "\n───── AI 코칭 피드백 ─────\n\n";
+
+        // 1. 적절성 점수 출력 (0-100점)
+        if (feedback.appropriatenessScore !== null && feedback.appropriatenessScore !== undefined) {
+            text += `📊 적절성 점수: ${feedback.appropriatenessScore}/100점\n\n`;
+        }
+
+        // 2. 코칭 메시지 출력
+        if (feedback.coachingMessage && feedback.coachingMessage.trim()) {
+            text += `💬 코칭 메시지:\n${feedback.coachingMessage}\n\n`;
+        }
+
+        // 3. 개선 제안 사항 리스트 출력
+        if (feedback.suggestions && Array.isArray(feedback.suggestions) && feedback.suggestions.length > 0) {
+            text += "💡 개선 제안 사항:\n";
+            feedback.suggestions.forEach((suggestion, index) => {
+                text += `  ${index + 1}. ${suggestion}\n`;
+            });
+            text += "\n";
+        }
+
+        // 4. 작성 예시 리스트 출력
+        if (feedback.examples && Array.isArray(feedback.examples) && feedback.examples.length > 0) {
+            text += "✨ 작성 예시:\n";
+            feedback.examples.forEach((example, index) => {
+                text += `  예시 ${index + 1}: ${example}\n`;
+            });
+            text += "\n";
+        }
+
+        // 5. 다음 작성해야 할 단계 안내
+        if (feedback.nextStepGuide && feedback.nextStepGuide.trim()) {
+            text += `🚀 다음 단계:\n${feedback.nextStepGuide}\n\n`;
+        }
+
+        // 6. 전체 포트폴리오 진행률 표시
+        if (feedback.progressPercentage !== null && feedback.progressPercentage !== undefined) {
+            text += `📈 진행률: ${feedback.progressPercentage}%\n\n`;
+        }
+
+        text += "──────────────────\n";
+
+        return text;
     };
 
 
@@ -571,6 +603,7 @@ function portfolioStepbystep() {
         fetchGuideInfo,
         fetchMemberGuides,
         fetchSavedFeedback,
+        formatFeedbackAsText,
         initializePortfolio,
         router
     };
