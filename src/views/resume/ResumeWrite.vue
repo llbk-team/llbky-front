@@ -423,6 +423,7 @@
 import SideBar from '@/components/sidebar/SideBar.vue'
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import resumeApi from '@/apis/resume'
 
 const router = useRouter()
 
@@ -523,29 +524,55 @@ const resumeData = reactive({
 
 
 // 🔥🔥 특정 섹션 피드백 생성 (프런트 기반)
-const getSectionFeedback = (section, index) => {
-  let msg = ''
+const getSectionFeedback = async (section, index) => {
+  try {
+    let content = "";
 
-  if (section === 'career') {
-    const c = resumeData.careers[index]
-    msg = `경력 ${index + 1} 분석: '${c.company || '회사명 미입력'}' 회사에서의 역할을 더 구체적으로 적어보세요. 성과는 수치로 표현하면 좋습니다.`
+    if (section === "career") {
+      content = resumeData.careers[index].responsibilities || "";
+    }
+    if (section === "activity") {
+      content = resumeData.activities[index].description || "";
+    }
+
+    if (!content.trim()) {
+      alert("내용을 입력해야 AI 피드백을 받을 수 있습니다.");
+      return;
+    }
+
+    const payload = {
+      memberId: 1,          // 로그인 전 임시값
+      section: section,
+      content: content
+    };
+
+    const { data } = await resumeApi.coach(payload);
+
+    // 오른쪽 AI 패널에 표시
+    aiFeedback.value.unshift({
+      type: "ai",
+      message: `
+        📌 요약: ${data.summary}
+        👍 강점: ${data.strengths}
+        ⚠️ 개선점: ${data.improvements}
+        ✨ 수정본: ${data.improvedText}
+      `,
+      timestamp: new Date()
+    });
+
+    // 10개 초과되면 오래된 것 제거
+    if (aiFeedback.value.length > 10) {
+      aiFeedback.value.pop();
+    }
+
+    showAICoaching.value = true;
+
+  } catch (err) {
+    console.error("AI 코칭 오류:", err);
+    alert("AI 피드백을 가져오지 못했습니다.");
   }
+};
 
-  if (section === 'activity') {
-    const a = resumeData.activities[index]
-    msg = `활동 ${index + 1} 분석: '${a.name || '활동명 미입력'}' 활동에서 맡았던 역할과 성과를 정량적으로 작성해보면 더 좋습니다.`
-  }
-
-  aiFeedback.value.unshift({
-    type: 'tip',
-    message: msg,
-    timestamp: new Date()
-  })
-
-  if (aiFeedback.value.length > 10) {
-    aiFeedback.value.pop()
-  }
-}
 
 // 피드백 아이콘
 const getFeedbackIcon = (type) => {
@@ -628,10 +655,39 @@ const previewResume = () => {
 }
 
 // 저장
-const submitResume = () => {
-  alert('작성완료되었습니다.');
-  router.push(`/resume/list`);
-}
+const submitResume = async () => {
+  try {
+    // memberId 필요 → 로그인 구현 전엔 임시 1 사용
+    const memberId = 1; 
+
+    const payload = {
+      memberId,
+      title: resumeData.name + "님의 이력서",
+
+      // JSON 문자열로 변환
+      careerInfo: JSON.stringify(resumeData.careers),
+      educationInfo: JSON.stringify(resumeData.educations),
+      skills: JSON.stringify(resumeData.skills),
+      certificates: JSON.stringify(resumeData.certificates),
+      awards: "[]", // 없으므로 빈 JSON 배열
+      activities: JSON.stringify(resumeData.activities)
+    };
+
+    console.log("📌 전송 payload:", payload);
+
+    const { data: resumeId } = await resumeApi.create(payload);
+
+    alert("이력서가 저장되었습니다!");
+
+    // 저장 후 이력서 상세 페이지로 이동
+    router.push(`/resume/${resumeId}`);
+
+  } catch (err) {
+    console.error("이력서 저장 실패", err);
+    alert("이력서 저장 중 오류가 발생했습니다.");
+  }
+};
+
 
 onMounted(() => {
   console.log('ResumeWrite 컴포넌트가 마운트되었습니다.')
