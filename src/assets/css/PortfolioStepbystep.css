@@ -1,0 +1,428 @@
+/* 포트폴리오 작성 도우미 페이지 전용 스타일 */
+
+.portfolio-write {
+  color: #111;
+}
+
+.subtitle1 {
+  color: #6c757d;
+  font-size: 1rem;
+  margin-bottom: 0px;
+}
+
+.subtitle2 {
+  color: #6c757d;
+  font-size: 1rem;
+  margin-bottom: 0px;
+  font-weight: 700;
+}
+
+/* ==================== 아코디언 스타일 ==================== */
+.step-accordion {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+}
+
+.step-header {
+  background-color: white;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+}
+
+.step-header:hover {
+  background-color: #f0fdf4;
+}
+
+.step-header.active {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  background-color: #f0fdf4;
+  border-color: #A2F1D6;
+}
+
+.step-content {
+  border: 1px solid #A2F1D6;
+  border-top: none;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+
+/* 항목 아코디언 */
+.item-accordion {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  transition: all 0.3s ease;
+}
+
+.item-header {
+  background-color: white;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+}
+
+.item-header:hover {
+  background-color: #f8fafc;
+}
+
+.item-header.active {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  background-color: #f8fafc;
+  border-color: #A2F1D6;
+}
+
+.item-content, .item-feedback {
+  border: 1px solid #e5e7eb;
+  border-top: none;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+/* ==================== 아이콘 스타일 ==================== */
+.step-icon {
+  font-size: 1.2rem;
+  color: #9ca3af;
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.step-icon.complete {
+  color: #4cd3a3;
+}
+
+.accordion-icon, .accordion-icon-sm {
+  font-size: 0.8rem;
+  color: #9ca3af;
+  transition: all 0.3s ease;
+}
+
+.accordion-icon-sm {
+  font-size: 0.7rem;
+}
+
+/* ==================== 프로그레스 바 ==================== */
+.custom-progress {
+  height: 8px;
+  border-radius: 4px;
+  background-color: #f3f4f6;
+}
+
+.custom-progress .progress-bar {
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+/* ==================== 상태 배지 ==================== */
+.status-badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+.status-badge.done {
+  background: #ecfdf5;
+  color: #059669;
+}
+
+.status-badge.ongoing {
+  background: #eef2ff;
+  color: #4f46e5;
+}
+
+.status-badge.planned {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+/* ==================== AI 코치 박스 ==================== */
+.ai-coach-box {
+  background: white;
+  border: 1px solid #e5e7eb;
+  min-height: 600px;
+  transition: 0.3s;
+  margin-top: 64px;
+}
+
+/* ==================== 피드백 스타일 ==================== */
+.feedback-header {
+  margin-bottom: 15px;
+}
+
+.score-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 10px;
+  height: 37px;
+  justify-content: center;
+}
+
+.bg-success-light {
+  background-color: #ecfdf5;
+  color: #059669;
+}
+
+.bg-info-light {
+  background-color: #eff6ff;
+  color: #3b82f6;
+}
+
+.bg-warning-light {
+  background-color: #fffbeb;
+  color: #d97706;
+}
+
+.feedback-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.feedback-title-inline {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #6b7280;
+  margin-left: 8px;
+}
+
+.feedback-section-inline {
+  display: inline-flex;
+  align-items: center;
+}
+
+.feedback-list {
+  padding-left: 20px;
+  margin-bottom: 0;
+}
+
+.feedback-list li {
+  margin-bottom: 5px;
+  font-size: 0.85rem;
+}
+
+.feedback-list .example-item {
+  margin-bottom: 8px;
+  color: #4b5563;
+  font-style: italic;
+  line-height: 1.6;
+}
+
+.feedback-text {
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.feedback-subtitle {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #374151;
+}
+
+.feedback-content {
+  font-size: 0.85rem;
+  color: #4b5563;
+  line-height: 1.5;
+  padding: 8px;
+  background-color: #f9fafb;
+  border-radius: 4px;
+}
+
+/* ==================== 버튼 스타일 ==================== */
+.bg-light-mint {
+  background-color: #F0FDF4 !important;
+}
+
+.btn-mint {
+  background-color: #A2F1D6;
+  border: none;
+  color: #111;
+  font-weight: 600;
+}
+
+.btn-mint:hover {
+  background-color: #71EBBE;
+}
+
+.btn-close {
+  opacity: 0.5;
+  transition: opacity 0.2s ease;
+}
+
+.btn-close:hover {
+  opacity: 1;
+}
+
+/* ==================== 등록 버튼 영역 ==================== */
+.registration-button {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.registration-button2 {
+  background-color: #71EBBE;
+}
+
+/* ==================== 예시 선택 카드 스타일 ==================== */
+.examples-selection-container {
+  margin-top: 12px;
+}
+
+.example-selection-card {
+  background-color: #fafafa;
+  border: 2px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 16px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.example-selection-card:hover {
+  border-color: #A2F1D6;
+  background-color: #f0fdf4;
+}
+
+.example-selection-card.selected {
+  border-color: #71EBBE;
+  background-color: #ecfdf5;
+  box-shadow: 0 4px 12px rgba(113, 235, 190, 0.2);
+}
+
+.example-header {
+  margin-bottom: 10px;
+}
+
+.example-info {
+  display: flex;
+  align-items: center;
+}
+
+.example-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #6b7280;
+}
+
+.example-content {
+  font-size: 0.8rem;
+  color: #1f2937;
+  line-height: 1.4;
+  font-style: italic;
+  padding-left: 4px;
+}
+
+/* 선택된 예시 미리보기 */
+.selected-preview {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { 
+    opacity: 0; 
+    transform: translateY(-10px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+.preview-content {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #065f46;
+  line-height: 1.5;
+}
+
+/* ==================== 드롭다운 예시 영역 ==================== */
+.examples-dropdown-container {
+  margin-top: 8px;
+}
+
+.example-item-dropdown {
+  transition: all 0.2s ease;
+}
+
+.example-card {
+  background-color: #fafafa;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 12px;
+  transition: all 0.2s ease;
+}
+
+.example-card:hover {
+  background-color: #f0fdf4;
+  border-color: #A2F1D6;
+  box-shadow: 0 2px 4px rgba(162, 241, 214, 0.1);
+}
+
+/* ==================== 사용자 콘텐츠 스타일 ==================== */
+.user-content {
+  font-size: 0.85rem;
+  color: #374151;
+  line-height: 1.4;
+  padding: 8px;
+  background-color: #f8fafc;
+  border-radius: 4px;
+  border-left: 3px solid #6b7280;
+}
+
+/* ==================== 개선 제안 스타일 ==================== */
+.suggestions-list {
+  padding-left: 8px;
+}
+
+.suggestion-item {
+  font-size: 0.85rem;
+  color: #4b5563;
+  line-height: 1.6;
+  margin-bottom: 8px;
+}
+
+.suggestions-dropdown-list {
+  margin-top: 8px;
+}
+
+.suggestion-item-dropdown {
+  display: flex;
+  align-items: flex-start;
+  padding: 8px 12px;
+  background-color: #f8fafc;
+  border-radius: 6px;
+  margin-bottom: 6px;
+  font-size: 0.8rem;
+  color: #374151;
+  line-height: 1.4;
+  border-left: 2px solid #3b82f6;
+}
+
+.suggestion-item-dropdown:last-child {
+  margin-bottom: 0;
+}
+
+/* ==================== 다음 단계 가이드 스타일 ==================== */
+.next-step-content {
+  background-color: #eff6ff;
+  padding: 12px;
+  border-radius: 6px;
+  border-left: 3px solid #3b82f6;
+  font-size: 0.85rem;
+  color: #1e40af;
+  line-height: 1.5;
+}
