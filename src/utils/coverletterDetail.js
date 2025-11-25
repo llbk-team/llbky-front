@@ -1,5 +1,5 @@
 // 자소서 상세 페이지 컴포넌트용 js 파일
-import { ref, reactive } from "vue";
+import { ref, reactive, onUnmounted, nextTick } from "vue";
 import { useRoute } from "vue-router";
 import * as bootstrap from "bootstrap";
 import coverletterApi from "@/apis/coverletterApi";
@@ -46,17 +46,47 @@ function useCoverletterDetail() {
     // 선택된 섹션 (문체 버전용)================================================
     const selectedSection = ref("");
 
+    // 모달 인스턴스 저장 변수==========================================
+    let styleModalRef = null;
+    
     // 모달 ID 고정=====================================================
     const styleModal = "styleModal"
     
     // 문체 선택 모달======================================================================
+    
+    // 로딩 스피너
+    const aiLoading = ref(false); 
+    
     const openStyleModal = async (section) => {
+        // 선택된 섹션 설정
         selectedSection.value = section;
+        
+        // 스피너 ON
+        aiLoading.value = true;
+
+        // 버전 초기화
+        versions.value = [];
+        
+        // 다음 틱에서 로딩 시작
+        await nextTick();
+        
         // bootstrap modal
-        const modal = new bootstrap.Modal(document.getElementById(styleModal));
-        modal.show();
-        await loadWritingStyles(section);
+        const el = document.getElementById(styleModal);
+        styleModalRef = bootstrap.Modal.getOrCreateInstance(el);
+        styleModalRef.show();
+
+        // 문체 버전 불러오기
+        try {
+            await loadWritingStyles(section);
+        } finally {
+            aiLoading.value = false;
+        } 
     };
+
+    // 페이지 벗어날 때 모달 제거====================================
+    onUnmounted(() => {
+        if (styleModalRef) styleModalRef.hide();
+    });
 
     // 문체 버전 생성========================================================================
     const versions = ref([]);
@@ -97,6 +127,11 @@ function useCoverletterDetail() {
             );
 
             console.log("DB 업데이트 완료");
+
+            const modalEl = document.getElementById(styleModal);
+            const modalInstance = bootstrap.Modal.getInstance(modalEl);
+            if (modalInstance) modalInstance.hide();
+
         } catch (err) {
             console.log("문체 버전 적용 실패: ", err);
         }
@@ -191,6 +226,7 @@ function useCoverletterDetail() {
         versions,
         selectedSection,
         openStyleModal,
+        aiLoading,
         applyVersion,
         loadWritingStyles,
         loadCoverLetter,

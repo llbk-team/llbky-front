@@ -42,12 +42,14 @@ function useCoverLetterCoach(introFields) {
 
   // 버튼 클릭 → 해당 항목 피드백 요청
   const getSectionFeedback = async (sectionKey, content) => {
+    aiLoading.value = true;
+
+      
     if (!content || !content.trim()) {
       alert("내용을 입력해야 AI 피드백을 받을 수 있습니다.");
+      aiLoading.value = false;
       return;
     }
-
-    aiLoading.value = true;
 
     const mapped = sectionMap[sectionKey];   // "지원동기" → "supportMotive" 이런 식
     currentSection.value = mapped;

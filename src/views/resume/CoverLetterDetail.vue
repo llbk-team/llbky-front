@@ -1,7 +1,7 @@
 <!-- 자소서 상세 페이지 컴포넌트 -->
 <template>
   <div class="d-flex bg-light min-vh-100 overflow-auto">
-    
+
     <!-- 메인 -->
     <section class="flex-grow-1 content-wrapper">
 
@@ -20,26 +20,18 @@
 
                 <!-- 수정 모드 -->
                 <template v-if="isEditMode">
-                  <textarea
-                    v-model="introFields[section]"
-                    class="form-control"
-                    rows="5"
-                  ></textarea>
+                  <textarea v-model="introFields[section]" class="form-control" rows="5"></textarea>
                 </template>
 
                 <!-- 상세보기 모드 -->
                 <template v-else>
-                  <div class="small text-secondary"
-                    style="white-space: pre-line; min-height: 120px;">
+                  <div class="small text-secondary" style="white-space: pre-line; min-height: 120px;">
                     {{ value }}
                   </div>
                 </template>
 
                 <div class="text-end mt-2 d-flex justify-content-end gap-2">
-                  <button
-                    class="btn btn-outline-secondary btn-sm fw-medium"
-                    @click="openStyleModal(section)"
-                  >
+                  <button class="btn btn-outline-secondary btn-sm fw-medium" @click="openStyleModal(section)">
                     ✏️ 문체 선택
                   </button>
                 </div>
@@ -49,10 +41,7 @@
           </div>
 
           <div class="d-flex justify-content-end">
-            <button
-              class="btn btn-mint fw-medium btn-sm px-4"
-              @click="isEditMode ? saveAllEdit() : editMode()"
-            >
+            <button class="btn btn-mint fw-medium btn-sm px-4" @click="isEditMode ? saveAllEdit() : editMode()">
               {{ isEditMode ? "저장하기" : "수정하기" }}
             </button>
           </div>
@@ -107,17 +96,26 @@
             </div>
 
             <div class="modal-body small text-secondary">
-              <div v-for="version in versions" :key="version.id" class="mb-3">
-                <h6 class="fw-bold">{{ version.name }}</h6>
-                <p class="mb-0" style="white-space: pre-line;">{{ version.text }}</p>
-                <div class="text-end mt-2">
-                  <button
-                    class="btn btn-mint fw-medium btn-sm mt-2"
-                    data-bs-dismiss="modal"
-                    @click="applyVersion(version.text)"
-                  >
-                    적용하기
-                  </button>
+
+              <!-- AI 분석 중 스피너 -->
+              <div v-if="aiLoading">
+                <div class="spinner-container mt-3 mb-3">
+                  <div class="spinner"></div>
+                  <p class="text-muted mt-2">AI가 분석 중입니다...</p>
+                </div>
+              </div>
+
+              <!-- 문체 버전 리스트 -->
+              <div v-else>
+                <div v-for="version in versions" :key="version.id" class="mb-3">
+                  <h6 class="fw-bold">{{ version.name }}</h6>
+                  <p class="mb-0" style="white-space: pre-line;">{{ version.text }}</p>
+                  <div class="text-end mt-2">
+                    <button class="btn btn-mint fw-medium btn-sm mt-2" data-bs-dismiss="modal"
+                      @click="applyVersion(version.text)">
+                      적용하기
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -140,6 +138,7 @@ const {
   versions,
   selectedSection,
   openStyleModal,
+  aiLoading,
   applyVersion,
   loadCoverLetter,
   memberName,
@@ -183,10 +182,33 @@ onMounted(() => {
   }
 }
 
-.content-wrapper > h2 {
+.content-wrapper>h2 {
   font-size: 1.75rem !important;
   font-weight: 700 !important;
   color: #111 !important;
   margin-bottom: 1.5rem !important;
+}
+
+/* ===== AI 로딩 스피너 스타일 ===== */
+.spinner-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px 0;
+}
+
+.spinner {
+  width: 28px;
+  height: 28px;
+  border: 4px solid #e0e0e0;
+  border-top-color: #71EBBE;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 </style>
