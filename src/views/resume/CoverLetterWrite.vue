@@ -153,6 +153,15 @@
       </div>
     </div>
   </div>
+
+  <!-- 작성 완료 로딩 오버레이 -->
+  <div v-if="saveLoading" class="save-loading-overlay">
+    <div class="save-loading-box">
+      <div class="spinner"></div>
+      <p>이력서를 저장하고 있습니다...</p>
+      <p class="sub">AI 분석이 자동으로 실행돼요!</p>
+    </div>
+  </div>
 </template>
 
 <script setup>
@@ -164,6 +173,7 @@ const {
   coverTitle,
   introFields,
   sections,
+  saveLoading,
   toggleSection,
   saveCoverLetter
 } = coverletterWrite.useCoverletterWrite();
