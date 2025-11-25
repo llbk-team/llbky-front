@@ -349,6 +349,8 @@
       </div>
 
       <!-- 스크롤 콘텐츠 -->
+
+
       <div class="ai-content">
         <!-- 환영 메시지 -->
         <div class="welcome-section">
@@ -382,22 +384,29 @@
           </div>
         </div>
 
+        <!-- AI 분석 중 스피너 -->
+        <div v-if="aiLoading" class="spinner-container mt-3 mb-3">
+          <div class="spinner"></div>
+          <p class="text-muted mt-2">AI가 분석 중입니다...</p>
+        </div>
         <!-- 실시간 피드백 -->
-        <div class="feedback-section" v-for="(items, sectionName) in groupedFeedback" :key="sectionName">
+        <div v-if="!aiLoading">
+          <div class="feedback-section" v-for="(items, sectionName) in groupedFeedback" :key="sectionName">
 
-          <div class="section-title">
-            <span class="icon">📝</span>
-            <span>{{ getSectionLabel(sectionName) }} 피드백</span>
-          </div>
+            <div class="section-title">
+              <span class="icon">📝</span>
+              <span>{{ getSectionLabel(sectionName) }} 피드백</span>
+            </div>
 
-          <div class="feedback-list">
-            <div v-for="(feedback, i) in items" :key="i" class="feedback-item">
-              <span class="feedback-icon">💡</span>
-              <span class="feedback-text" v-html="feedback.message"></span>
+            <div class="feedback-list">
+              <div v-for="(feedback, i) in items" :key="i" class="feedback-item">
+                <span class="feedback-icon">💡</span>
+                <span class="feedback-text" v-html="feedback.message"></span>
+              </div>
             </div>
           </div>
-
         </div>
+
 
 
         <!-- 액션 버튼 -->
@@ -410,6 +419,16 @@
       </div>
     </div>
   </div>
+
+  <!-- 🔥 작성 완료 로딩 오버레이 -->
+<div v-if="saveLoading" class="save-loading-overlay">
+  <div class="save-loading-box">
+    <div class="spinner"></div>
+    <p>이력서를 저장하고 있습니다...</p>
+    <p class="sub">AI 분석이 자동으로 실행돼요!</p>
+  </div>
+</div>
+
 </template>
 
 
@@ -477,6 +496,12 @@ const sections = reactive({
   certificates: false,
 })
 
+// ai 로딩
+const aiLoading = ref(false);
+
+// 저장 로딩
+const saveLoading = ref(false);
+
 // AI 피드백
 const aiFeedback = ref([])
 
@@ -535,6 +560,8 @@ const getSectionFeedback = async (section, index) => {
       return;
     }
 
+    aiLoading.value = true; // 스피너 시작
+
     const payload = {
       memberId: 1,          // 로그인 전 임시값
       section: section,
@@ -567,6 +594,8 @@ const getSectionFeedback = async (section, index) => {
   } catch (err) {
     console.error("AI 코칭 오류:", err);
     alert("AI 피드백을 가져오지 못했습니다.");
+  } finally {
+    aiLoading.value = false; // 스피너종료
   }
 };
 
@@ -654,6 +683,8 @@ const previewResume = () => {
 // 저장
 const submitResume = async () => {
   try {
+    saveLoading.value = true; // 로딩(스피너) 시작
+
     // memberId 필요 → 로그인 구현 전엔 임시 1 사용
     const memberId = 1;
 
@@ -682,6 +713,8 @@ const submitResume = async () => {
   } catch (err) {
     console.error("이력서 저장 실패", err);
     alert("이력서 저장 중 오류가 발생했습니다.");
+  } finally {
+    saveLoading.value = false; // 로딩 종료
   }
 };
 
@@ -1350,4 +1383,75 @@ textarea {
   border-color: #71EBBE;
   box-shadow: 0 0 0 3px rgba(113, 235, 190, 0.1);
 }
+
+/* ===== AI 로딩 스피너 스타일 ===== */
+.spinner-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px 0;
+}
+
+.spinner {
+  width: 28px;
+  height: 28px;
+  border: 4px solid #e0e0e0;
+  border-top-color: #71EBBE;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ===== 작성 완료 로딩 오버레이 ===== */
+.save-loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  backdrop-filter: blur(3px);
+  z-index: 9999;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.save-loading-box {
+  background: white;
+  padding: 28px 40px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+}
+
+.save-loading-box p {
+  margin-top: 12px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.save-loading-box .sub {
+  margin-top: 4px;
+  font-size: 13px;
+  color: #666;
+}
+
+/* 스피너 */
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 5px solid #e0e0e0;
+  border-top-color: #71EBBE;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
 </style>
