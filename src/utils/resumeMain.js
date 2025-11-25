@@ -68,17 +68,18 @@ export function useResumeMain() {
     const portfolioList = ref([]);
 
     const fetchPortfolioList = async () => {
-        try {
-            const res = await portfolioApi.getPortfolioList(1);
-            portfolioList.value = res.data.map((item) => ({
-                id: item.coverletterId,
-                title: item.title,
-                updatedAt: item.updatedAt?.substring(0, 10),
-            }));
-        } catch (err) {
-            console.error("포트폴리오 조회 실패:", err);
-        }
-    };
+    try {
+        const res = await portfolioApi.getPortfolioList(1);
+        portfolioList.value = res.data.map(item => ({
+            portfolioId: item.portfolioId ?? item.portfolio_id,
+            title: item.title,
+            updatedAt: item.updatedAt?.substring(0, 10)
+        }));
+    } catch (err) {
+        console.error("포트폴리오 조회 실패:", err);
+    }
+};
+
 
     const goToPortfolioDetail = (id) => {
         router.push(`/resume/portfolio/coach?id=${id}`);
