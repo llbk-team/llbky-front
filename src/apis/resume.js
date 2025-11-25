@@ -26,6 +26,11 @@ function analyze(memberId, resumeId){
   return axios.post("/resume/analyze", null, {params: {memberId, resumeId}});
 }
 
+// AI 분석 결과 조회
+function findanalyze(resumeId){
+  return axios.get(`/resume/report/${resumeId}`);
+}
+
 // 실시간 코칭
 function coach(data){
   return axios.post("/resume/coach", data);
@@ -37,6 +42,7 @@ const resumeApi = {
   list,
   remove,
   analyze,
+  findanalyze,
   coach
 }
 

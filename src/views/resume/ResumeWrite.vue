@@ -979,12 +979,19 @@ textarea {
 
 /* 개별 아이템 */
 .education-item,
-.cert-item,
+.cert-item {
+  position: relative;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  background-color: #f8f9fa;
+}
 
-.remove-btn {
+.cert-item .remove-btn {
   position: absolute;
-  top: 12px;
-  right: 12px;
+  top: 10px;
+  right: 10px;
   background: #ff6b6b;
   color: white;
   border: none;
@@ -993,6 +1000,7 @@ textarea {
   font-size: 12px;
   cursor: pointer;
 }
+
 
 .add-btn {
   background: #f8f9fa;
