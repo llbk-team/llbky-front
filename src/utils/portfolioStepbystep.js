@@ -37,6 +37,9 @@ function portfolioStepbystep() {
     const selectedExample = ref(""); // 선택된 예시 내용
     const selectedExampleIndex = ref(null); // 선택된 예시의 인덱스
     const originalContent = ref(""); // 원본 작성 내용
+    
+    // AI 로딩 상태
+    const aiLoading = ref(false);
 
     // 모든 단계가 100% 완료되었는지 확인하는 계산된 속성
     const isAllComplete = computed(() => {
@@ -97,6 +100,9 @@ function portfolioStepbystep() {
                 return;
             }
 
+            // 로딩 시작
+            aiLoading.value = true;
+
             // 원본 내용 저장 (나중에 복원을 위해)
             originalContent.value = currentContent.value;
 
@@ -150,6 +156,9 @@ function portfolioStepbystep() {
             }
 
             alert(errorMessage);
+        } finally {
+            // 로딩 종료 (성공/실패 모두)
+            aiLoading.value = false;
         }
     };
 
@@ -206,7 +215,7 @@ function portfolioStepbystep() {
         // 해당 항목 상태 '완료'로 업데이트
         portfolioSteps.value[openStepIndex.value].items[index].status = '완료';
         
-        // 사용자 입력 저장
+        // 사용자 입력 저장  
         portfolioSteps.value[openStepIndex.value].items[index].userInput = currentContent.value;
         
         // 단계 진행률 업데이트
@@ -576,6 +585,7 @@ function portfolioStepbystep() {
         selectedExampleIndex,
         originalContent,
         isAllComplete,
+        aiLoading,
         
         // 사용자 정보
         memberId,
