@@ -63,7 +63,6 @@
                 <div class="resume-icon">📄</div>
                 <div class="resume-info">
                   <h3 class="resume-title">{{ resume.title }}</h3>
-                  <p class="resume-description">{{ resume.description }}</p>
                   <div class="resume-meta">
                     <span class="update-date">📅 최종 수정: {{ resume.updatedAt }}</span>
                   </div>
