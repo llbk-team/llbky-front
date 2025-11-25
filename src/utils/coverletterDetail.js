@@ -33,6 +33,16 @@ function useCoverletterDetail() {
         improvement: [], //개선점
     });
 
+    // 피드백 초기화=====================================================
+    const resetFeedback = () => {
+        feedback.grammarScore = 0;
+        feedback.readabilityScore = 0;
+        feedback.logicFlowScore = 0;
+
+        feedback.strength = [];
+        feedback.improvement = [];
+    };
+
     // 선택된 섹션 (문체 버전용)================================================
     const selectedSection = ref("");
 
@@ -127,12 +137,12 @@ function useCoverletterDetail() {
             }
 
             // 최종 피드백 주입
-            if (data.coverFeedback) {
-                feedback.grammarScore = parsed.grammarScore || 0;
-                feedback.readabilityScore = parsed.readabilityScore || 0;
-                feedback.logicFlowScore = parsed.logicFlowScore || 0;
-                feedback.strength = parsed.strength || "";
-                feedback.improvement = parsed.improvement || "";
+            if (parsed) {
+                feedback.grammarScore = parsed.grammarScore ?? 0;
+                feedback.readabilityScore = parsed.readabilityScore ?? 0;
+                feedback.logicFlowScore = parsed.logicFlowScore ?? 0;
+                feedback.strength = parsed.strength ?? [];
+                feedback.improvement = parsed.improvement ?? [];
             }
 
         } catch (err) {
@@ -177,6 +187,7 @@ function useCoverletterDetail() {
     return {
         introFields,
         feedback,
+        resetFeedback,
         versions,
         selectedSection,
         openStyleModal,

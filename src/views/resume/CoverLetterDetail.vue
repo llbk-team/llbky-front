@@ -136,6 +136,7 @@ import coverletterDetail from "@/utils/coverletterDetail";
 const {
   introFields,
   feedback,
+  resetFeedback,
   versions,
   selectedSection,
   openStyleModal,
@@ -148,6 +149,7 @@ const {
 } = coverletterDetail.useCoverletterDetail();
 
 onMounted(() => {
+  resetFeedback();
   loadCoverLetter();
 });
 </script>
