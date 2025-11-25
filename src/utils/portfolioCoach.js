@@ -6,7 +6,7 @@ import router from "@/router";
 
 export function usePortfolioCoach(portfolioId) {
 
-  // 🔥 로딩 상태
+  // 로딩 상태
   const loadingPdf = ref(true);
   const loadingPages = ref(true);
   const loadingOverall = ref(true);

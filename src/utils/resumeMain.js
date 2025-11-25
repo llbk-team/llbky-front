@@ -70,7 +70,11 @@ export function useResumeMain() {
     const fetchPortfolioList = async () => {
         try {
             const res = await portfolioApi.getPortfolioList(1);
-            portfolioList.value = res.data;
+            portfolioList.value = res.data.map((item) => ({
+                id: item.coverletterId,
+                title: item.title,
+                updatedAt: item.updatedAt?.substring(0, 10),
+            }));
         } catch (err) {
             console.error("포트폴리오 조회 실패:", err);
         }

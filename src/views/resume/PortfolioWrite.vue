@@ -1,515 +1,79 @@
 <template>
   <div class="app-container">
+
     <!-- 사이드바 -->
-    <SideBar/>
+    <SideBar />
 
     <!-- 메인 컨테이너 -->
     <div class="main-container">
-      
-      <!-- 포트폴리오 폼 컨테이너 -->
-      <div class="resume-form-container">
-        
 
-        <!-- 업로드 섹션 -->
+      <!-- 포트폴리오 업로드 박스 -->
+      <div class="resume-form-container">
+
+        <!-- 상단 설명 -->
         <div class="upload-section">
           <div class="upload-icon">📁</div>
+
           <div class="form-header">
-          <h1>포트폴리오 코칭</h1>
-          <p>포트폴리오나 링크나 파일을 업로드하면
-             AI가 전문적으로 리뷰해드립니다.</p>
-        </div>
-          <div class="upload-types"> 
-            <div class="type-btn" :class="{ active: selectedType === 'link' }" @click="handleUpload">
+            <h1>포트폴리오 코칭</h1>
+            <p>포트폴리오나 PDF 파일을 업로드하면 AI가 전문적으로 리뷰해드립니다.</p>
+          </div>
+
+          <!-- 업로드 버튼 -->
+          <div class="upload-types">
+            <div class="type-btn" :class="{ active: true }" @click="triggerFileInput">
               <div class="type-label">📤 포트폴리오 올리기</div>
-               <input type="file" id="fileInput" style="display: none">
+              <input type="file" id="fileInput" @change="handleUpload" accept="application/pdf" style="display:none;">
             </div>
-            
-            <div class="type-btn" :class="{ active: selectedType === 'project' }" @click="router.push('/resume/portfolio/stepbystep')">
+
+            <div class="type-btn" @click="router.push('/resume/portfolio/stepbystep')">
               <div class="type-label">📊 포트폴리오 가이드</div>
             </div>
           </div>
+
+          <!-- 파일 선택됨 → 제목 입력 -->
+          <div v-if="uploadedFile" class="input-title-box">
+            <input v-model="portfolioTitle" placeholder="포트폴리오 제목을 입력하세요" class="title-input" />
+          </div>
+
+          <!-- 파일 업로드 완료 표시 -->
+          <div v-if="uploadedFile" class="upload-result">
+            <span class="check-icon">📄</span>
+            <span class="file-name">{{ uploadedFile.name }}</span>
+          </div>
+
         </div>
 
-        <!-- 액션 버튼 -->
+        <!-- 피드백 받기 버튼 -->
         <div class="action-section">
           <button class="action-btn" @click="startAnalysis">
             ✏️ 포트폴리오 피드백 받기
           </button>
         </div>
+        <div v-if="loadingUpload" class="upload-overlay">
+          <div class="big-spinner"></div>
+          <p style="margin-top: 10px; color: white;">업로드 중입니다...</p>
+        </div>
+
       </div>
     </div>
 
-    <!-- AI 코칭 패널 - 이력서 작성하기 페이지와 동일하게 추가 -->
-    <div class="ai-coaching-panel" v-if="showAICoaching">
-      <!-- AI 헤더 -->
-      <div class="ai-header">
-        <div class="ai-profile">
-          <div class="ai-avatar">🤖</div>
-          <div class="ai-info">
-            <span class="ai-name">AI 코치</span>
-            <span class="ai-desc">포트폴리오 코칭 전문가</span>
-          </div>
-        </div>
-        <button class="close-btn" @click="toggleAICoaching">×</button>
-      </div>
-
-      <!-- AI 상태 -->
-      <div class="ai-status">
-        <div class="status-indicator">
-          <div class="status-icon">🤖</div>
-          <span class="status-text">AI 코치 활성화</span>
-        </div>
-      </div>
-
-      <!-- 스크롤 콘텐츠 -->
-      <div class="ai-content">
-        <!-- 환영 메시지 -->
-        <div class="welcome-section">
-          <p>안녕하세요! 포트폴리오 작성을 도와 드릴 AI 코치입니다.</p>
-          <p>항상 더 나은 포트폴리오를 만들 수 있도록 도와드리겠습니다.
-          궁금한 점이 있으면 언제든지 물어보세요!</p>
-        </div>
-
-        <!-- 팁 섹션 -->
-        <div class="tips-section">
-          <div class="section-title">
-            <span class="icon">💡</span>
-            <span>포트폴리오 팁</span>
-          </div>
-          <div class="tips-content">
-            <h4>좋은 포트폴리오를 위한 핵심 포인트</h4>
-            <div class="checklist">
-              <div class="check-item">
-                <span class="check">✅</span>
-                <span>구체적인 기술 스택과 역할을 명시하세요.</span>
-              </div>
-              <div class="check-item">
-                <span class="check">✅</span>
-                <span>프로젝트의 문제 해결 과정을 보여주세요.</span>
-              </div>
-              <div class="check-item">
-                <span class="check">✅</span>
-                <span>실제 결과와 성과를 수치로 표현하세요.</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 액션 버튼 -->
-        <div class="ai-actions">
-          <button class="ai-action-btn" @click="askAI">
-            💬 AI에게 질문하기
-          </button>
-          <button class="ai-action-btn" @click="getDetailedAnalysis">
-            📋 상세한 분석받기
-          </button>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
 <script setup>
 import SideBar from '@/components/sidebar/SideBar.vue'
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { usePortfolioWrite } from "@/utils/portfolioWrite";
 
-
-// Router 사용
-const router = useRouter()
-
-// 상태 선언 - data()를 ref()로 변환
-const selectedType = ref('link')
-const activeTab = ref('overall')
-
-const tabs = ref([
-  { id: 'overall', name: '전체 평가' },
-  { id: 'technical', name: '기술 깊이' },
-  { id: 'collaboration', name: '협업 역량' },
-  { id: 'problem-solving', name: '문제해결' }
-])
-
-const reviewCards = ref([
-  {
-    id: 1,
-    icon: '💻',
-    title: '기술 깊이',
-    description: '기술 스택의 이해도와 구현 수준을 평가합니다',
-    stars: '★★★★★',
-    score: 92
-  },
-  {
-    id: 2,
-    icon: '🤝',
-    title: '협업 역량',
-    description: '팀 프로젝트와 협업 능력을 평가합니다',
-    stars: '★★★★☆',
-    score: 78
-  },
-  {
-    id: 3,
-    icon: '🔧',
-    title: '문제해결력',
-    description: '복잡한 문제를 해결한 경험을 평가합니다',
-    stars: '★★★★★',
-    score: 88
-  },
-  {
-    id: 4,
-    icon: '📈',
-    title: '성과 지표',
-    description: '프로젝트의 임팩트와 성과를 평가합니다',
-    stars: '★★★★☆',
-    score: 85
-  }
-])
-
-// 프로젝트 데이터 (기존 코드에서 가져온 것)
-const projectData = ref({
-  name: '프로젝트명 제목',
-  description: '실시간 채팅 플랫폼',
-  period: '2023.01 - 2023.06',
-  role: '백엔드 개발 및 팀 리더',
-  teamSize: '5명 (FE 2명, BE 2명, 디자이너 1명)',
-  techStack: [
-    'Node.js', 'Socket.io', 'Redis', 'MongoDB', 'AWS EC2', 'Docker'
-  ],
-  features: [
-    '실시간(1:1) 그룹 채팅',
-    '파일 첨부 및 이미지 공유',
-    '읽음 표시 및 알림 기능',
-    '검색 및 채팅방 관리'
-  ],
-  longDescription: '실시간 소통이 필요한 업무 환경을 위해 개발한 Redis Pub/Sub 패턴을 도입하여 수평적 확장이 가능한 아키텍처로 구현했습니다. 메시지 서비스의 실시간 처리성능을 50ms 이하로 최적화했습니다.'
-})
-
-const analysisData = ref({
-  score: 85,
-  goodPoints: [
-    '기술 스택이 트렌드에 맞고 최신 기술을 잘 활용했습니다',
-    '실제 문제를 해결하는 프로젝트로 실무 적용 가능성이 높습니다',
-    '성능 최적화에 대한 구체적인 수치와 방법이 제시되어 있습니다',
-    '팀워크와 리더십 역할을 명확히 보여줍니다'
-  ],
-  improvementPoints: [
-    '프로젝트의 결과와 임팩트를 더 구체적으로 제시',
-    '사용자 피드백이나 실제 사용 현황 데이터 추가',
-    '코드 품질이나 테스트 커버리지 같은 기술적 완성도 언급',
-    '향후 확장 계획이나 개선 방향 제시'
-  ],
-  overallFeedback: '기술적 역량과 팀워크가 잘 드러나는 우수한 프로젝트입니다. 성과를 수치화하여 제시한 점이 인상적이며, 실무에서 바로 활용할 수 있는 기술 스택을 사용한 점이 긍정적입니다.'
-})
-
-// 함수 선언 - methods를 일반 함수로 변환
-function selectType(type) {
-  selectedType.value = type
-  console.log('선택된 타입:', type)
-}
-
-function setActiveTab(tabId) {
-  activeTab.value = tabId
-  console.log('활성 탭:', tabId)
-}
-
-function handleUpload() {
-  // 파일 업로드 로직 구현
-  console.log('파일 업로드 시작')
-  console.log('선택된 타입:', selectedType.value)
-  // 실제 파일 업로드 로직을 여기에 구현
-  // 예: FormData 생성, API 호출 등
-}
-
-function selectCard(card) {
-  // 카드 선택 로직 구현
-  console.log('선택된 카드:', card.title)
-  console.log('카드 점수:', card.score)
-  
-  // 카드 선택에 따른 상세 분석으로 이동 (예시)
-  if (card.id === 1) {
-    setActiveTab('technical')
-  } else if (card.id === 2) {
-    setActiveTab('collaboration')
-  } else if (card.id === 3) {
-    setActiveTab('problem-solving')
-  }
-}
-
-function startAnalysis() {
-  // 분석 시작 로직 구현
-  console.log('포트폴리오 분석 시작')
-  console.log('프로젝트 데이터:', projectData.value.name)
-  
-  // 분석 중 상태 표시 (예시)
-  // loading.value = true
-  
-  // API 호출 예시
-  // try {
-  //   const result = await portfolioAnalysisAPI(projectData.value)
-  //   analysisData.value = result
-  //   router.push('/portfolio/analysis/result')
-  // } catch (error) {
-  //   console.error('분석 실패:', error)
-  // } finally {
-  //   loading.value = false
-  // }
-  
-  alert('포트폴리오 분석을 시작합니다!')
-
-  router.push('/resume/portfolio/coach')
-}
-
-function downloadReport() {
-  console.log('리포트 다운로드')
-  console.log('프로젝트명:', projectData.value.name)
-  // 리포트 다운로드 로직
-}
-
-function editPortfolio() {
-  console.log('포트폴리오 수정')
-  router.push('/resume/portfolio/coach')
-}
-
-function saveResult() {
-  console.log('분석 결과 저장')
-  console.log('저장할 데이터:', {
-    project: projectData.value.name,
-    score: analysisData.value.score,
-    selectedType: selectedType.value,
-    activeTab: activeTab.value
-  })
-  alert('분석 결과가 저장되었습니다!')
-}
-
-// 추가 유틸리티 함수들
-function resetAnalysis() {
-  // 분석 초기화
-  selectedType.value = 'link'
-  activeTab.value = 'overall'
-  console.log('분석이 초기화되었습니다.')
-}
-
-function getScoreColor(score) {
-  // 점수에 따른 색상 반환
-  if (score >= 90) return '#4CAF50'      // 초록색
-  if (score >= 80) return '#71EBBE'      // 민트색
-  if (score >= 70) return '#FF9800'      // 주황색
-  return '#F44336'                       // 빨간색
-}
-
-// ref 변수 접근 시 .value 사용 예시 함수
-function getCurrentTabName() {
-  const currentTab = tabs.value.find(tab => tab.id === activeTab.value)
-  return currentTab ? currentTab.name : '알 수 없음'
-}
+const {
+  uploadedFile,
+  portfolioTitle,
+  loadingUpload,
+  triggerFileInput,
+  handleUpload,
+  startAnalysis
+} = usePortfolioWrite();
 </script>
-<style scoped>
-/* 전체 앱 컨테이너 */
-.app-container {
-  display: flex;
-  min-height: 100vh;
-  background-color: #EFF0F1;
-}
 
-/* 메인 컨테이너 */
-.main-container {
-  flex: 1;
-  padding: 40px;
-  max-width: calc(100vw - 200px - 400px); /* 사이드바와 AI패널 제외 */
-}
 
-/* 폼 컨테이너 */
-.resume-form-container {
-  background: #EAEBEC;
-  border-radius: 12px;
-  padding: 30px;
-  margin-bottom: 20px;
-  border-color: #a8a6a6;
-}
-
-.form-header h1 {
-  margin: 0 0 12px 0;
-  font-size: 24px;
-  font-weight: 700;
-  color: #333;
-}
-
-.form-header p {
-  margin: 0 0 40px 0;
-  color: #666;
-  line-height: 1.6;
-}
-
-/* 업로드 섹션 */
-.upload-section {
-  background: #FFFFFF;
-  border: 3px dashed #71EBBE;
-  border-radius: 25px;
-  padding: 24px;
-  text-align: center;
-  margin-bottom: 2rem;
-}
-
-.upload-icon {
-  font-size: 3rem;
-  margin-bottom: 1rem;
-}
-
-.upload-types {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  margin-bottom: 2rem;
-}
-
-.type-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #F8F9FA;
-  border: 2px solid #E5E5E5;
-  padding: 5px 12px;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: all 0.3s;
-  min-width: 180px;
-}
-
-.type-btn:hover {
-  border-color: #71EBBE;
-  background: #F0FDF8;
-}
-
-.type-btn.active {
-  background: linear-gradient(135deg, #71EBBE, #A2F1D6);
-  border-color: #71EBBE;
-  color: #000;
-  font-weight: 600;
-}
-
-.type-label {
-  font-size: 0.9rem;
-  font-weight: 700;
-
-}
-
-/* 액션 버튼 */
-.action-section {
-  display: flex;
-  justify-content: center;
-  margin-top: 2rem;
-}
-
-.action-btn {
-  display: flex;
-  background: linear-gradient(135deg, #71EBBE, #A2F1D6);
-  align-items: center;
-  height: 37px;
-  color: #000;
-  padding: 1.2rem 3rem;
-  border: none;
-  border-radius: 0.4rem;
-  font-weight: 700;
-  font-size: 1.1rem;
-  cursor: pointer;
-  transition: all 0.3s;
-  box-shadow: 0 4px 15px rgba(113, 235, 190, 0.3);
-  justify-content: center;
-}
-
-.action-btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 30px rgba(113, 235, 190, 0.5);
-}
-
-/* AI 코칭 패널 */
-.ai-coaching-panel {
-  width: 380px;
-  background: #fff;
-  position: fixed;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  border-left: 1px solid #e5e5e5;
-  display: flex;
-  flex-direction: column;
-  z-index: 1000;
-}
-
-/* AI 헤더 */
-.ai-header {
-  background: #000;
-  color: white;
-  padding: 16px 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.ai-profile {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.ai-avatar {
-  font-size: 18px;
-}
-
-.ai-name {
-  font-weight: 600;
-  font-size: 14px;
-  display: block;
-}
-
-.ai-desc {
-  font-size: 11px;
-  color: #ccc;
-  display: block;
-}
-
-.close-btn {
-  background: none;
-  border: none;
-  color: white;
-  font-size: 18px;
-  cursor: pointer;
-  padding: 4px;
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 4px;
-}
-
-/* 나머지 AI 코칭 패널 스타일 */
-.ai-status, .ai-content, .tips-section, .ai-actions {
-  /* 이력서 작성하기 페이지의 스타일과 동일하게 적용 */
-}
-
-/* 반응형 설정 */
-@media (max-width: 1200px) {
-  .ai-coaching-panel {
-    display: none;
-  }
-  
-  .main-container {
-    max-width: calc(100vw - 200px);
-  }
-}
-
-@media (max-width: 768px) {
-  .app-container {
-    flex-direction: column;
-  }
-  
-  .main-container {
-    max-width: 100%;
-    padding: 20px;
-  }
-  
-  .upload-types {
-    flex-direction: column;
-  }
-}
-</style>
+<style src="@/assets/css/portfolioWrite.css"></style>
