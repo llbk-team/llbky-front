@@ -1,3 +1,4 @@
+<!-- 이력서 작성 페이지 컴포넌트-->
 <template>
   <div class="app-container">
     <!-- 사이드바 -->
@@ -5,13 +6,14 @@
 
     <!-- 메인 컨테이너 -->
     <div class="main-container">
-
       <!-- 이력서 작성 폼 -->
       <div class="resume-form-container">
         <div class="form-header">
           <h1>이력서 작성하기</h1>
-          <p>단순한 정보를 입력하여보면 자동으로 양식에 맞게 내용까지 추천받을 수 있습니다.<br>
-            자세한 이력서를 경력의 빛을 낼 수 있도록 작성해보세요.</p>
+          <p>
+            단순한 정보를 입력하여보면 자동으로 양식에 맞게 내용까지 추천받을 수 있습니다.<br>
+            자세한 이력서를 경력의 빛을 낼 수 있도록 작성해보세요.
+          </p>
         </div>
 
         <!-- 이력서 제목 입력 -->
@@ -20,7 +22,6 @@
           <input id="resume-title" type="text" v-model="resumeData.title" placeholder="예: 백엔드 개발자 이력서"
             @input="onInputChange('title', $event.target.value)" />
         </div>
-
 
         <!-- 기본 정보 -->
         <div class="form-section" :class="{ 'expanded': sections.basic, 'active': sections.basic }">
@@ -52,7 +53,6 @@
               <input type="email" v-model="resumeData.email" placeholder="example@email.com"
                 @input="onInputChange('email', $event.target.value)" />
             </div>
-
           </div>
         </div>
 
@@ -93,9 +93,13 @@
                 </div>
               </div>
               <button type="button" class="remove-btn" @click="removeEducation(index)"
-                v-if="resumeData.educations.length > 1">삭제</button>
+                v-if="resumeData.educations.length > 1">
+                삭제
+              </button>
             </div>
-            <button type="button" class="add-btn" @click="addEducation">+ 교육사항 추가하기</button>
+            <button type="button" class="add-btn" @click="addEducation">
+              + 교육사항 추가하기
+            </button>
           </div>
         </div>
 
@@ -127,7 +131,6 @@
                     class="btn btn-danger btn-sm">
                     삭제
                   </button>
-
                 </div>
               </div>
 
@@ -180,8 +183,6 @@
           </div>
         </div>
 
-
-
         <!-- 활동 -->
         <div class="form-section" :class="{ 'expanded': sections.activities, 'active': sections.activities }">
           <div class="section-header" @click="toggleSection('activities')">
@@ -195,10 +196,8 @@
           </div>
 
           <div class="section-content" v-show="sections.activities">
-
             <div v-for="(activity, index) in resumeData.activities" :key="index" class="career-item">
-
-              <!-- 🔥 경력과 동일한 HEADER 구조 적용 -->
+              <!-- 경력과 동일한 HEADER 구조 -->
               <div class="career-header">
                 <h4>활동 {{ index + 1 }}</h4>
 
@@ -210,11 +209,10 @@
                     class="btn btn-danger btn-sm">
                     삭제
                   </button>
-
                 </div>
               </div>
 
-              <!-- 🔥 경력과 동일한 2열 form-grid 구조 -->
+              <!-- 2열 form-grid -->
               <div class="form-grid">
                 <div class="form-group">
                   <label>활동명</label>
@@ -253,10 +251,8 @@
                 + 활동 추가하기
               </button>
             </div>
-
           </div>
         </div>
-
 
         <!-- 스킬 -->
         <div class="form-section" :class="{ 'expanded': sections.skills, 'active': sections.skills }">
@@ -275,11 +271,14 @@
               <div v-for="(skill, index) in resumeData.skills" :key="index" class="skill-item">
                 <input type="text" v-model="skill.name" placeholder="기술 스택 입력"
                   @input="onInputChange('skills', resumeData.skills)" />
-                <button class="remove-skill-btn" @click="removeSkill(index)"
-                  v-if="resumeData.skills.length > 1">×</button>
+                <button class="remove-skill-btn" @click="removeSkill(index)" v-if="resumeData.skills.length > 1">
+                  ×
+                </button>
               </div>
             </div>
-            <button type="button" class="add-btn" @click="addSkill">+ 스킬 추가하기</button>
+            <button type="button" class="add-btn" @click="addSkill">
+              + 스킬 추가하기
+            </button>
           </div>
         </div>
 
@@ -311,10 +310,13 @@
                 <label>발급기관</label>
                 <input type="text" v-model="cert.issuer" placeholder="한국산업인력공단" />
               </div>
-              <button class="remove-btn" @click="removeCertificate(index)"
-                v-if="resumeData.certificates.length > 1">삭제</button>
+              <button class="remove-btn" @click="removeCertificate(index)" v-if="resumeData.certificates.length > 1">
+                삭제
+              </button>
             </div>
-            <button type="button" class="add-btn" @click="addCertificate">+ 자격증 추가하기</button>
+            <button type="button" class="add-btn" @click="addCertificate">
+              + 자격증 추가하기
+            </button>
           </div>
         </div>
 
@@ -327,20 +329,20 @@
     </div>
 
     <!-- AI 코칭 패널 -->
-    <div class="ai-coaching-panel" v-if="showAICoaching">
-      <!-- AI 헤더 -->
+    <!-- === AI 코칭 패널 (자소서 UI 그대로 복붙 적용) === -->
+    <div class="ai-coaching-panel">
+
+      <!-- 헤더 -->
       <div class="ai-header">
         <div class="ai-profile">
           <div class="ai-avatar">🤖</div>
           <div class="ai-info">
             <span class="ai-name">AI 코치</span>
-            <span class="ai-desc">컴퓨터공학 프로젝트 출력고</span>
           </div>
         </div>
-        <button class="close-btn" @click="toggleAICoaching">×</button>
       </div>
 
-      <!-- AI 상태 -->
+      <!-- 상태 -->
       <div class="ai-status">
         <div class="status-indicator">
           <div class="status-icon">🤖</div>
@@ -348,143 +350,74 @@
         </div>
       </div>
 
-      <!-- 스크롤 콘텐츠 -->
-
-
+      <!-- 콘텐츠 -->
       <div class="ai-content">
-        <!-- 환영 메시지 -->
+
+        <!-- 환영 문구 -->
         <div class="welcome-section">
-          <p>안녕하세요! 이력서 작성을 도와 드릴 AI 코치입니다.</p>
-          <p>항상 더 나은 이력서를 만들 수 있도록 도와드리겠습니다.
-            궁금한 점이 있으면 언제든지 물어보세요!</p>
+          <p>안녕하세요! 이력서 작성 코치를 맡고 있는 AI입니다.</p>
+          <p>각 항목 입력 후 피드백을 받아 정확도를 높여보세요.</p>
         </div>
 
-        <!-- 적성 팁 -->
+        <!-- 팁 -->
         <div class="tips-section">
           <div class="section-title">
             <span class="icon">💡</span>
-            <span>적성 팁</span>
+            <span>좋은 이력서 작성 팁</span>
           </div>
-          <div class="tips-content">
-            <h4>좋은 이력서를 위한 핵심 포인트</h4>
-            <div class="checklist">
-              <div class="check-item">
-                <span class="check">✅</span>
-                <span>구체적인 수치와 성과를 포함하세요.</span>
-              </div>
-              <div class="check-item">
-                <span class="check">✅</span>
-                <span>사용한 기술 스택을 명확히 기재하세요.</span>
-              </div>
-              <div class="check-item">
-                <span class="check">✅</span>
-                <span>프로젝트의 역할과 기여도를 작성하세요.</span>
-              </div>
-            </div>
+          <div class="checklist">
+            <div class="check-item">✅ 구체적 수치와 성과를 포함하세요.</div>
+            <div class="check-item">✅ 역할과 기여도를 중심으로 작성하세요.</div>
+            <div class="check-item">✅ 사용하는 기술 스택을 명확히 적으세요.</div>
           </div>
         </div>
 
-        <!-- AI 분석 중 스피너 -->
-        <div v-if="aiLoading" class="spinner-container mt-3 mb-3">
+        <!-- 로딩 -->
+        <div class="spinner-container" v-if="aiLoading">
           <div class="spinner"></div>
-          <p class="text-muted mt-2">AI가 분석 중입니다...</p>
+          <span>AI가 분석 중입니다...</span>
         </div>
-        <!-- 실시간 피드백 -->
-        <div v-if="!aiLoading">
-          <div class="feedback-section" v-for="(items, sectionName) in groupedFeedback" :key="sectionName">
 
-            <div class="section-title">
-              <span class="icon">📝</span>
-              <span>{{ getSectionLabel(sectionName) }} 피드백</span>
-            </div>
+        <!-- 🔥 피드백 박스 (자소서 UI 동일) -->
+        <div class="ai-feedback-box" v-for="item in aiFeedback" :key="item.timestamp">
+          <h4>📝 {{ getSectionLabel(item.section) }} 항목 코칭</h4>
 
-            <div class="feedback-list">
-              <div v-for="(feedback, i) in items" :key="i" class="feedback-item">
-                <span class="feedback-icon">💡</span>
-                <span class="feedback-text" v-html="feedback.message"></span>
-              </div>
-            </div>
+          <p><strong>요약:</strong> {{ item.summary }}</p>
+          <p><strong>잘한 점:</strong> {{ item.strengths }}</p>
+          <p><strong>개선점:</strong> {{ item.improvements }}</p>
+
+          <div class="improved-box" v-if="item.improvedText">
+            <h5>✨ AI 수정본</h5>
+            <p>{{ item.improvedText }}</p>
+
+            <button class="btn btn-outline-success btn-sm mt-3" @click="applyImprovedToResume(item)">
+              수정본 적용하기
+            </button>
           </div>
         </div>
 
-
-
-        <!-- 액션 버튼 -->
-        <div class="ai-actions">
-          <!-- 질문 버튼 완전 삭제됨 -->
-          <button class="ai-action-btn" @click="getDetailedAnalysis">
-            📋 관련 키워드
-          </button>
-        </div>
       </div>
     </div>
+
   </div>
 
-  <!-- 🔥 작성 완료 로딩 오버레이 -->
-<div v-if="saveLoading" class="save-loading-overlay">
-  <div class="save-loading-box">
-    <div class="spinner"></div>
-    <p>이력서를 저장하고 있습니다...</p>
-    <p class="sub">AI 분석이 자동으로 실행돼요!</p>
+  <!-- 작성 완료 로딩 오버레이 -->
+  <div v-if="saveLoading" class="save-loading-overlay">
+    <div class="save-loading-box">
+      <div class="spinner"></div>
+      <p>이력서를 저장하고 있습니다...</p>
+      <p class="sub">AI 분석이 자동으로 실행돼요!</p>
+    </div>
   </div>
-</div>
-
 </template>
-
 
 <script setup>
 import SideBar from '@/components/sidebar/SideBar.vue'
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import resumeApi from '@/apis/resume'
-import { computed } from 'vue'
 
 const router = useRouter()
-
-// 섹션 토글 함수
-const toggleSection = (section) => {
-  sections[section] = !sections[section]
-}
-
-// 기본 정보 입력 변경 함수
-const onInputChange = (field, value) => {
-  resumeData[field] = value
-}
-
-// 경력 입력 변경 함수
-const onCareerInputChange = (index, field, value) => {
-  resumeData.careers[index][field] = value
-}
-
-const onCareerCurrentChange = (index) => {
-  if (resumeData.careers[index].isCurrent) {
-    resumeData.careers[index].endDate = ''
-  }
-}
-
-// 경력 추가
-const addCareer = () => {
-  resumeData.careers.push({
-    company: '',
-    position: '',
-    startDate: '',
-    endDate: '',
-    department: '',
-    rank: '',
-    responsibilities: '',
-    isCurrent: false
-  })
-}
-
-// 경력 삭제
-const removeCareer = (index) => {
-  if (resumeData.careers.length > 1) {
-    resumeData.careers.splice(index, 1)
-  }
-}
-
-// AI 코칭 패널
-const showAICoaching = ref(true)
 
 // 섹션 확장 상태
 const sections = reactive({
@@ -493,17 +426,14 @@ const sections = reactive({
   career: false,
   skills: false,
   activities: false,
-  certificates: false,
+  certificates: false
 })
 
-// ai 로딩
-const aiLoading = ref(false);
+const aiFeedback = ref([]);
 
-// 저장 로딩
-const saveLoading = ref(false);
-
-// AI 피드백
-const aiFeedback = ref([])
+// 로딩 상태
+const aiLoading = ref(false)
+const saveLoading = ref(false)
 
 // 이력서 데이터
 const resumeData = reactive({
@@ -512,9 +442,7 @@ const resumeData = reactive({
   phone: '',
   email: '',
   github: '',
-  educations: [
-    { school: '', major: '', startDate: '', endDate: '' }
-  ],
+  educations: [{ school: '', major: '', startDate: '', endDate: '' }],
   careers: [
     {
       company: '',
@@ -537,79 +465,53 @@ const resumeData = reactive({
       description: ''
     }
   ],
-  certificates: [
-    { name: '', date: '', issuer: '' }
-  ]
+  certificates: [{ name: '', date: '', issuer: '' }]
 })
 
+// 자소서 스타일의 피드백 리스트
+const feedbackList = ref([])
 
-// 🔥🔥 특정 섹션 피드백 생성 (프런트 기반)
-const getSectionFeedback = async (section, index) => {
-  try {
-    let content = "";
+// 섹션 토글
+const toggleSection = (section) => {
+  sections[section] = !sections[section]
+}
 
-    if (section === "career") {
-      content = resumeData.careers[index].responsibilities || "";
-    }
-    if (section === "activity") {
-      content = resumeData.activities[index].description || "";
-    }
+// 입력 변경
+const onInputChange = (field, value) => {
+  resumeData[field] = value
+}
 
-    if (!content.trim()) {
-      alert("내용을 입력해야 AI 피드백을 받을 수 있습니다.");
-      return;
-    }
+const onCareerInputChange = (index, field, value) => {
+  resumeData.careers[index][field] = value
+}
 
-    aiLoading.value = true; // 스피너 시작
-
-    const payload = {
-      memberId: 1,          // 로그인 전 임시값
-      section: section,
-      content: content
-    };
-
-    const { data } = await resumeApi.coach(payload);
-
-    // 오른쪽 AI 패널에 표시
-    aiFeedback.value.unshift({
-      section,
-      index,
-      type: "ai",
-      message: `
-        <b>요약</b>: ${data.summary}<br>
-        <b>강점</b>: ${data.strengths}<br>
-        <b>개선점</b>: ${data.improvements}<br>
-        <b>수정본</b>: ${data.improvedText}
-      `,
-      timestamp: new Date()
-    });
-
-    // 10개 초과되면 오래된 것 제거
-    if (aiFeedback.value.length > 10) {
-      aiFeedback.value.pop();
-    }
-
-    showAICoaching.value = true;
-
-  } catch (err) {
-    console.error("AI 코칭 오류:", err);
-    alert("AI 피드백을 가져오지 못했습니다.");
-  } finally {
-    aiLoading.value = false; // 스피너종료
-  }
-};
-
-
-// 피드백 아이콘
-const getFeedbackIcon = (type) => {
-  switch (type) {
-    case 'positive': return '👍'
-    case 'warning': return '⚠️'
-    default: return '💡'
+const onCareerCurrentChange = (index) => {
+  if (resumeData.careers[index].isCurrent) {
+    resumeData.careers[index].endDate = ''
   }
 }
 
-// 활동 관련
+// 경력 추가/삭제
+const addCareer = () => {
+  resumeData.careers.push({
+    company: '',
+    position: '',
+    startDate: '',
+    endDate: '',
+    department: '',
+    rank: '',
+    responsibilities: '',
+    isCurrent: false
+  })
+}
+
+const removeCareer = (index) => {
+  if (resumeData.careers.length > 1) {
+    resumeData.careers.splice(index, 1)
+  }
+}
+
+// 활동 추가/삭제
 const addActivity = () => {
   resumeData.activities.push({
     name: '',
@@ -626,18 +528,17 @@ const removeActivity = (index) => {
   }
 }
 
-// 스킬 관련
+// 스킬
 const addSkill = () => {
   resumeData.skills.push({ name: '' })
 }
-
 const removeSkill = (index) => {
   if (resumeData.skills.length > 1) {
     resumeData.skills.splice(index, 1)
   }
 }
 
-// 교육 삭제 / 추가
+// 교육
 const addEducation = () => {
   resumeData.educations.push({
     school: '',
@@ -646,7 +547,6 @@ const addEducation = () => {
     endDate: ''
   })
 }
-
 const removeEducation = (index) => {
   if (resumeData.educations.length > 1) {
     resumeData.educations.splice(index, 1)
@@ -656,23 +556,91 @@ const removeEducation = (index) => {
 // 자격증
 const addCertificate = () => {
   resumeData.certificates.push({
-    name: '', date: '', issuer: ''
+    name: '',
+    date: '',
+    issuer: ''
   })
 }
-
 const removeCertificate = (index) => {
   if (resumeData.certificates.length > 1) {
     resumeData.certificates.splice(index, 1)
   }
 }
 
-// 상세 분석(더미)
+/* 🔥 섹션 이름 한글 라벨 */
+const getSectionLabel = (section) => {
+  switch (section) {
+    case "career": return "경력";
+    case "activity": return "활동";
+    case "education": return "교육";
+    case "skill": return "스킬";
+    default: return "기타";
+  }
+};
+
+// 특정 섹션 피드백 요청 (자소서 스타일)
+const getSectionFeedback = async (section, index) => {
+  try {
+    let content = ''
+
+    if (section === 'career') {
+      content = resumeData.careers[index].responsibilities || ''
+    } else if (section === 'activity') {
+      content = resumeData.activities[index].description || ''
+    }
+
+    if (!content.trim()) {
+      alert('내용을 입력해야 AI 피드백을 받을 수 있습니다.')
+      return
+    }
+
+    aiLoading.value = true
+
+    const payload = {
+      memberId: 1,
+      section,
+      content
+    }
+
+    const { data } = await resumeApi.coach(payload)
+
+    aiFeedback.value.unshift({
+      section,
+      index,
+      summary: data.summary,
+      strengths: data.strengths,
+      improvements: data.improvements,
+      improvedText: data.improvedText,
+      timestamp: new Date()
+    })
+
+
+    if (feedbackList.value.length > 10) {
+      feedbackList.value.pop()
+    }
+  } catch (err) {
+    console.error('AI 코칭 오류:', err)
+    alert('AI 피드백을 가져오지 못했습니다.')
+  } finally {
+    aiLoading.value = false
+  }
+}
+
+/* 🔥 AI 결과 이력서에 반영 */
+const applyImprovedToResume = (item) => {
+  if (item.section === "career") {
+    resumeData.careers[item.index].responsibilities = item.improvedText;
+  }
+  if (item.section === "activity") {
+    resumeData.activities[item.index].description = item.improvedText;
+  }
+  alert("AI 수정본을 내용에 적용했습니다!");
+};
+
+
+// 더미 상세 분석
 const getDetailedAnalysis = () => {
-  aiFeedback.value.unshift({
-    type: 'tip',
-    message: '키워드 기반 상세 이력서 분석 기능은 준비 중입니다.',
-    timestamp: new Date()
-  })
+  alert('키워드 기반 상세 이력서 분석 기능은 준비 중입니다.')
 }
 
 // 미리보기
@@ -683,70 +651,38 @@ const previewResume = () => {
 // 저장
 const submitResume = async () => {
   try {
-    saveLoading.value = true; // 로딩(스피너) 시작
-
-    // memberId 필요 → 로그인 구현 전엔 임시 1 사용
-    const memberId = 1;
+    saveLoading.value = true
+    const memberId = 1
 
     const payload = {
       memberId,
       title: resumeData.title,
-
-      // JSON 문자열로 변환
       careerInfo: JSON.stringify(resumeData.careers),
       educationInfo: JSON.stringify(resumeData.educations),
       skills: JSON.stringify(resumeData.skills),
       certificates: JSON.stringify(resumeData.certificates),
-      awards: "[]", // 없으므로 빈 JSON 배열
+      awards: '[]',
       activities: JSON.stringify(resumeData.activities)
-    };
+    }
 
-    console.log("📌 전송 payload:", payload);
+    console.log('📌 전송 payload:', payload)
 
-    const { data: resumeId } = await resumeApi.create(payload);
+    const { data: resumeId } = await resumeApi.create(payload)
 
-    alert("이력서가 저장되었습니다!");
-
-    // 저장 후 이력서 상세 페이지로 이동
-    router.push(`/resume/coach?id=${resumeId}`);
-
+    alert('이력서가 저장되었습니다!')
+    router.push(`/resume/coach?id=${resumeId}`)
   } catch (err) {
-    console.error("이력서 저장 실패", err);
-    alert("이력서 저장 중 오류가 발생했습니다.");
+    console.error('이력서 저장 실패', err)
+    alert('이력서 저장 중 오류가 발생했습니다.')
   } finally {
-    saveLoading.value = false; // 로딩 종료
+    saveLoading.value = false
   }
-};
-
+}
 
 onMounted(() => {
   console.log('ResumeWrite 컴포넌트가 마운트되었습니다.')
 })
-
-const groupedFeedback = computed(() => {
-  const groups = {}
-
-  aiFeedback.value.forEach(item => {
-    const key = `${item.section}`
-
-    if (!groups[key]) groups[key] = []
-    groups[key].push(item)
-  })
-
-  return groups
-})
-
-const getSectionLabel = (section) => {
-  switch (section) {
-    case 'career': return '경력'
-    case 'activity': return '활동'
-    default: return '기타'
-  }
-}
-
-
 </script>
-
 
 <style scoped>
 /* 전체 앱 컨테이너 */
@@ -1146,28 +1082,6 @@ textarea {
   margin-bottom: 1rem;
 }
 
-
-
-
-.close-btn {
-  background: none;
-  border: none;
-  color: white;
-  font-size: 18px;
-  cursor: pointer;
-  padding: 4px;
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 4px;
-}
-
-.close-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-
 /* AI 상태 */
 .ai-status {
   padding: 16px 20px;
@@ -1411,7 +1325,7 @@ textarea {
 .save-loading-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.45);
+  background: rgba(0, 0, 0, 0.45);
   backdrop-filter: blur(3px);
   z-index: 9999;
 
@@ -1425,7 +1339,7 @@ textarea {
   padding: 28px 40px;
   border-radius: 12px;
   text-align: center;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
 }
 
 .save-loading-box p {
@@ -1451,7 +1365,133 @@ textarea {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ai-feedback-box / improved-box는 자소서 컴포넌트에서 쓰던 것 복붙 */
+.ai-feedback-box {
+  background: #f7f7f7;
+  border: 1px solid #e3e3e3;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.ai-feedback-box h4 {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: #333;
+}
+
+.improved-box {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  padding: 16px 18px;
+  border-radius: 8px;
+  margin-top: 16px;
+}
+
+.improved-box h5 {
+  font-size: 14px;
+  font-weight: 700;
+  color: #166534;
+  margin-bottom: 8px;
+}
+
+/* ===== 오른쪽 패널 메인 ===== */
+.ai-coaching-panel {
+  width: 380px;
+  background: #fff;
+  position: fixed;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  border-left: 1px solid #e5e5e5;
+  display: flex;
+  flex-direction: column;
+  z-index: 1000;
+  font-family: 'Pretendard', sans-serif;
+  font-size: 13px;
+}
+
+/* 헤더 */
+.ai-header {
+  background: #000;
+  color: white;
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ai-avatar {
+  font-size: 18px;
+}
+
+.ai-name {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* 상태 */
+.ai-status {
+  padding: 16px 20px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.status-indicator {
+  background: #f8f9fa;
+  padding: 8px 12px;
+  border-radius: 6px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* 콘텐츠 */
+.ai-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+/* 환영 문구 */
+.welcome-section {
+  background: #f8f9fa;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+/* 팁 */
+.tips-section {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+/* 피드백 박스 */
+.ai-feedback-box {
+  background: #f7f7f7;
+  border: 1px solid #e3e3e3;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+/* AI 수정본 */
+.improved-box {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  padding: 16px;
+  border-radius: 8px;
+  margin-top: 16px;
 }
 
 </style>
