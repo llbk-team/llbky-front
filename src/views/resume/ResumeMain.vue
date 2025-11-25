@@ -97,7 +97,6 @@
                 <div class="resume-icon">🖋️</div>
                 <div class="resume-info">
                   <h3 class="resume-title">{{ cover.title }}</h3>
-                  <p class="resume-description">{{ cover.description }}</p>
                   <div class="resume-meta">
                     <span class="update-date">📅 최종 수정: {{ cover.updatedAt }}</span>
                   </div>

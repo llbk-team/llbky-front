@@ -3,6 +3,7 @@ import { ref, onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
 import resumeApi from "@/apis/resume";
 import portfolioApi from "@/apis/portfolioApi";
+import coverletterApi from "@/apis/coverletterApi";
 
 export function useResumeMain() {
     const router = useRouter();
@@ -43,11 +44,21 @@ export function useResumeMain() {
         router.push(`/resume/coach?id=${id}`);
     };
 
-    // 자소서 리스트 (정적)
-    const coverLetterList = ref([
-        { id: 1, title: "카카오 자기소개서", description: "백엔드 개발", updatedAt: "2024.03.12" },
-        { id: 2, title: "네이버 자기소개서", description: "AI 플랫폼", updatedAt: "2024.03.09" },
-    ]);
+    // 자소서 
+    const coverLetterList = ref([]);
+
+    const fetchCoverletterList = async () => {
+        try {
+            const res = await coverletterApi.getCoverLetterList(1);
+            coverLetterList.value = res.data.map((item) => ({
+                id: item.coverletterId,
+                title: item.title,
+                updatedAt: item.updatedAt?.substring(0, 10),
+            }));
+        } catch (err) {
+            console.error("이력서 조회 실패:", err);
+        }
+    };
 
     const goToCoverDetail = (id) => {
         router.push(`/resume/coverletter/detail?id=${id}`);
@@ -151,6 +162,7 @@ export function useResumeMain() {
 
     onMounted(() => {
         fetchResumeList();
+        fetchCoverletterList();
         fetchPortfolioList();
     });
 
