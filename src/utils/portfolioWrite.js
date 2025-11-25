@@ -47,7 +47,7 @@ export function usePortfolioWrite() {
     try {
       const res = await portfolioApi.createPortfolio(formData);
 
-      const newId = res.data.portfoliId;
+      const newId = res.data.portfolioId;
 
       if (!newId) {
         alert("포트폴리오 ID를 가져오지 못했습니다.");
