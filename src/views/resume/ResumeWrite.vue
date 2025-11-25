@@ -14,6 +14,14 @@
             자세한 이력서를 경력의 빛을 낼 수 있도록 작성해보세요.</p>
         </div>
 
+        <!-- 이력서 제목 입력 -->
+        <div class="title-input-box">
+          <label for="resume-title">이력서 제목 *</label>
+          <input id="resume-title" type="text" v-model="resumeData.title" placeholder="예: 백엔드 개발자 이력서"
+            @input="onInputChange('title', $event.target.value)" />
+        </div>
+
+
         <!-- 기본 정보 -->
         <div class="form-section" :class="{ 'expanded': sections.basic, 'active': sections.basic }">
           <div class="section-header" @click="toggleSection('basic')">
@@ -175,97 +183,79 @@
 
 
         <!-- 활동 -->
-<div class="form-section" :class="{ 'expanded': sections.activities, 'active': sections.activities }">
-  <div class="section-header" @click="toggleSection('activities')">
-    <div class="section-info">
-      <h3>활동</h3>
-      <span class="section-desc">대외활동, 동아리, 봉사활동 등을 추가하세요</span>
-    </div>
-    <button class="toggle-btn" :class="{ 'active': sections.activities }">
-      {{ sections.activities ? '×' : '+' }}
-    </button>
-  </div>
+        <div class="form-section" :class="{ 'expanded': sections.activities, 'active': sections.activities }">
+          <div class="section-header" @click="toggleSection('activities')">
+            <div class="section-info">
+              <h3>활동</h3>
+              <span class="section-desc">대외활동, 동아리, 봉사활동 등을 추가하세요</span>
+            </div>
+            <button class="toggle-btn" :class="{ 'active': sections.activities }">
+              {{ sections.activities ? '×' : '+' }}
+            </button>
+          </div>
 
-  <div class="section-content" v-show="sections.activities">
-    
-    <div v-for="(activity, index) in resumeData.activities" :key="index" class="career-item">
-      
-      <!-- 🔥 경력과 동일한 HEADER 구조 적용 -->
-      <div class="career-header">
-        <h4>활동 {{ index + 1 }}</h4>
+          <div class="section-content" v-show="sections.activities">
 
-        <div class="career-actions">
-          <button 
-            class="btn btn-outline-success btn-sm"
-            @click="getSectionFeedback('activity', index)"
-          >
-            피드백 받기
-          </button>
-          <button 
-            v-if="resumeData.activities.length > 1" 
-            @click="removeActivity(index)" 
-            class="btn btn-danger btn-sm"
-          >
-            삭제
-          </button>
+            <div v-for="(activity, index) in resumeData.activities" :key="index" class="career-item">
 
+              <!-- 🔥 경력과 동일한 HEADER 구조 적용 -->
+              <div class="career-header">
+                <h4>활동 {{ index + 1 }}</h4>
+
+                <div class="career-actions">
+                  <button class="btn btn-outline-success btn-sm" @click="getSectionFeedback('activity', index)">
+                    피드백 받기
+                  </button>
+                  <button v-if="resumeData.activities.length > 1" @click="removeActivity(index)"
+                    class="btn btn-danger btn-sm">
+                    삭제
+                  </button>
+
+                </div>
+              </div>
+
+              <!-- 🔥 경력과 동일한 2열 form-grid 구조 -->
+              <div class="form-grid">
+                <div class="form-group">
+                  <label>활동명</label>
+                  <input type="text" v-model="activity.name" placeholder="예: 대학생 IT 동아리"
+                    @input="onInputChange('activities', resumeData.activities)" />
+                </div>
+
+                <div class="form-group">
+                  <label>기관/단체</label>
+                  <input type="text" v-model="activity.organization" placeholder="예: 학교명, 기관명"
+                    @input="onInputChange('activities', resumeData.activities)" />
+                </div>
+              </div>
+
+              <div class="form-grid">
+                <div class="form-group">
+                  <label>시작일</label>
+                  <input type="month" v-model="activity.startDate" />
+                </div>
+                <div class="form-group">
+                  <label>종료일</label>
+                  <input type="month" v-model="activity.endDate" />
+                </div>
+              </div>
+
+              <div class="form-group mb-4">
+                <label>활동 내용</label>
+                <textarea v-model="activity.description" placeholder="활동에서 수행한 주요 역할과 성과를 입력하세요" rows="4"
+                  @input="onInputChange('activities', resumeData.activities)"></textarea>
+              </div>
+            </div>
+
+            <!-- 활동 추가 -->
+            <div class="add-career-btn-container">
+              <button @click="addActivity" class="btn btn-outline-primary">
+                + 활동 추가하기
+              </button>
+            </div>
+
+          </div>
         </div>
-      </div>
-
-      <!-- 🔥 경력과 동일한 2열 form-grid 구조 -->
-      <div class="form-grid">
-        <div class="form-group">
-          <label>활동명</label>
-          <input 
-            type="text"
-            v-model="activity.name"
-            placeholder="예: 대학생 IT 동아리"
-            @input="onInputChange('activities', resumeData.activities)"
-          />
-        </div>
-
-        <div class="form-group">
-          <label>기관/단체</label>
-          <input 
-            type="text"
-            v-model="activity.organization"
-            placeholder="예: 학교명, 기관명"
-            @input="onInputChange('activities', resumeData.activities)"
-          />
-        </div>
-      </div>
-
-      <div class="form-grid">
-        <div class="form-group">
-          <label>시작일</label>
-          <input type="month" v-model="activity.startDate" />
-        </div>
-        <div class="form-group">
-          <label>종료일</label>
-          <input type="month" v-model="activity.endDate" />
-        </div>
-      </div>
-
-      <div class="form-group mb-4">
-        <label>활동 내용</label>
-        <textarea
-          v-model="activity.description"
-          placeholder="활동에서 수행한 주요 역할과 성과를 입력하세요"
-          rows="4"
-          @input="onInputChange('activities', resumeData.activities)"
-        ></textarea>
-      </div>
-    </div>
-
-    <!-- 활동 추가 -->
-    <div class="add-career-btn-container">
-      <button @click="addActivity" class="btn btn-outline-primary">
-        + 활동 추가하기
-      </button>
-    </div>
-
-  </div>
-</div>
 
 
         <!-- 스킬 -->
@@ -393,18 +383,22 @@
         </div>
 
         <!-- 실시간 피드백 -->
-        <div class="feedback-section" v-if="aiFeedback.length > 0">
+        <div class="feedback-section" v-for="(items, sectionName) in groupedFeedback" :key="sectionName">
+
           <div class="section-title">
             <span class="icon">📝</span>
-            <span>실시간 피드백</span>
+            <span>{{ getSectionLabel(sectionName) }} 피드백</span>
           </div>
+
           <div class="feedback-list">
-            <div v-for="(feedback, index) in aiFeedback" :key="index" class="feedback-item">
-              <span class="feedback-icon">{{ getFeedbackIcon(feedback.type) }}</span>
-              <span class="feedback-text">{{ feedback.message }}</span>
+            <div v-for="(feedback, i) in items" :key="i" class="feedback-item">
+              <span class="feedback-icon">💡</span>
+              <span class="feedback-text" v-html="feedback.message"></span>
             </div>
           </div>
+
         </div>
+
 
         <!-- 액션 버튼 -->
         <div class="ai-actions">
@@ -424,6 +418,7 @@ import SideBar from '@/components/sidebar/SideBar.vue'
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import resumeApi from '@/apis/resume'
+import { computed } from 'vue'
 
 const router = useRouter()
 
@@ -480,7 +475,6 @@ const sections = reactive({
   skills: false,
   activities: false,
   certificates: false,
-  introduction: false
 })
 
 // AI 피드백
@@ -488,6 +482,7 @@ const aiFeedback = ref([])
 
 // 이력서 데이터
 const resumeData = reactive({
+  title: '',
   name: '',
   phone: '',
   email: '',
@@ -550,12 +545,14 @@ const getSectionFeedback = async (section, index) => {
 
     // 오른쪽 AI 패널에 표시
     aiFeedback.value.unshift({
+      section,
+      index,
       type: "ai",
       message: `
-        📌 요약: ${data.summary}
-        👍 강점: ${data.strengths}
-        ⚠️ 개선점: ${data.improvements}
-        ✨ 수정본: ${data.improvedText}
+        <b>요약</b>: ${data.summary}<br>
+        <b>강점</b>: ${data.strengths}<br>
+        <b>개선점</b>: ${data.improvements}<br>
+        <b>수정본</b>: ${data.improvedText}
       `,
       timestamp: new Date()
     });
@@ -658,11 +655,11 @@ const previewResume = () => {
 const submitResume = async () => {
   try {
     // memberId 필요 → 로그인 구현 전엔 임시 1 사용
-    const memberId = 1; 
+    const memberId = 1;
 
     const payload = {
       memberId,
-      title: resumeData.name + "님의 이력서",
+      title: resumeData.title,
 
       // JSON 문자열로 변환
       careerInfo: JSON.stringify(resumeData.careers),
@@ -680,7 +677,7 @@ const submitResume = async () => {
     alert("이력서가 저장되었습니다!");
 
     // 저장 후 이력서 상세 페이지로 이동
-    router.push(`/resume/${resumeId}`);
+    router.push(`/resume/coach?id=${resumeId}`);
 
   } catch (err) {
     console.error("이력서 저장 실패", err);
@@ -692,6 +689,29 @@ const submitResume = async () => {
 onMounted(() => {
   console.log('ResumeWrite 컴포넌트가 마운트되었습니다.')
 })
+
+const groupedFeedback = computed(() => {
+  const groups = {}
+
+  aiFeedback.value.forEach(item => {
+    const key = `${item.section}`
+
+    if (!groups[key]) groups[key] = []
+    groups[key].push(item)
+  })
+
+  return groups
+})
+
+const getSectionLabel = (section) => {
+  switch (section) {
+    case 'career': return '경력'
+    case 'activity': return '활동'
+    default: return '기타'
+  }
+}
+
+
 </script>
 
 
@@ -959,15 +979,7 @@ textarea {
 
 /* 개별 아이템 */
 .education-item,
-.activity-item,
 .cert-item,
-.intro-item {
-  border: 1px solid #f0f0f0;
-  border-radius: 8px;
-  padding: 20px;
-  margin-bottom: 16px;
-  position: relative;
-}
 
 .remove-btn {
   position: absolute;
@@ -1303,5 +1315,31 @@ textarea {
   .skills-grid {
     grid-template-columns: 1fr;
   }
+}
+
+.title-input-box {
+  margin: 20px 0 40px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.title-input-box label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+}
+
+.title-input-box input {
+  padding: 12px 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.title-input-box input:focus {
+  outline: none;
+  border-color: #71EBBE;
+  box-shadow: 0 0 0 3px rgba(113, 235, 190, 0.1);
 }
 </style>
