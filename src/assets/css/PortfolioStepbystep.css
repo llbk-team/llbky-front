@@ -4,6 +4,29 @@
   color: #111;
 }
 
+/* ==================== 스피너 애니메이션 ==================== */
+.spinner-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid #f3f4f6;
+  border-top-color: #71EBBE;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .subtitle1 {
   color: #6c757d;
   font-size: 1rem;
@@ -242,6 +265,32 @@
   background-color: #f9fafb;
   border-radius: 4px;
 }
+
+/* ===== AI 로딩 스피너 스타일 ===== */
+.spinner-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px 0;
+}
+
+.spinner {
+  width: 28px;
+  height: 28px;
+  border: 4px solid #e0e0e0;
+  border-top-color: #71EBBE;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+
 
 /* ==================== 버튼 스타일 ==================== */
 .bg-light-mint {

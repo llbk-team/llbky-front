@@ -135,13 +135,7 @@
                       <div class="user-content">{{ originalContent }}</div>
                     </div>
 
-                    <!-- 코칭 메시지 -->
-                    <div v-if="currentAiFeedback?.coachingMessage" class="mb-3">
-                      <h6 class="feedback-subtitle">💬 AI 코칭 메시지</h6>
-                      <div class="feedback-content">
-                        {{ currentAiFeedback.coachingMessage }}
-                      </div>
-                    </div>
+                    
 
                     <!-- 예시 선택 기능 -->
                     <div v-if="currentAiFeedback?.examples && currentAiFeedback.examples.length > 0" class="mb-3">
@@ -176,19 +170,6 @@
                             <i class="bi bi-check-circle-fill me-2"></i>선택된 내용
                           </h6>
                           <div class="preview-content">{{ selectedExample }}</div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <!-- 개선 제안 -->
-                    <div v-if="currentAiFeedback?.suggestions && currentAiFeedback.suggestions.length > 0" class="mb-3">
-                      <h6 class="feedback-subtitle">🎯 개선 제안</h6>
-                      <div class="suggestions-list">
-                        <div v-for="(suggestion, sugIndex) in currentAiFeedback.suggestions" 
-                             :key="sugIndex" 
-                             class="suggestion-item">
-                          <i class="bi bi-arrow-right-circle text-primary me-2"></i>
-                          {{ suggestion }}
                         </div>
                       </div>
                     </div>
@@ -236,7 +217,13 @@
             <span class="badge bg-light text-dark">실시간</span>
           </div>
           
-          <div v-if="selectedItem && showItemFeedback[openItemIndex]" class="ai-feedback">
+          <!-- AI 분석 중 스피너 -->
+          <div v-if="aiLoading" class="spinner-container text-center py-5">
+            <div class="spinner"></div>
+            <p class="text-muted mt-3 mb-0">AI가 분석 중입니다...</p>
+          </div>
+          
+          <div v-else-if="selectedItem && showItemFeedback[openItemIndex]" class="ai-feedback">
             <div class="feedback-header mb-3 pb-2 border-bottom">
               <p class="fw-semibold mb-1">{{ selectedItem.title }} 분석 결과</p>
               <div class="d-flex align-items-center">
@@ -319,6 +306,7 @@ const {
   selectedExampleIndex,
   originalContent,
   isAllComplete,
+  aiLoading,
   
   // 함수
   toggleStep,
