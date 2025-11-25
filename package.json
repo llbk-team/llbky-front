@@ -15,6 +15,7 @@
     "chart.js": "^4.5.1",
     "chartjs-plugin-datalabels": "^2.2.0",
     "core-js": "^3.8.3",
+    "pdfjs-dist": "^2.10.377",
     "remixicon": "^4.7.0",
     "vue": "^3.2.13",
     "vue-chartjs": "^5.3.3",

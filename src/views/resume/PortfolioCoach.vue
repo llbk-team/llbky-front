@@ -1,205 +1,228 @@
 <template>
   <div class="resume-coach-page d-flex">
     <div class="coach-container flex-fill d-flex flex-column">
-      <!-- ✅ 공통 wrapper (제목 + 본문 + 전체 분석 전부 여기 안에서) -->
       <div class="content-wrapper">
         <div class="content-inner">
-          <!-- ✅ 본문 상단: 제목 + 리포트 저장 버튼 (헤더 옆) -->
+
+          <!-- 상단 헤더 -->
           <div class="content-header-row">
             <div class="content-title-box">
               <h2 class="page-title">AI 포트폴리오 코칭</h2>
-              <p class="page-subtitle">
-                업로드된 포트폴리오 페이지별로 AI가 분석한 피드백과 전체 종합 리포트를 확인하세요.
-              </p>
+              <p class="page-subtitle">업로드된 포트폴리오 페이지별로 AI가 분석한 피드백을 확인하세요.</p>
             </div>
 
             <button class="btn btn-save" @click="saveReport">
-              <span class="icon">💾</span> 리포트 저장하기
+              💾 리포트 저장하기
             </button>
           </div>
 
-          <!-- ✅ 본문: 좌우 2열 (이미지 뷰어 + AI 페이지별 분석) -->
+          <!-- 본문 -->
           <div class="content-main-row">
-            <!-- 왼쪽: 이미지 뷰어 -->
-            <div class="preview-section d-flex flex-column align-items-center justify-content-center">
-              <div class="image-viewer position-relative">
-                <button class="slide-btn left" :disabled="currentIndex === 0" @click="prevImage">‹</button>
+
+            <!-- 왼쪽: PDF 이미지 -->
+            <div class="preview-section" v-show="true">
+
+
+              <!-- PDF 로딩 스피너 -->
+              <div v-if="loadingPdf" class="spinner-container">
+                <div class="spinner"></div>
+                <p class="text-muted mt-2">PDF 렌더링 중...</p>
+              </div>
+
+              <!-- PDF 이미지 뷰 -->
+              <div v-else-if="images.length" class="image-viewer position-relative">
+                <button class="slide-btn left" @click="prevImage" :disabled="currentIndex === 0">‹</button>
 
                 <transition name="fade" mode="out-in">
-                  <img
-                    :key="currentIndex"
-                    :src="currentImage"
-                    alt="portfolio page"
-                    class="portfolio-image rounded shadow-sm"
-                  />
+                  <img :key="currentIndex" :src="currentImage" class="portfolio-image" />
                 </transition>
 
-                <button
-                  class="slide-btn right"
-                  :disabled="currentIndex === images.length - 1"
-                  @click="nextImage"
-                >
-                  ›
-                </button>
+                <button class="slide-btn right" @click="nextImage" :disabled="currentIndex === images.length - 1">›</button>
+
                 <div class="page-indicator">{{ currentIndex + 1 }} / {{ images.length }}</div>
               </div>
 
-              <!-- 썸네일 미리보기 -->
-              <div class="thumbnail-bar mt-3">
-                <div
-                  v-for="(img, i) in images"
-                  :key="i"
-                  class="thumbnail-item"
-                  :class="{ active: currentIndex === i }"
-                  @click="goToPage(i)"
-                >
+              <!-- 썸네일 -->
+              <div v-if="!loadingPdf && images.length" class="thumbnail-bar mt-3">
+                <div v-for="(img, index) in images" :key="index" class="thumbnail-item" :class="{ active: currentIndex === index }" @click="goToPage(index)">
                   <img :src="img" class="thumbnail-img" />
-                  <span class="thumb-label">{{ i + 1 }}</span>
+                  <span class="thumb-label">{{ index + 1 }}</span>
                 </div>
               </div>
             </div>
 
-            <!-- 오른쪽: AI 분석 -->
-            <div class="analysis-section">
-              <h5 class="fw-bold mb-3" style="color:#111;">AI 페이지별 분석 결과</h5>
+            <!-- 오른쪽: 분석 -->
+            <div class="analysis-section" v-show="true">
 
-              <div class="analysis-card rounded mb-4">
-                <p class="fw-semibold mb-2">📄 페이지 {{ pageFeedbacks[currentIndex].page }}</p>
-                <p class="small mb-2" style="color:#111;">
-                  {{ pageFeedbacks[currentIndex].summary }}
-                </p>
-                <p class="text-muted small mb-0">
-                  💬 코멘트: {{ pageFeedbacks[currentIndex].comment }}
-                </p>
+              <!-- 페이지별 피드백 로딩 -->
+              <div v-if="loadingPages" class="spinner-container">
+                <div class="spinner"></div>
+                <p class="text-muted mt-2">페이지 분석 로딩 중...</p>
               </div>
 
-              <div class="overall-feedback-box rounded mb-4">
-                <h6 class="fw-bold mb-3" style="color:#111;">🧠 전체 포트폴리오 종합 분석</h6>
+              <!-- 페이지별 피드백 -->
+              <div v-else-if="pageFeedbacks.length">
+                <h5 class="fw-bold mb-3">AI 페이지별 분석</h5>
 
-                <div class="score-box mb-3">
-                  <p class="fw-bold fs-4 mb-1" style="color:#00b47b;">
-                    {{ overallFeedback.score }}/100
+                <div class="analysis-card mb-4">
+                  <p class="fw-semibold mb-2">📄 페이지 {{ currentIndex + 1 }}</p>
+                  <p class="small mb-2">
+                    {{ pageFeedbacks[currentIndex].page_feedback.page_summary }}
                   </p>
-                  <p class="text-muted small mb-0">AI 평가 기준 종합 점수</p>
-                </div>
-
-                <div class="criteria-list mb-3">
-                  <p
-                    v-for="(c, i) in overallFeedback.criteria"
-                    :key="i"
-                    class="small mb-1"
-                  >
-                    <span class="fw-semibold" style="color:#111;">
-                      • {{ c.category }}:
-                    </span>
-                    <span class="text-muted">{{ c.comment }}</span>
+                  <p class="text-muted small">
+                    💬 {{ pageFeedbacks[currentIndex].page_feedback.page_comment }}
                   </p>
                 </div>
 
-                <p class="small mb-2" style="color:#111;">
-                  {{ overallFeedback.summary }}
-                </p>
-                <p class="text-muted small">💬 총평: {{ overallFeedback.comment }}</p>
+                <!-- 🔥 전체 분석 로딩 -->
+                <div v-if="loadingOverall" class="overall-feedback-box spinner-container">
+                  <div class="spinner"></div>
+                  <p class="text-muted mt-2">전체 분석 로딩 중...</p>
+                </div>
+
+                <!-- 전체 분석 -->
+                <div v-if="!loadingOverall" class="overall-feedback-box">
+
+                  <h6 class="fw-bold mb-3">🧠 전체 포트폴리오 분석</h6>
+
+                  <!-- 종합 점수 -->
+                  <div class="score-box mb-3">
+                    <p class="fw-bold fs-4">{{ overallFeedback.final_score }}/100</p>
+                    <p class="text-muted small">AI 종합 점수</p>
+                  </div>
+
+                  <!-- strengths -->
+                  <div class="feedback-section mb-3" v-if="overallFeedback.strengths?.length">
+                    <h6 class="fw-bold">강점 👍</h6>
+                    <ul>
+                      <li v-for="(item, idx) in overallFeedback.strengths" :key="'s' + idx">
+                        {{ item }}
+                      </li>
+                    </ul>
+                  </div>
+
+                  <!-- weaknesses -->
+                  <div class="feedback-section mb-3" v-if="overallFeedback.weaknesses?.length">
+                    <h6 class="fw-bold">보완 필요점 👎</h6>
+                    <ul>
+                      <li v-for="(item, idx) in overallFeedback.weaknesses" :key="'w' + idx">
+                        {{ item }}
+                      </li>
+                    </ul>
+                  </div>
+
+                  <!-- expression -->
+                  <div class="feedback-section mb-3" v-if="overallFeedback.expression">
+                    <h6 class="fw-bold">표현 분석 ✏️</h6>
+                    <p>{{ overallFeedback.expression }}</p>
+                  </div>
+
+                  <!-- visual_design -->
+                  <div class="feedback-section mb-3" v-if="overallFeedback.visual_design">
+                    <h6 class="fw-bold">시각적 디자인 🎨</h6>
+                    <p>{{ overallFeedback.visual_design }}</p>
+                  </div>
+
+                  <!-- content_quality -->
+                  <div class="feedback-section mb-3" v-if="overallFeedback.content_quality">
+                    <h6 class="fw-bold">콘텐츠 품질 📄</h6>
+                    <p>{{ overallFeedback.content_quality }}</p>
+                  </div>
+
+                  <!-- information_structure -->
+                  <div class="feedback-section mb-3" v-if="overallFeedback.information_structure">
+                    <h6 class="fw-bold">정보 구조 🧩</h6>
+                    <p>{{ overallFeedback.information_structure }}</p>
+                  </div>
+
+                  <!-- technical_composition -->
+                  <div class="feedback-section mb-3" v-if="overallFeedback.technical_composition">
+                    <h6 class="fw-bold">기술 구성 ⚙️</h6>
+                    <p>{{ overallFeedback.technical_composition }}</p>
+                  </div>
+
+                  <!-- overall_review -->
+                  <div class="feedback-section" v-if="overallFeedback.overall_review">
+                    <h6 class="fw-bold">종합 리뷰 📝</h6>
+                    <p>{{ overallFeedback.overall_review }}</p>
+                  </div>
+
+                </div>
+
               </div>
             </div>
           </div>
         </div>
-      </div> <!-- /content-wrapper -->
+      </div>
     </div>
   </div>
 </template>
 
-<script setup>
-import { ref, computed } from "vue";
 
-import portfolio1 from "@/assets/portfolio.png";
-import portfolio2 from "@/assets/portfolio2.png";
-import portfolio3 from "@/assets/portfolio3.png";
-import portfolio4 from "@/assets/portfolio4.png";
-import portfolio5 from "@/assets/portfolio5.png";
+<script setup>
+import { onMounted } from "vue";
+import { usePortfolioCoach } from "@/utils/portfolioCoach";
 import router from "@/router";
 
-const images = ref([portfolio1, portfolio2, portfolio3, portfolio4, portfolio5]);
+const route = router.currentRoute.value;
+const portfolioId = route.query.id;
 
-const pageFeedbacks = ref([
-  {
-    page: 1,
-    summary:
-      "해당 페이지는 프로젝트의 전체 개요를 간결하게 제시하고 있으며, 시각적으로도 명확한 첫인상을 제공합니다. 프로젝트 목적, 문제 정의, 해결 방향을 한눈에 파악할 수 있도록 구성된 점이 매우 좋습니다. 또한 표기된 주요 기능이나 특징들이 명확하게 분리되어 있어 사용자가 프로젝트의 핵심 포인트를 빠르게 캐치할 수 있습니다.\n\n" +
-      "다만 제목과 본문 사이의 여백이 조금 넓어 시선이 한 번 끊기는 느낌이 있어, 해당 거리만 조금 좁혀도 집중도가 훨씬 좋아질 것으로 보입니다.",
-    comment:
-      "전체적으로 좋은 구성입니다만, 핵심 메시지를 강조하는 부분이 상대적으로 약합니다. 주요 포인트 아래에 간단한 하이라이트 색상 혹은 짧은 키워드를 추가하면 페이지의 정보 전달력이 더 선명해질 것입니다."
-  },
-  {
-    page: 2,
-    summary:
-      "이번 페이지는 기능 흐름과 서비스 이용 절차가 단계별로 잘 정리되어 있어 사용자가 서비스 구조를 빠르게 이해할 수 있습니다. 플로우 차트와 설명 텍스트의 길이도 적절해 과도한 정보량 없이 핵심만 전달됩니다.\n\n" +
-      "특히 유저가 어떤 과정을 거쳐 서비스에 도달하는지 시각화가 잘 되어 있어 전체적인 이해 흐름이 매우 매끄럽습니다.",
-    comment:
-      "각 단계 요소 간 간격이 약간 좁아 보입니다. 요소 간 padding을 조금만 늘리면 훨씬 안정적인 레이아웃이 됩니다. 또한 강조 색상 대비를 조금만 강하게 주면 주요 프로세스가 더 눈에 띌 것입니다."
-  },
-  {
-    page: 3,
-    summary:
-      "기술 스택 부분은 전체적으로 깔끔하고 정리된 느낌을 줍니다. 백엔드, 프론트엔드, 인프라, 데이터베이스 등 범주를 잘 나누어 기술 요소들을 표현한 점이 돋보입니다. 아키텍처 다이어그램 역시 서비스 구조를 한눈에 보여주어 매우 효과적입니다.\n\n" +
-      "각 기술 요소가 프로젝트 내에서 어떤 역할을 했는지 간단한 설명이 더해진다면 기술 선택의 타당성을 더욱 강하게 어필할 수 있을 것입니다.",
-    comment:
-      "아키텍처 박스 간의 여백 혹은 연결선 간격이 조금 좁아 답답해 보일 수 있습니다. 노드 간 간격을 6~10px 정도만 늘리면 훨씬 균형 잡힌 다이어그램이 됩니다."
-  },
-  {
-    page: 4,
-    summary:
-      "데이터 시각화 페이지는 숫자와 그래프의 가독성이 좋아서 분석 결과를 명확하게 드러내고 있습니다. 데이터 기반 사고를 강조한다는 점에서 매우 강점이 되는 페이지입니다.\n\n" +
-      "또한 그래프 색상이 안정적인 톤으로 구성되어 있어 시선이 산만하지 않고, 주요 수치가 강조되어 있어 의도한 메시지가 효과적으로 전달됩니다.",
-    comment:
-      "그래프 축 라벨이나 단위(%)를 조금 더 자세히 표기하면 신뢰도가 올라갑니다. 그래프 하단의 캡션을 한 줄 추가하는 것도 좋은 방법입니다."
-  },
-  {
-    page: 5,
-    summary:
-      "프로젝트 결론 및 회고 페이지는 전체 프로젝트를 마무리짓는 데 필요한 요소가 잘 정리되어 있습니다. 배운 점, 기술적으로 성장한 부분, 향후 개선 방향 등이 균형 있게 배치되어 있어 완성도가 높습니다.\n\n" +
-      "다만 이미지보다는 텍스트 비중이 많아 다소 단조로울 수 있으므로, 시각적 포인트를 조금 추가하면 훨씬 더 매력적인 마무리 페이지가 될 것입니다.",
-    comment:
-      "프로젝트에서 본인이 맡았던 역할을 시각적으로 정리한 그래픽(예: 역할 비율, 역할 다이어그램)을 넣으면 페이지의 흡입력과 전문성이 더 강해집니다."
-  },
-]);
+const {
+  images,
+  pageFeedbacks,
+  overallFeedback,
+  currentIndex,
+  currentImage,
 
-const overallFeedback = ref({
-  score: 93,
-  criteria: [
-    { category: "시각 디자인", comment: "색상 대비와 여백이 안정적입니다." },
-    { category: "정보 구조", comment: "페이지 흐름이 자연스럽고 논리적입니다." },
-    { category: "기술 구성", comment: "기술 스택이 목적과 잘 맞습니다." },
-    { category: "콘텐츠 명료성", comment: "텍스트 구성이 명확하고 핵심이 잘 전달됩니다." },
-    { category: "표현력", comment: "그래픽과 타이포그래피 조화가 좋습니다." },
-  ],
-  summary:
-    "AI 기반 포트폴리오로서 구조와 내용의 일관성이 우수합니다. 특히 기술 섹션과 트렌드 분석 파트는 시각적으로도 완성도가 높습니다. 정보 흐름이 자연스럽고 페이지 간 연결성이 뛰어나며, 전반적으로 기획력과 표현력이 잘 드러납니다.",
-  comment:
-    "세부 인터랙션(hover, transition 등)을 추가하면 사용자 경험이 한층 강화될 것입니다.",
-});
+  loadingPdf,
+  loadingPages,
+  loadingOverall,
 
-const currentIndex = ref(0);
-const currentImage = computed(() => images.value[currentIndex.value]);
+  loadPortfolio,
+  nextImage,
+  prevImage,
+  goToPage,
+  saveReport,
+} = usePortfolioCoach(portfolioId);
 
-function nextImage() {
-  if (currentIndex.value < images.value.length - 1) currentIndex.value++;
-}
-function prevImage() {
-  if (currentIndex.value > 0) currentIndex.value--;
-}
-function goToPage(i) {
-  currentIndex.value = i;
-}
-
-function saveReport() {
-  router.push("/resume/list");
-}
+onMounted(loadPortfolio);
 </script>
 
+
+
+
 <style scoped>
+/* 전체 스피너 */
+.spinner-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 0;
+}
+
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 4px solid #e0f7ef;
+  border-top: 4px solid #00c896;
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+
 /* ============================================================
-   🌿 전체 페이지
+   전체 페이지
    ============================================================ */
 
 .resume-coach-page {
@@ -222,7 +245,7 @@ function saveReport() {
 }
 
 /* ============================================================
-   🌿 상단 헤더 (제목 + 버튼)
+   상단 헤더 (제목 + 버튼)
    ============================================================ */
 
 .content-header-row {
@@ -257,7 +280,8 @@ function saveReport() {
   height: 37px !important;
   border-radius: 30px !important;
   font-size: 13.5px !important;
-  font-weight: 500 !important; /* 얇게 변경 */
+  font-weight: 500 !important;
+  /* 얇게 변경 */
   padding: 0 24px !important;
   cursor: pointer;
   white-space: nowrap;
@@ -287,10 +311,21 @@ function saveReport() {
   border: 2px solid #e5e5e5;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
   padding: 24px;
+  min-height: 650px;
+  min-width: 600px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+}
+
+.analysis-section {
+  width: 50%;
+  min-height: 650px;
+  min-width: 600px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
 }
 
 .image-viewer {
@@ -314,6 +349,7 @@ function saveReport() {
 .fade-leave-active {
   transition: opacity 0.4s ease;
 }
+
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
@@ -349,6 +385,7 @@ function saveReport() {
 .slide-btn.left {
   left: 14px;
 }
+
 .slide-btn.right {
   right: 14px;
 }
@@ -446,6 +483,24 @@ function saveReport() {
   border: 1px solid #71ebbe;
   border-radius: 12px;
   padding: 12px;
+}
+
+.feedback-section {
+  background: #ffffff;
+  border: 1px solid #e4f7ee;
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+}
+
+.feedback-section ul {
+  padding-left: 18px;
+  margin: 0;
+}
+
+.feedback-section li {
+  font-size: 14px;
+  margin-bottom: 4px;
 }
 
 </style>
