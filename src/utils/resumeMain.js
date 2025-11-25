@@ -68,18 +68,17 @@ export function useResumeMain() {
     const portfolioList = ref([]);
 
     const fetchPortfolioList = async () => {
-    try {
-        const res = await portfolioApi.getPortfolioList(1);
-        portfolioList.value = res.data.map(item => ({
-            portfolioId: item.portfolioId ?? item.portfolio_id,
-            title: item.title,
-            updatedAt: item.updatedAt?.substring(0, 10)
-        }));
-    } catch (err) {
-        console.error("포트폴리오 조회 실패:", err);
-    }
-};
-
+        try {
+            const res = await portfolioApi.getPortfolioList(1);
+            portfolioList.value = res.data.map(item => ({
+                portfolioId: item.portfolioId ?? item.portfolio_id,
+                title: item.title,
+                updatedAt: item.updatedAt?.substring(0, 10)
+            }));
+        } catch (err) {
+            console.error("포트폴리오 조회 실패:", err);
+        }
+    };
 
     const goToPortfolioDetail = (id) => {
         router.push(`/resume/portfolio/coach?id=${id}`);
@@ -140,6 +139,19 @@ export function useResumeMain() {
         selectedResumes.value = [];
     };
 
+    // 자소서 삭제
+    const deleteCoverLetter = async () => {
+        for (const id of selectedCovers.value) {
+            try {
+                await coverletterApi.deleteCoverLetter(1, id);
+            } catch (err) {
+                console.error("자소서 삭제 실패:", err);
+            }
+        }
+        await fetchCoverletterList();
+        selectedCovers.value = [];
+    };
+
     // 포트폴리오 삭제
     const deleteSelectedPortfolios = async () => {
         for (const id of selectedPortfolios.value) {
@@ -160,7 +172,7 @@ export function useResumeMain() {
         if (confirm("정말 삭제하시겠습니까?")) {
             deleteSelectedResumes();
             deleteSelectedPortfolios();
-            // coverLetterList는 아직 API 없음 → 건드리지 않음
+            deleteCoverLetter();
         }
     };
 
