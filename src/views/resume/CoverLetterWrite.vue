@@ -15,6 +15,17 @@
           </p>
         </div>
 
+        <!-- 자기소개서 제목 -->
+        <div class="form-group">
+          <label style="font-weight:600;">&nbsp;&nbsp;자기소개서 제목</label>
+          <input 
+            type="text"
+            v-model="coverTitle"
+            class="form-control mb-4"
+            placeholder="예: 백엔드 개발자 지원 자기소개서"
+          />
+        </div>
+
         <!-- 자기소개서 항목 -->
         <div
           v-for="(value, key) in introFields"
@@ -42,6 +53,15 @@
                 placeholder="이 항목에 대한 자기소개 내용을 작성하세요."
               ></textarea>
             </div>
+
+            <div class="btn-wrapper">
+              <button 
+                class="btn btn-outline-success btn-sm mt-4"
+                @click="getSectionFeedback(key, introFields[key])"
+              >
+                피드백 받기
+              </button>
+            </div>
           </div>
         </div>
 
@@ -56,17 +76,18 @@
 
     <!-- AI 코칭 패널 -->
     <div class="ai-coaching-panel">
+      <!-- AI 헤더 -->
       <div class="ai-header">
         <div class="ai-profile">
           <div class="ai-avatar">🤖</div>
           <div class="ai-info">
             <span class="ai-name">AI 코치</span>
-            <span class="ai-desc">컴퓨터공학 프로젝트 출력고</span>
           </div>
         </div>
-        <button class="close-btn">×</button>
+        <button class="close-btn" @click="toggleAICoaching">×</button>
       </div>
 
+      <!-- AI 상태 -->
       <div class="ai-status">
         <div class="status-indicator">
           <div class="status-icon">🤖</div>
@@ -74,12 +95,15 @@
         </div>
       </div>
 
+      <!-- AI 콘텐츠 -->
       <div class="ai-content">
+        <!-- 환영 메시지 -->
         <div class="welcome-section">
           <p>안녕하세요! 자기소개서 작성을 도와드릴 AI 코치입니다.</p>
           <p>각 항목을 입력하면 피드백을 받을 수 있습니다 💬</p>
         </div>
 
+        <!-- 작성 팁 -->
         <div class="tips-section">
           <div class="section-title">
             <span class="icon">💡</span>
@@ -92,21 +116,39 @@
           </div>
         </div>
 
-        <div class="feedback-section">
-          <div class="section-title">
-            <span class="icon">📝</span>
-            <span>실시간 피드백 예시</span>
+        <!-- 실시간 피드백 -->
+        <div
+          class="ai-feedback-box"
+          v-for="item in visibleFeedbackList"
+          :key="item.key"
+        >
+          <h4>📝 {{ reverseSectionMap[item.key] }} 항목 코칭</h4>
+          <p><strong>요약:</strong> {{ item.box.summary }}</p>
+          <p><strong>잘한 점:</strong> {{ item.box.strengths }}</p>
+          <p><strong>개선점:</strong> {{ item.box.improvements }}</p>
+
+          <div class="improved-box" v-if="item.box.improvedText">
+            <h5>✨ AI 수정본</h5>
+            <p>{{ item.box.improvedText }}</p>
+            <div class="btn-wrapper">
+              <button 
+                class="btn btn-outline-success btn-sm mt-4"
+                @click="applyImprovedText(item.key)"
+              >
+                수정본 적용하기
+              </button>
+            </div>
           </div>
-          <ul class="list-unstyled small mb-0 ps-2">
-            <li>💡 문장이 약간 길어요. 핵심만 간결히 써보세요.</li>
-            <li>👍 구체적인 수치 예시가 좋습니다.</li>
-            <li>⚠️ 회사 비전과 연관성을 추가해보세요.</li>
-          </ul>
+
+          <!-- 로딩 스피너로 대체할 부분 -->
+          <div class="loading-spinner" v-if="aiLoading">
+            <div class="spinner"></div>
+            <span>AI가 분석 중입니다...</span>
+          </div>
         </div>
 
         <div class="ai-actions">
-          <button class="ai-action-btn">💬 AI에게 질문하기</button>
-          <button class="ai-action-btn">📋 상세한 분석받기</button>
+          <button class="ai-action-btn">📋 관련 키워드</button>
         </div>
       </div>
     </div>
@@ -116,13 +158,27 @@
 <script setup>
 import SideBar from '@/components/sidebar/SideBar.vue';
 import coverletterWrite from '@/utils/coverletterWrite';
+import coverletterCoach from '@/utils/coverletterCoach';
 
 const {
+  coverTitle,
   introFields,
   sections,
   toggleSection,
   saveCoverLetter
 } = coverletterWrite.useCoverletterWrite();
+
+const {
+  feedbackBoxes,
+  aiLoading,
+  sectionMap,
+  reverseSectionMap,
+  currentSection,
+  toggleAICoaching,
+  getSectionFeedback,
+  visibleFeedbackList,
+  applyImprovedText
+} = coverletterCoach.useCoverLetterCoach(introFields);
 </script>
 
 <style scoped>
@@ -275,6 +331,12 @@ const {
   background: #5dd4a3;
   transform: translateY(-1px);
 }
+.btn-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
 
 /* ─────────────────────────────── */
 /*      AI 코칭 패널 (오른쪽 패널)   */
@@ -442,6 +504,38 @@ const {
   padding: 16px;
   margin-bottom: 20px;
 }
+
+.ai-feedback-box {
+  background: #f7f7f7;           /* 연한 회색 배경 */
+  border: 1px solid #e3e3e3;      /* 더 연한 테두리 */
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* 살짝 그림자 */
+}
+
+.ai-feedback-box h4 {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: #333;
+}
+
+.improved-box {
+  background: #f0fdf4;                 /* 연한 민트 */
+  border: 1px solid #bbf7d0;           /* 민트 테두리 */
+  padding: 16px 18px;
+  border-radius: 8px;
+  margin-top: 16px;
+}
+
+.improved-box h5 {
+  font-size: 14px;
+  font-weight: 700;
+  color: #166534;                      /* 딥그린 */
+  margin-bottom: 8px;
+}
+
 
 /* 버튼 */
 .ai-actions {

@@ -1,10 +1,14 @@
 // 자소서 작성 페이지 컴포넌트용 js 파일
 import coverletterApi from "@/apis/coverletterApi";
-import { reactive } from "vue";
+import { reactive, ref } from "vue";
 import router from "@/router";
 
 // 자소서 작성
 function useCoverletterWrite() {
+
+    // 제목
+    const coverTitle = ref("");
+
     // 자소서 내용
     const introFields = reactive({
         "지원동기": "",
@@ -30,6 +34,7 @@ function useCoverletterWrite() {
     const saveCoverLetter = async () => {
         try {
             const coverLetter = {
+                title: coverTitle.value,
                 supportMotive: introFields["지원동기"],
                 growthExperience: introFields["성장경험"],
                 jobCapability: introFields["직무역량"],
@@ -51,7 +56,13 @@ function useCoverletterWrite() {
         }
     }
 
-    return { introFields, sections, toggleSection, saveCoverLetter }; 
+    return { 
+        coverTitle,
+        introFields, 
+        sections, 
+        toggleSection, 
+        saveCoverLetter 
+    }; 
 }
 
 
