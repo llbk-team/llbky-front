@@ -54,7 +54,7 @@ const activeMenu = ref(getMenuFromPath(route.path));
 -------------------------- */
 const mainMenus = [
   { name: "my", label: "MY" },
-  { name: "resume", label: "이력서" },
+  { name: "resume", label: "서류" },
   { name: "interview", label: "면접" },
   { name: "learning", label: "학습" },
   { name: "trend", label: "트렌드" },

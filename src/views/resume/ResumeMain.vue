@@ -128,7 +128,7 @@
                 <div class="resume-icon">🎨</div>
                 <h3 class="resume-title">{{ portfolio.title }}</h3>
                 <div class="resume-meta">
-                  <span class="update-date">📅 최종 수정: {{ portfolio.updatedAt }}</span>
+                  <span class="update-date">📅 분석 날짜: {{ portfolio.updatedAt }}</span>
                 </div>
               </div>
             </div>

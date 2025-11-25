@@ -63,7 +63,10 @@
 
 <script setup>
 import SideBar from '@/components/sidebar/SideBar.vue'
+import { useRouter } from "vue-router"
 import { usePortfolioWrite } from "@/utils/portfolioWrite";
+
+const router = useRouter();
 
 const {
   uploadedFile,
@@ -74,6 +77,7 @@ const {
   startAnalysis
 } = usePortfolioWrite();
 </script>
+
 
 
 <style src="@/assets/css/portfolioWrite.css"></style>
