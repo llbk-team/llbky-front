@@ -106,13 +106,18 @@ function portfolioStepbystep() {
             // 원본 내용 저장 (나중에 복원을 위해)
             originalContent.value = currentContent.value;
 
-            // test-example API 요청 데이터
+            // 🔥 수정: 하드코딩된 값들을 명시적으로 포함
             const requestData = {
                 userInput: currentContent.value,
-                inputFieldType: currentItem.title
+                inputFieldType: currentItem.title,
+                // 하드코딩된 사용자 정보 포함
+                jobGroup: jobGroup.value,      // '개발'
+                jobRole: jobRole.value,        // '백엔드'
+                careerYears: 2,                // 하드코딩 (또는 ref로 관리)
+                currentStep: currentStep.value // 현재 단계
             };
 
-            console.log('🚀 AI 피드백 요청 (test-example):', requestData);
+            console.log('🚀 AI 피드백 요청 (하드코딩 포함):', requestData);
 
             // test-example API 호출
             const response = await portfolioGuideApi.getTestExample(requestData);
@@ -150,7 +155,7 @@ function portfolioStepbystep() {
                 errorMessage += `상태 코드: ${error.response.status}\n`;
                 errorMessage += `메시지: ${error.response.data?.message || error.message}`;
             } else if (error.request) {
-                errorMessage += '서버로부터 응답이 없습니다.\n백엔드 서버(http://localhost:8080)가 실행 중인지 확인해주세요.';
+                errorMessage += '서버로부터 응답이 없습니다.\n백엔드 서버(http://localhost:8081)가 실행 중인지 확인해주세요.';
             } else {
                 errorMessage += error.message;
             }
