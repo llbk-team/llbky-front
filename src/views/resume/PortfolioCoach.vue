@@ -58,8 +58,8 @@
 
                 <div class="analysis-card mb-4">
                   <p class="fw-semibold mb-2">📄 페이지 {{ currentIndex + 1 }}</p>
-                  <p class="small mb-2">{{ pageFeedbacks[currentIndex].page_feedback.page_summary }}</p>
-                  <p class="text-muted small">💬 {{ pageFeedbacks[currentIndex].page_feedback.page_comment }}</p>
+                  <p class="small mb-2">{{ pageFeedbacks[currentIndex].page_feedback.pageSummary }}</p>
+                  <p class="text-muted small">💬 {{ pageFeedbacks[currentIndex].page_feedback.pageComment }}</p>
                 </div>
 
                 <!-- 전체 분석 로딩 -->
@@ -75,7 +75,7 @@
 
                   <!-- 종합 점수 -->
                   <div class="score-box mb-3">
-                    <p class="fw-bold fs-4">{{ overallFeedback.final_score }}/100</p>
+                    <p class="fw-bold fs-4">{{ overallFeedback.finalScore }}/100</p>
                     <p class="text-muted small">AI 종합 점수</p>
                   </div>
 
@@ -106,33 +106,33 @@
                   </div>
 
                   <!-- visual_design -->
-                  <div class="feedback-section mb-3" v-if="overallFeedback.visual_design">
+                  <div class="feedback-section mb-3" v-if="overallFeedback.visualDesign">
                     <h6 class="fw-bold">시각적 디자인 🎨</h6>
-                    <p>{{ overallFeedback.visual_design }}</p>
+                    <p>{{ overallFeedback.visualDesign }}</p>
                   </div>
 
                   <!-- content_quality -->
-                  <div class="feedback-section mb-3" v-if="overallFeedback.content_quality">
+                  <div class="feedback-section mb-3" v-if="overallFeedback.contentQuality">
                     <h6 class="fw-bold">콘텐츠 품질 📄</h6>
-                    <p>{{ overallFeedback.content_quality }}</p>
+                    <p>{{ overallFeedback.contentQuality }}</p>
                   </div>
 
                   <!-- information_structure -->
-                  <div class="feedback-section mb-3" v-if="overallFeedback.information_structure">
+                  <div class="feedback-section mb-3" v-if="overallFeedback.informationStructure">
                     <h6 class="fw-bold">정보 구조 🧩</h6>
-                    <p>{{ overallFeedback.information_structure }}</p>
+                    <p>{{ overallFeedback.informationStructure }}</p>
                   </div>
 
                   <!-- technical_composition -->
-                  <div class="feedback-section mb-3" v-if="overallFeedback.technical_composition">
+                  <div class="feedback-section mb-3" v-if="overallFeedback.technicalComposition">
                     <h6 class="fw-bold">기술 구성 ⚙️</h6>
-                    <p>{{ overallFeedback.technical_composition }}</p>
+                    <p>{{ overallFeedback.technicalComposition }}</p>
                   </div>
 
                   <!-- overall_review -->
-                  <div class="feedback-section" v-if="overallFeedback.overall_review">
+                  <div class="feedback-section" v-if="overallFeedback.overallReview">
                     <h6 class="fw-bold">종합 리뷰 📝</h6>
-                    <p>{{ overallFeedback.overall_review }}</p>
+                    <p>{{ overallFeedback.overallReview }}</p>
                   </div>
                 </div>
                 
