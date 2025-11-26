@@ -1,0 +1,514 @@
+.page-wrapper {
+  min-height: 100vh;
+  background: #f6f6f6;
+}
+
+.main-layout {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.title {
+  font-weight: 700;
+  font-size: 1.75rem;
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
+/* ===== 레이아웃 ===== */
+.two-column-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 2.2fr) 340px;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+.left-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.right-column {
+  position: sticky;
+  top: 20px;
+  height: fit-content;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+}
+
+.right-column::-webkit-scrollbar {
+  width: 6px;
+}
+
+.right-column::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+/* ===== 카드 공통 ===== */
+.resume-card,
+.ai-card,
+.ai-report-card,
+.c-text-resume,
+.c-standard-resume {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* ===== 이력서 상단 헤더 ===== */
+.resume-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.2rem;
+}
+
+.resume-header-left h2 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 0.3rem;
+}
+
+.resume-title {
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+.badge.bg-mint {
+  background-color: #a2d5c6 !important;
+  color: #000;
+  font-weight: 600;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.85rem;
+  border-radius: 999px;
+}
+
+/* ===== 섹션 탭 ===== */
+.section-tab-area {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.section-tab-area button {
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: #4b5563;
+}
+
+.section-tab-area button.active {
+  background: #00c896;
+  color: #ffffff;
+  border-color: #00c896;
+}
+
+/* ===== 섹션 ===== */
+.section {
+  border-bottom: 1px solid #eef0f3;
+  padding-bottom: 1.4rem;
+  margin-bottom: 1.4rem;
+}
+
+.section:last-child {
+  border-bottom: none;
+}
+
+.section-header h3 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+/* ===== 수정 폼 ===== */
+.edit-form {
+  background: #f9fafb;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-top: 0.75rem;
+}
+
+.form-group label {
+  font-weight: 500;
+  font-size: 0.9rem;
+  color: #4b5563;
+}
+
+/* ===== 각 항목 박스 ===== */
+.career-item,
+.education-item,
+.activity-item,
+.cert-item {
+  background: #f9fafb;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-top: 0.75rem;
+}
+
+/* ===== 수정 항목 박스 ===== */
+.career-edit-item,
+.education-edit-item,
+.activity-edit-item,
+.cert-edit-item {
+  background: #ffffff;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  margin-top: 0.75rem;
+}
+
+.section-edit-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  font-size: 0.9rem;
+  color: #4b5563;
+}
+
+.edit-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+/* ===== 스킬 Input 정렬 ===== */
+.skills-edit {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.skill-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.skill-input {
+  flex: 1;
+}
+
+.skill-remove-btn {
+  margin-left: auto;
+}
+
+/* ===== 버튼 공통 ===== */
+.btn-primary,
+.btn-outline,
+.btn-secondary,
+.btn-ghost-danger,
+.btn-report-list {
+  border-radius: 8px;
+  padding: 0.55rem 1.6rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-primary {
+  background: #00c896;
+  color: #ffffff;
+  box-shadow: 0 4px 10px rgba(0, 200, 150, 0.25);
+}
+
+.btn-primary-save {
+  background: #00b583;
+}
+
+.btn-outline {
+  background: #ffffff;
+  color: #4b5563;
+  border: 1px solid #d1d5db;
+}
+
+.btn-secondary {
+  background: #e3fff5;
+  color: #059669;
+  border: 1px solid #a7f3d0;
+  padding-inline: 1.1rem;
+  font-size: 0.85rem;
+}
+
+.btn-ghost-danger {
+  background: transparent;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+  padding: 0.3rem 0.8rem;
+  font-size: 0.8rem;
+}
+
+/* ===== 리포트 목록 버튼 ===== */
+.btn-report-list {
+  background: #ffffff;
+  color: #00c896;
+  border: 1px solid #00c896;
+  padding-inline: 2.2rem;
+}
+
+/* ===== 수정/저장 버튼 영역 ===== */
+.bottom-action-area {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  padding-top: 1.3rem;
+  border-top: 1px solid #eef0f3;
+}
+
+/* ============================= */
+/*  ⭐ AI 제안 카드 (수정완료)   */
+/* ============================= */
+.ai-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+}
+
+.ai-card h2 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+  color: #111;
+}
+
+.edit-label {
+  font-size: 0.9rem;
+  color: #6b7280;
+  margin-bottom: 1rem;
+}
+
+.ai-card .before,
+.ai-card .after {
+  padding: 1rem 1.3rem;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+  line-height: 1.6;
+  font-size: 0.92rem;
+}
+
+/* 자소서 강조 */
+.ai-card .before {
+  background: #fff8ea !important;
+  border: 1px solid #ffe19d !important;
+}
+
+/* 포트폴리오 제안 */
+.ai-card .after {
+  background: #e9f8f2 !important;
+  border: 1px solid #a2d5c6 !important;
+}
+
+/* ============================= */
+/* ⭐ AI 코칭 결과 카드 (수정완료) */
+/* ============================= */
+.ai-report-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+}
+
+.ai-report-card h2 {
+  font-size: 1.45rem !important;
+  font-weight: 700 !important;
+  margin-bottom: 1.2rem !important;
+  color: #111827 !important;
+}
+
+.score-badge {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  padding: 0.55rem 1.2rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 1.5rem !important;
+}
+
+.feedback-box {
+  padding: 1.4rem 1.6rem !important;
+  border-radius: 12px !important;
+  margin-bottom: 1.6rem !important;
+  font-size: 0.95rem !important;
+  line-height: 1.7 !important;
+  color: #111827 !important;
+}
+
+.feedback-box strong {
+  font-size: 1.2rem !important;
+  font-weight: 700 !important;
+  display: block;
+  margin-bottom: 0.8rem !important;
+  color: #111827 !important;
+}
+
+/* 리스트 스타일 */
+.feedback-box ul {
+  padding-left: 20px !important;
+}
+
+.feedback-box li {
+  margin-bottom: 0.45rem !important;
+  font-size: 0.95rem !important;
+  color: #111827 !important;
+}
+
+/* 강점 박스 */
+.strengths-box {
+  background: #e9f8f2 !important;
+  border: 1px solid #a2d5c6 !important;
+  margin-top: 1.5rem !important;
+}
+
+/* 개선 사항 박스 */
+.improvements-box {
+  background: #eef7ff !important;
+  border: 1px solid #c9e3ff !important;
+}
+
+/* ============================= */
+/* ⭐ 이력서 형식 선택 (통일)   */
+/* ============================= */
+.format-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  text-align: center;
+  margin-top: 1.5rem;
+}
+
+.format-subtitle {
+  font-size: 0.9rem;
+  text-align: center;
+  color: #6b7280;
+  margin-bottom: 1.4rem;
+}
+
+.format-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.format-btn {
+  background: #e6fff7;
+  color: #047857;
+  border-radius: 12px;
+  border: 1px solid #00c896;
+  padding: 0.75rem 1.9rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.format-btn.active {
+  background: #00c896;
+  color: #ffffff;
+}
+
+.report-action {
+  display: flex;
+  justify-content: center;
+}
+
+/* ===== 줄글 형식 ===== */
+.c-text-resume {
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.c-text-resume .heading {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 18px;
+}
+
+.c-text-resume .block {
+  margin-bottom: 20px;
+}
+
+.c-text-resume .text-item .company {
+  font-weight: 600;
+}
+
+.c-text-resume .text-item .period {
+  font-size: 13px;
+  color: #888;
+}
+
+/* ===== 표준 양식 ===== */
+.c-standard-resume {
+  margin-top: 10px;
+}
+
+.resume-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #ffffff;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.resume-table th {
+  background: #f1f5f9;
+  width: 180px;
+  padding: 12px;
+  font-weight: 700;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.resume-table td {
+  padding: 12px;
+  border-bottom: 1px solid #f3f4f6;
+  vertical-align: top;
+}
+
+.resume-table ul {
+  padding-left: 20px;
+}
+
+.resume-table .sub {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+/* ===== 빈 줄 ===== */
+.empty-field,
+.empty-text {
+  min-height: 20px;
+  display: block;
+}
+
+/* ===== 반응형 ===== */
+@media (max-width: 1200px) {
+  .two-column-layout {
+    grid-template-columns: 1fr;
+  }
+  .right-column {
+    position: static;
+    max-height: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-layout {
+    padding: 1.2rem;
+  }
+}
