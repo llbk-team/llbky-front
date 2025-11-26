@@ -16,6 +16,10 @@ function list (memberId = 1){
   return axios.get(`/resume/list/${memberId}`);
 }
 
+function update(resume){
+  return axios.put("/resume/update", resume);
+}
+
 // 이력서 삭제
 function remove(resumeId){
   return axios.delete(`/resume/delete/${resumeId}`);
@@ -40,6 +44,7 @@ const resumeApi = {
   create,
   find,
   list,
+  update,
   remove,
   analyze,
   findanalyze,
