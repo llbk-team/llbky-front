@@ -230,9 +230,7 @@
                 <div class="score-pill me-2 bg-success-light">
                   적절성 {{ currentAiFeedback?.appropriatenessScore || 0 }}점
                 </div>
-                <div class="feedback-section-inline" v-if="currentAiFeedback?.examples && currentAiFeedback.examples.length > 0">
-                  <h6 class="feedback-title-inline mb-0">✨ 작성 예시</h6>
-                </div>
+                
               </div>
             </div>
 
@@ -252,10 +250,7 @@
               </ul>
             </div>
             
-            <div class="feedback-section" v-if="currentAiFeedback?.nextStepGuide">
-              <h6 class="feedback-title">🎯 다음 단계 가이드</h6>
-              <p class="feedback-text">{{ currentAiFeedback.nextStepGuide }}</p>
-            </div>
+           
             
             
           </div>
