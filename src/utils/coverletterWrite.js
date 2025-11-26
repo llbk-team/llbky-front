@@ -8,6 +8,8 @@ function useCoverletterWrite() {
 
     // 제목
     const coverTitle = ref("");
+    // 저장 로딩 상태
+    const saveLoading = ref(false);
 
     // 자소서 내용
     const introFields = reactive({
@@ -33,6 +35,7 @@ function useCoverletterWrite() {
     // 자소서 저장
     const saveCoverLetter = async () => {
         try {
+            saveLoading.value = true;
             const coverLetter = {
                 title: coverTitle.value,
                 supportMotive: introFields["지원동기"],
@@ -53,6 +56,8 @@ function useCoverletterWrite() {
     
         } catch (err) {
             console.log("자소서 저장 실패:", err);
+        } finally {
+            saveLoading.value = false;
         }
     }
 
@@ -60,6 +65,7 @@ function useCoverletterWrite() {
         coverTitle,
         introFields, 
         sections, 
+        saveLoading,
         toggleSection, 
         saveCoverLetter 
     }; 

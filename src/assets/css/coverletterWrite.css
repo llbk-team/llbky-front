@@ -354,6 +354,39 @@
   margin-bottom: 8px;
 }
 
+/* ===== 작성 완료 로딩 오버레이 ===== */
+.save-loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(3px);
+  z-index: 9999;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.save-loading-box {
+  background: white;
+  padding: 28px 40px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+.save-loading-box p {
+  margin-top: 12px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.save-loading-box .sub {
+  margin-top: 4px;
+  font-size: 13px;
+  color: #666;
+}
+
 /* ===== AI 로딩 스피너 스타일 ===== */
 .spinner-container {
   display: flex;

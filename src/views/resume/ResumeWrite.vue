@@ -651,7 +651,7 @@ const previewResume = () => {
 // 저장
 const submitResume = async () => {
   try {
-    saveLoading.value = true
+    saveLoading.value = true;
     const memberId = 1
 
     const payload = {
@@ -675,7 +675,7 @@ const submitResume = async () => {
     console.error('이력서 저장 실패', err)
     alert('이력서 저장 중 오류가 발생했습니다.')
   } finally {
-    saveLoading.value = false
+    saveLoading.value = false;
   }
 }
 
