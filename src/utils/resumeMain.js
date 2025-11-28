@@ -1,7 +1,7 @@
 // src/utils/resumeMain.js
 import { ref, onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
-import resumeApi from "@/apis/resume";
+import resumeApi from "@/apis/resumeApi";
 import portfolioApi from "@/apis/portfolioApi";
 import coverletterApi from "@/apis/coverletterApi";
 
