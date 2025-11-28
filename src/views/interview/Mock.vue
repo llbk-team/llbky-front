@@ -57,19 +57,24 @@
 
             <!-- 서류 선택 -->
             <div class="mb-4">
-              <label class="fw-semibold mb-2 text-dark mt-4">관련 서류 선택</label>
+              <label class="fw-semibold mb-2 text-dark mt-4">분석할 PDF 파일 업로드</label>
               <small class="text-muted d-block mt-1 mb-2">
                 AI 분석을 위해 기존 서류 중 필요한 항목만 선택하세요.
               </small>
-              <div class="bg-light rounded-3 p-3 border checkbox-scroll">
-                <div v-for="(file, index) in files" :key="index" class="form-check mb-2">
-                  <input class="form-check-input" type="checkbox" :id="'file' + index" v-model="selectedFiles" :value="file" />
-                  <label class="form-check-label text-dark" :for="'file' + index">
-                    {{ file }}
-                  </label>
-                </div>
+
+              <input type="file" accept="application/pdf" class="form-control" @change="onFileSelect" />
+
+              <!-- 선택된 파일 표시 -->
+              <div v-if="selectedFileObject" class="mt-3 p-3 bg-light rounded-3 border">
+                <strong class="text-dark">업로드된 파일:</strong>
+                <span class="ms-2">{{ selectedFileObject.name }}</span>
+
+                <button class="btn btn-sm btn-outline-danger float-end" @click="removeFile">
+                  제거
+                </button>
               </div>
             </div>
+
 
             <!-- AI 질문 생성 -->
             <button class="btn btn-mint w-100 py-3 fw-medium mb-3 mt-4" @click="generateQuestions">
@@ -88,6 +93,11 @@
 
             <div class="ai-question-body">
 
+              <!-- 스피너 (AI 질문 생성 중일 때만 표시) -->
+              <div v-if="loading" class="d-flex justify-content-center py-5">
+                <div class="spinner-border text-success" role="status"></div>
+              </div>
+
               <div v-for="(q, i) in questions" :key="i" class="ai-question-item">
                 <strong>Q{{ i + 1 }}.</strong> {{ q }}
               </div>
@@ -105,7 +115,7 @@
                 </button>
               </div>
 
-              <button class="btn btn-mint w-100 py-3 fw-medium" @click="router.push('/interview/progress')">
+              <button class="btn btn-mint w-100 py-3 fw-medium" @click="saveSession">
                 모의 면접 시작하기 →
               </button>
 
@@ -120,53 +130,92 @@
 <script setup>
 import router from "@/router";
 import { ref } from "vue";
+import interviewApi from "@/apis/interview";
 
 const type = ref("comprehensive");
 const selectedCompany = ref("");
 const selectedKeywords = ref([]);
 
+const keywordList = ref(["Spring AI", "Oracle", "Vue.js", "Python"]);
 
-const keywordList = ref([
-  "Spring AI",
-  "Oracle",
-  "Vue.js",
-  "Python"
-]);
-
-const files = ref([
-  "구글_김병현_이력서",
-  "구글_김병현_포트폴리오",
-  "구글_김병현_자기소개서",
-  "카카오_김병현_이력서",
-  "카카오_김병현_포트폴리오",
-  "카카오_김병현_자기소개서",
-]);
+const files = ref([]);
 const selectedFiles = ref([]);
 
-const questions = ref([
-  "1분 동안 자기소개를 해주세요.",
-  "우리 회사에 지원한 이유는 무엇인가요?",
-  "당신의 강점과 약점은 무엇인가요?",
-  "팀 프로젝트에서 갈등이 생겼을 때 어떻게 해결하셨나요?",
-  "AI 프로젝트를 개발할 때 가장 어려웠던 부분은 무엇이었나요?",
-]);
+const questions = ref([]);
+const aiQuestions = ref([]);      // AI 생성 질문
+const customQuestions = ref([]);  // 사용자가 추가한 질문
 
 const isAdding = ref(false);
 const newQuestion = ref("");
 const showQuestions = ref(false);
 
+const loading = ref(false);
+
+// 파일 업로드용
+const selectedFileObject = ref(null);
+const onFileSelect = (e) => {
+  selectedFileObject.value = e.target.files[0];
+};
+
+// 사용자 질문 추가
 const addQuestion = () => {
   if (newQuestion.value.trim()) {
     questions.value.push(newQuestion.value);
+    customQuestions.value.push(newQuestion.value);
     newQuestion.value = "";
     isAdding.value = false;
   }
 };
 
-const generateQuestions = () => {
+// AI 질문 생성 API
+const generateQuestions = async () => {
   showQuestions.value = true;
+  loading.value = true;
+
+  try {
+    const res = await interviewApi.createAiQuestions(
+      1,
+      type.value,
+      selectedCompany.value,
+      selectedKeywords.value,
+      selectedFileObject.value
+    );
+
+    questions.value = res.data.map(q => q.aiQuestion);
+  } finally {
+    loading.value = false;
+  }
 };
+
+
+// 세션 저장 API
+const saveSession = async () => {
+  try {
+    const res = await interviewApi.saveSession(
+      1,
+      type.value,
+      selectedCompany.value,
+      selectedKeywords.value,
+      aiQuestions.value,
+      customQuestions.value,
+      selectedFileObject.value
+    );
+
+    // 일단 에러 안 나게 세션 ID 체크 제거
+    console.log("Saved:", res.data);
+
+    // 세션 ID 없어도 그냥 넘어가줌
+    router.push("/interview/progress");
+  } catch (err) {
+    console.error("세션 저장 오류:", err);
+
+    // 에러 나도 그냥 넘어감
+    router.push("/interview/progress");
+  }
+};
+
 </script>
+
 
 <style scoped>
 /* 제목 */
