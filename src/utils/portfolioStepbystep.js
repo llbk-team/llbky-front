@@ -111,6 +111,7 @@ function portfolioStepbystep() {
                 userInput: currentContent.value,
                 inputFieldType: currentItem.title,
                 // 하드코딩된 사용자 정보 포함
+                memberId:1,
                 jobGroup: jobGroup.value,      // '개발'
                 jobRole: jobRole.value,        // '백엔드'
                 careerYears: 2,                // 하드코딩 (또는 ref로 관리)
@@ -119,11 +120,9 @@ function portfolioStepbystep() {
 
             console.log('🚀 AI 피드백 요청 (하드코딩 포함):', requestData);
 
-            // test-example API 호출
-            const response = await portfolioGuideApi.getTestExample(requestData);
+            // 실시간 코칭 API 호출 (POST /portfolio-guide/coaching)
+            const response = await portfolioGuideApi.getRealtimeCoaching(requestData);
 
-            console.log('✅ AI 피드백 응답 (전체):', response);
-            console.log('✅ AI 피드백 응답 (data):', response.data);
 
             if (response.data) {
                 const feedback = response.data;
