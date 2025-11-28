@@ -15,7 +15,7 @@ const routes = [
     component: () => import(/*webpackChunkName: "interviewRouting"*/ "@/views/interview/Mock.vue")
   },
   {
-    path: "/interview/progress",
+    path: "/interview/progress/:sessionId",
     name: "Progress",
     component: () => import(/*webpackChunkName: "interviewRouting"*/ "@/views/interview/Progress.vue")
   }

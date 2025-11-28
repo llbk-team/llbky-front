@@ -130,7 +130,7 @@
 <script setup>
 import router from "@/router";
 import { ref } from "vue";
-import interviewApi from "@/apis/interviewApi";
+import interviewApi from "@/apis/interviewApi"
 
 const type = ref("comprehensive");
 const selectedCompany = ref("");
@@ -173,15 +173,23 @@ const generateQuestions = async () => {
   loading.value = true;
 
   try {
-    const res = await interviewApi.createAiQuestions(
-      1,
-      type.value,
-      selectedCompany.value,
-      selectedKeywords.value,
-      selectedFileObject.value
-    );
+    const formData = new FormData();
+    formData.append("memberId", 1);
+    formData.append("type", type.value === "comprehensive" ? "종합" : "직무");
+    formData.append("targetCompany", selectedCompany.value);
 
+    selectedKeywords.value.forEach(k => formData.append("keywords", k));
+
+    if (selectedFileObject.value) {
+      formData.append("file", selectedFileObject.value);
+    }
+
+    const res = await interviewApi.createAiQuestions(formData);
+
+    // AI 질문 저장
     questions.value = res.data.map(q => q.aiQuestion);
+    aiQuestions.value = [...questions.value];   // ✨ 이거 안 하면 저장 안됨
+
   } finally {
     loading.value = false;
   }
@@ -191,28 +199,31 @@ const generateQuestions = async () => {
 // 세션 저장 API
 const saveSession = async () => {
   try {
-    const res = await interviewApi.saveSession(
-      1,
-      type.value,
-      selectedCompany.value,
-      selectedKeywords.value,
-      aiQuestions.value,
-      customQuestions.value,
-      selectedFileObject.value
-    );
+    const formData = new FormData();
 
-    // 일단 에러 안 나게 세션 ID 체크 제거
-    console.log("Saved:", res.data);
+    formData.append("memberId", 1);
+    formData.append("type", type.value === "comprehensive" ? "종합" : "직무");
+    formData.append("targetCompany", selectedCompany.value);
 
-    // 세션 ID 없어도 그냥 넘어가줌
-    router.push("/interview/progress");
+    selectedKeywords.value.forEach(k => formData.append("keywords", k));
+    aiQuestions.value.forEach(q => formData.append("aiQuestions", q));
+    customQuestions.value.forEach(q => formData.append("customQuestions", q));
+
+    if (selectedFileObject.value) {
+      formData.append("file", selectedFileObject.value);
+    }
+
+    const res = await interviewApi.saveSession(formData);
+
+    const sessionId = res.data[0]?.sessionId;
+    router.push(`/interview/progress?sessionId=${sessionId}`);
+
   } catch (err) {
     console.error("세션 저장 오류:", err);
-
-    // 에러 나도 그냥 넘어감
     router.push("/interview/progress");
   }
 };
+
 
 </script>
 
