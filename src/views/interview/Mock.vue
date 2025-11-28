@@ -216,7 +216,7 @@ const saveSession = async () => {
     const res = await interviewApi.saveSession(formData);
 
     const sessionId = res.data[0]?.sessionId;
-    router.push(`/interview/progress?sessionId=${sessionId}`);
+    router.push(`/interview/progress/${sessionId}`);
 
   } catch (err) {
     console.error("세션 저장 오류:", err);
