@@ -130,7 +130,7 @@
 <script setup>
 import router from "@/router";
 import { ref } from "vue";
-import interviewApi from "@/apis/interview";
+import interviewApi from "@/apis/interviewApi";
 
 const type = ref("comprehensive");
 const selectedCompany = ref("");
