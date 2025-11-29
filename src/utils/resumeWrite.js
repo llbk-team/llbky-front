@@ -1,7 +1,7 @@
 // 이력서 작성 페이지 전용 JS 파일
 import { ref, reactive } from "vue";
 import { useRouter } from "vue-router";
-import resumeApi from "@/apis/resume";
+import resumeApi from "@/apis/resumeApi";
 
 function useResumeWrite() {
     const router = useRouter();

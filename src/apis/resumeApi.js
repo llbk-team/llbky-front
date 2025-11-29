@@ -1,5 +1,5 @@
 import axios from "axios";
-axios.defaults.baseURL = "http://localhost:8080";
+import "./axiosConfig";
 
 // 이력서 생성
 function create(resume){

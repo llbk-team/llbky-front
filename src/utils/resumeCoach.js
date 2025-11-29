@@ -1,7 +1,7 @@
 // src/utils/resumeCoach.js
 import { ref, reactive, computed, onMounted } from "vue";
 import { useRoute } from "vue-router";
-import resumeApi from "@/apis/resume";
+import resumeApi from "@/apis/resumeApi";
 
 function useResumeCoach() {
   const route = useRoute();
