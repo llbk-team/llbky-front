@@ -20,6 +20,15 @@ function saveSession(formData) {
 }
 
 /**
+ * 기업 검색
+ */
+function searchCompany(query) {
+  return axios.get("/interview/search", {
+    params: { query }
+  });
+}
+
+/**
  * 세션 질문 조회
  */
 function getSessionDetail(sessionId) {
@@ -110,6 +119,7 @@ function getOneAnswer(answerId) {
 
 export default {
   createAiQuestions,
+  searchCompany,
   saveSession,
   getSessionDetail,
   submitAnswer,
