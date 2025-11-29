@@ -1,0 +1,216 @@
+/* 면접 진행 페이지 컴포넌트용 css */
+/* -------------------------
+   🔹 제목 / 부제 폰트 통일
+-------------------------- */
+
+/* 상단 큰 제목 */
+h3.fw-bold {
+  font-size: 1.75rem !important;
+  font-weight: 700 !important;
+}
+
+/* 설명 텍스트 */
+p.small,
+.text-muted.small,
+label,
+small,
+span,
+div.small
+
+/* 질문 번호 */
+.fw-semibold,
+.fw-bold {
+  font-weight: 700 !important;
+}
+
+
+/* -------------------------
+   🔹 버튼 규격 통일
+-------------------------- */
+
+.btn {
+  height: 37px !important;
+  font-size: 13.5px !important;
+  font-weight: 500 !important;
+  display: inline-flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  padding: 0 16px !important;
+  letter-spacing: 0 !important;
+}
+
+/* 기본 버튼 너비(130px), 풀사이즈 버튼은 따로 유지 */
+.btn:not(.w-50):not(.w-100):not(.rounded-circle) {
+  width: 130px !important;
+}
+
+/* pill 버튼 */
+.btn.rounded-pill {
+  border-radius: 30px !important;
+}
+
+/* 기본 라운드는 네모(6px)—기존 px 유지 */
+.btn {
+  border-radius: 6px !important;
+}
+
+/* 녹화/녹음 버튼(크기 유지해야 하므로 width 제외) */
+.record-btn {
+  width: auto !important;
+}
+
+/* ‘이전 질문으로 돌아가기’ 링크 버튼 크기 깨지지 않도록 예외 처리 */
+.btn-link {
+  width: auto !important;
+  height: auto !important;
+  padding: 0 !important;
+  font-size: 0.85rem !important;
+}
+
+
+/* -------------------------
+   🔹 모드 선택 버튼도 규격 맞추기
+-------------------------- */
+
+.mode-btn {
+  height: 37px !important;
+  font-size: 13.5px !important;
+  font-weight: 500 !important;
+  border-radius: 6px !important;
+}
+
+/* 🔹 민트 색상 통일 */
+.bg-mint,
+.progress-bar.bg-mint {
+  background-color: #71ebbe !important;
+}
+
+/* 🔹 버튼 폰트 & 간격 */
+.btn {
+  font-weight: 500 !important;
+  letter-spacing: 0.2px;
+  transition: all 0.2s ease;
+}
+
+/* 🔹 기본 민트 버튼 */
+.btn-mint {
+  background-color: #71ebbe !important;
+  color: #000 !important;
+  border: none !important;
+}
+.btn-mint:hover {
+  background-color: #5cd8ab !important;
+}
+
+/* 🔹 모드 선택 버튼 (비활성 시 DDF3EB) */
+.mode-btn {
+  background-color: #ddf3eb !important;
+  color: #000 !important;
+  border: none !important;
+}
+.mode-btn.active {
+  background-color: #71ebbe !important;
+  color: #000 !important;
+  border: none !important;
+}
+.mode-btn:hover {
+  background-color: #b8ecdb !important;
+}
+
+/* 🔹 기타 스타일 */
+.bg-dark {
+  background-color: #0e1111 !important;
+}
+.btn-danger {
+  background-color: #ff6464 !important;
+  border: none !important;
+}
+.btn-danger:hover {
+  background-color: #e45454 !important;
+}
+
+.status-box {
+  min-height: 85px !important; /* 두 줄 기준 고정 */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+/* 미리보기 박스 */
+.preview-box {
+  height: 320px;
+  background-color: #0e1111 !important;
+  font-weight: 100;
+  color: #fff;
+}
+.preview-box i {
+  opacity: 0.8;
+}
+.preview-box p {
+  line-height: 1.4;
+}
+.prev-question-btn {
+  left: -8px !important; /* 더 왼쪽으로 당기기 */
+  padding-left: 0 !important;
+  margin-left: 0 !important;
+}
+
+.tip-box {
+  background: #e9f8f2;
+  border: 1px solid #a2f1d6;
+  border-radius: 12px;
+  padding: 18px 22px;
+  font-size: 10px;
+  margin-top: 20px;
+}
+
+.tip-box h6 {
+  color: #008b6a;  /* 분석 완료 박스 톤에 맞춰 자연스러운 녹색 */
+}
+
+.tip-box ul li {
+  color: #555;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+/* 녹화 중 빨간 점 깜빡임 */
+.record-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  background: red;
+  border-radius: 50%;
+  animation: blink 1s infinite;
+  margin-right: 5px;
+}
+
+@keyframes blink {
+  0% { opacity: 1; }
+  50% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+/* ===== AI 로딩 스피너 스타일 ===== */
+.spinner-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px 0;
+}
+
+.spinner {
+  width: 28px;
+  height: 28px;
+  border: 4px solid #e0e0e0;
+  border-top-color: #71EBBE;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
