@@ -159,8 +159,11 @@ function useInterviewProgress(sessionId) {
 
   const extractAudio = async (video) => {
     const ffmpeg = await getFFmpeg();
+
+    // 1) 브라우저 Blob -> ffmpeg 가상 파일로 write
     await ffmpeg.writeFile("input.webm", await fetchFile(video));
 
+    // 2) ffmpeg 명령 실행
     await ffmpeg.exec([
       "-i",
       "input.webm",
@@ -174,6 +177,7 @@ function useInterviewProgress(sessionId) {
       "audio.wav",
     ]);
 
+    // 3) 변환된 오디오 파일 읽어오기
     const data = await ffmpeg.readFile("audio.wav");
     await ffmpeg.deleteFile("input.webm");
     await ffmpeg.deleteFile("audio.wav");
@@ -183,13 +187,17 @@ function useInterviewProgress(sessionId) {
 
   const extractFrames = async (video) => {
     const ffmpeg = await getFFmpeg();
+
+    // 1) Blob 형태의 video를 ffmpeg 가상 파일로 write
     await ffmpeg.writeFile("input.webm", await fetchFile(video));
 
+    // 2) ffmpeg 명령 실행
     await ffmpeg.exec(["-i", "input.webm", "-vf", "fps=1", "frame_%03d.png"]);
 
     const frames = [];
     let index = 1;
 
+    // 3) 순서대로 읽어오기
     while (index >= 1) {
       const name = `frame_${String(index).padStart(3, "0")}.png`;
       try {
