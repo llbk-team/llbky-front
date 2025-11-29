@@ -31,11 +31,33 @@
             <!-- 기업 선택 -->
             <div class="mb-4">
               <label class="fw-semibold mb-2 text-dark mt-4">희망하시는 기업이 어디인가요?</label>
-              <input type="text" class="form-control p-3 rounded-3" v-model="selectedCompany" placeholder="예: 네이버, 삼성전자, 카카오 등" />
+
+              <div class="input-group">
+                <input type="text" class="form-control p-3 rounded-start-3" v-model="companyQuery" @keyup.enter="searchCompany" placeholder="예: 네이버, 삼성전자, 카카오 등" />
+
+                <button class="btn btn-outline-secondary px-4" @click="searchCompany">
+                  검색
+                </button>
+              </div>
+
+              <!-- 로딩 스피너 -->
+              <div v-if="companyLoading" class="mt-2 text-muted small">
+                <i class="spinner-border spinner-border-sm me-2"></i>
+                검색 중...
+              </div>
+
+              <!-- 검색 결과 표시 -->
+              <ul v-if="companyResults.length && !companyLoading" class="list-group mt-2">
+                <li v-for="(c, index) in companyResults" :key="index" class="list-group-item list-group-item-action" @click="selectCompany(c)">
+                  {{ c }}
+                </li>
+              </ul>
+
               <small class="text-muted d-block mt-2">
                 *AI가 입력된 기업명을 기반으로 질문을 생성합니다.
               </small>
             </div>
+
 
             <!-- 키워드 선택 -->
             <div class="mb-4">
@@ -59,7 +81,7 @@
             <div class="mb-4">
               <label class="fw-semibold mb-2 text-dark mt-4">분석할 PDF 파일 업로드</label>
               <small class="text-muted d-block mt-1 mb-2">
-                AI 분석을 위해 기존 서류 중 필요한 항목만 선택하세요.
+                AI 분석을 위해 이력서, 자기소개서, 포트폴리오 중 하나의 파일을 선택해주세요.
               </small>
 
               <input type="file" accept="application/pdf" class="form-control" @change="onFileSelect" />
@@ -128,252 +150,37 @@
 </template>
 
 <script setup>
-import router from "@/router";
-import { ref } from "vue";
-import interviewApi from "@/apis/interviewApi"
+import interviewMock from "@/utils/interviewMock";
 
-const type = ref("comprehensive");
-const selectedCompany = ref("");
-const selectedKeywords = ref([]);
+const { useInterviewMock } = interviewMock;
 
-const keywordList = ref(["Spring AI", "Oracle", "Vue.js", "Python"]);
+const {
+  type,
 
-const files = ref([]);
-const selectedFiles = ref([]);
+  companyQuery,
+  companyResults,
+  companyLoading,
+  searchCompany,
+  selectCompany,
 
-const questions = ref([]);
-const aiQuestions = ref([]);      // AI 생성 질문
-const customQuestions = ref([]);  // 사용자가 추가한 질문
+  selectedKeywords,
+  keywordList,
 
-const isAdding = ref(false);
-const newQuestion = ref("");
-const showQuestions = ref(false);
+  questions,
+  isAdding,
+  newQuestion,
+  showQuestions,
+  loading,
 
-const loading = ref(false);
+  selectedFileObject,
+  onFileSelect,
+  removeFile,
 
-// 파일 업로드용
-const selectedFileObject = ref(null);
-const onFileSelect = (e) => {
-  selectedFileObject.value = e.target.files[0];
-};
-
-// 사용자 질문 추가
-const addQuestion = () => {
-  if (newQuestion.value.trim()) {
-    questions.value.push(newQuestion.value);
-    customQuestions.value.push(newQuestion.value);
-    newQuestion.value = "";
-    isAdding.value = false;
-  }
-};
-
-// AI 질문 생성 API
-const generateQuestions = async () => {
-  showQuestions.value = true;
-  loading.value = true;
-
-  try {
-    const formData = new FormData();
-    formData.append("memberId", 1);
-    formData.append("type", type.value === "comprehensive" ? "종합" : "직무");
-    formData.append("targetCompany", selectedCompany.value);
-
-    selectedKeywords.value.forEach(k => formData.append("keywords", k));
-
-    if (selectedFileObject.value) {
-      formData.append("file", selectedFileObject.value);
-    }
-
-    const res = await interviewApi.createAiQuestions(formData);
-
-    // AI 질문 저장
-    questions.value = res.data.map(q => q.aiQuestion);
-    aiQuestions.value = [...questions.value];   // ✨ 이거 안 하면 저장 안됨
-
-  } finally {
-    loading.value = false;
-  }
-};
-
-
-// 세션 저장 API
-const saveSession = async () => {
-  try {
-    const formData = new FormData();
-
-    formData.append("memberId", 1);
-    formData.append("type", type.value === "comprehensive" ? "종합" : "직무");
-    formData.append("targetCompany", selectedCompany.value);
-
-    selectedKeywords.value.forEach(k => formData.append("keywords", k));
-    aiQuestions.value.forEach(q => formData.append("aiQuestions", q));
-    customQuestions.value.forEach(q => formData.append("customQuestions", q));
-
-    if (selectedFileObject.value) {
-      formData.append("file", selectedFileObject.value);
-    }
-
-    const res = await interviewApi.saveSession(formData);
-
-    const sessionId = res.data[0]?.sessionId;
-    router.push(`/interview/progress/${sessionId}`);
-
-  } catch (err) {
-    console.error("세션 저장 오류:", err);
-    router.push("/interview/progress");
-  }
-};
-
+  addQuestion,
+  generateQuestions,
+  saveSession,
+} = useInterviewMock();
 
 </script>
 
-
-<style scoped>
-/* 제목 */
-.title,
-h3.fw-bold {
-  font-size: 1.75rem !important;
-  /* 28px */
-  font-weight: 700 !important;
-}
-
-/* 설명 텍스트 */
-.subtitle,
-.text-muted.small,
-p,
-label,
-span,
-small {
-  font-size: 1rem !important;
-  /* 16px */
-}
-
-.btn-mint {
-  background-color: #71ebbe !important;
-  color: #000 !important;
-  border: none !important;
-}
-
-.btn-mint:hover {
-  background-color: #5cd8ab !important;
-}
-
-.btn-deep-mint {
-  background-color: #00b17f !important;
-  color: #fff !important;
-  border: none !important;
-}
-
-.btn-deep-mint:hover {
-  background-color: #009a70 !important;
-}
-
-.bg-light-green {
-  background-color: #f3fef9 !important;
-}
-
-/* 면접 유형 버튼 높이 통일 */
-.type-btn {
-  height: 100px !important;
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: center !important;
-  align-items: center !important;
-  gap: 4px;
-  padding: 0 !important;
-  /* py-3 덮어쓰기 */
-  white-space: nowrap;
-  text-align: center;
-}
-
-.type-btn span {
-  font-size: 16px;
-}
-
-.type-btn small {
-  font-size: 13px;
-  color: #666;
-}
-
-
-
-/* 입력칸이 flex에서 과도하게 넓어지지 않도록 */
-.add-question-box .form-control {
-  min-width: 0;
-}
-
-/* 버튼이 줄바꿈되지 않도록(안전장치) */
-.add-question-box .btn {
-  white-space: nowrap;
-}
-
-/* 입력 필드 placeholder 색상 연하게 */
-input::placeholder {
-  color: #bcbcbc !important;
-  /* 좀 더 연한 회색 */
-  opacity: 1;
-  /* Safari용 (기본 투명도 제거) */
-}
-
-/* 오른쪽 AI 질문 영역 전체 스타일 */
-.ai-question-box {
-  background: linear-gradient(135deg, #f0fdf4 0%, #f5f7ff 100%) !important;
-  border: 1px solid #e0e7ff !important;
-  border-radius: 16px !important;
-  padding: 0 !important;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
-}
-
-/* 헤더 (bg-dark 부분 대체) */
-.ai-question-header {
-  background: #ffffff !important;
-  padding: 16px 24px !important;
-  font-weight: 700 !important;
-  font-size: 1.1rem !important;
-  border-bottom: 1px solid #e0e7ff !important;
-}
-
-/* 본문 */
-.ai-question-body {
-  padding: 24px !important;
-  background: transparent !important;
-}
-
-/* 각 질문 카드 */
-.ai-question-item {
-  background: #ffffff !important;
-  border: 1px solid #e5e7eb !important;
-  border-radius: 12px !important;
-  padding: 16px !important;
-  margin-bottom: 12px !important;
-  transition: 0.2s ease;
-}
-
-.ai-question-item:hover {
-  background: #f8fafc !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
-}
-
-/* 플러스 버튼 배경 정리 */
-.ai-plus-btn {
-  background: #ffffff !important;
-  border: 2px solid #d1d5db !important;
-}
-
-/* “추가” 버튼 통일 */
-.ai-add-btn {
-  height: 37px !important;
-  width: 130px !important;
-  border-radius: 30px !important;
-  font-size: 13.5px !important;
-  font-weight: 500 !important;
-}
-
-/* 체크박스 영역 스크롤 – 3줄까지만 보이도록 */
-.checkbox-scroll {
-  max-height: 140px;
-  /* 약 3줄 높이 */
-  overflow-y: auto;
-}
-</style>
+<style src="@/assets/css/interviewMock.css"></style>
