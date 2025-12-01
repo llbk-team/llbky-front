@@ -134,11 +134,11 @@
             <div class="d-flex align-items-center gap-2">
               <span class="badge bg-mint text-dark">완료</span>
               <small class="text-muted">{{ h.date }}</small>
-              <small class="text-muted">{{ h.questionCount }}개 질문</small>
+              <!-- <small class="text-muted">{{ h.questionCount }}개 질문</small> -->
             </div>
             <button
             class="btn btn-outline-secondary rounded-pill px-4 btn-auto"
-              @click="$router.push(`/interview/report/${i}`)"
+              @click="goToReport(h)"
             >
               📄 리포트 보기
             </button>
@@ -196,202 +196,25 @@
 </template>
 
 <script setup>
-import router from "@/router";
-import { ref, computed } from "vue";
+import interviewList from '@/utils/interviewList';
+import { useStore } from 'vuex';
 
-const tab = ref("question");
-const showAllJob = ref(false);
-const showAllGeneral = ref(false);
-const showModal = ref(false);
-const selectedQuestion = ref(null);
+const memberId = 1;
 
-const jobQuestions = ref([
-  { text: "Spring Boot와 Spring Framework의 차이점을 설명해주세요.", type: "audio" },
-  { text: "RESTful API 설계 원칙에 대해 설명해주세요.", type: "video" },
-  { text: "JPA N+1 문제의 해결 방법을 설명해주세요.", type: "audio" },
-  { text: "서비스 계층의 역할은 무엇인가요?", type: "video" },
-  { text: "DI(Dependency Injection)에 대해 설명해주세요.", type: "audio" },
-]);
-
-const generalQuestions = ref([
-  { text: "1분 자기소개를 해주세요.", type: "video" },
-  { text: "본인의 강점과 약점을 말해주세요.", type: "audio" },
-  { text: "팀 내 의견 충돌이 있었을 때 어떻게 해결하셨나요?", type: "audio" },
-  { text: "성공적인 협업 경험을 말해주세요.", type: "video" },
-  { text: "가장 도전적이었던 프로젝트는 무엇인가요?", type: "audio" },
-  { text: "실패 경험이 있다면 어떻게 극복했나요?", type: "video" },
-]);
-
-const displayedJobQuestions = computed(() =>
-  showAllJob.value ? jobQuestions.value : jobQuestions.value.slice(0, 5)
-);
-const displayedGeneralQuestions = computed(() =>
-  showAllGeneral.value
-    ? generalQuestions.value
-    : generalQuestions.value.slice(0, 5)
-);
-
-const openAnswerModal = (question) => {
-  selectedQuestion.value = question;
-  showModal.value = true;
-};
-
-const goToReport = (question) => {
-  showModal.value = false;
-
-  // ⚙️ 정적 예시 (실제론 question.id 나 sessionId 로 매핑될 예정)
-  // 여기서는 그냥 질문 타입에 따라 임시 리포트 페이지 다르게 이동시킴
-  if (question.type === "audio") {
-    // 오디오형 질문 -> 리포트 1번 페이지
-    router.push("/interview/report/1");
-  } else {
-    // 비디오형 질문 -> 리포트 2번 페이지
-    router.push("/interview/report/2");
-  }
-};
-
-const histories = ref([
-  {
-    date: "2025-10-28",
-    questionCount: 8,
-    scoreSummary: "종합 점수 67점",
-    feedback: "답변 구조는 좋으나 구체적인 예시 보완 필요",
-    progress: 70,
-  },
-  {
-    date: "2025-10-25",
-    questionCount: 3,
-    scoreSummary: "종합 점수 50점",
-    feedback: "시선 처리와 말의 속도 개선 필요",
-    progress: 50,
-  },
-  {
-    date: "2025-10-18",
-    questionCount: 10,
-    scoreSummary: "종합 점수 76점",
-    feedback: "STAR 기법 활용 적절",
-    progress: 80,
-  },
-]);
+const {
+  tab,
+  jobQuestions,
+  generalQuestions,
+  displayedJobQuestions,
+  displayedGeneralQuestions,
+  showAllJob,
+  showAllGeneral,
+  showModal,
+  selectedQuestion,
+  histories,
+  openAnswerModal,
+  goToReport
+} = interviewList.useInterviewList(memberId);
 </script>
 
-<style scoped>
-.title {
-    font-weight: 700;
-    font-size: 28px;
-}
-
-.subtitle {
-  color: #6c757d;
-  font-size: 16px;
-}
-
-/* 탭 버튼 */
-.d-flex.bg-light .btn {
-    font-size: 14px;
-}
-
-/* 섹션 제목 */
-h5.fw-bold {
-    font-size: 18px;
-}
-
-/* 목록 폰트 크기 */
-.border.rounded-3 span,
-.border.rounded-3 p {
-    font-size: 14px;
-}
-
-/* small 통일 */
-small,
-.text-muted.small {
-    font-size: 12px !important;
-}
-
-/* 모달 */
-.modal-content-custom h5 {
-    font-size: 18px;
-}
-.modal-content-custom button {
-    font-size: 14px;
-}
-
-.btn-mint {
-  background-color: #71ebbe !important;
-  color: #000 !important;
-  border: none !important;
-}
-.btn-outline-mint {
-  border: 1px solid #71ebbe !important;
-  color: #000 !important;
-}
-.btn-outline-mint:hover {
-  background-color: #71ebbe !important;
-  color: #000 !important;
-}
-.bg-mint {
-  background-color: #71ebbe !important;
-}
-/* 버튼 공통 규격 */
-.btn {
-  width: 130px;
-  height: 37px;
-  font-size: 13.5px !important;
-  font-weight: 500 !important;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-/* 라운드형 버튼 */
-.btn.rounded-pill {
-  border-radius: 30px !important;
-}
-
-/* 네모형 버튼 */
-.btn.square {
-  border-radius: 6px !important;
-}
-
-/* 기존 mint 버튼 색상 유지 */
-.btn-mint {
-  background-color: #71ebbe !important;
-  color: #000 !important;
-  border: none !important;
-}
-
-/* 아웃라인 mint */
-.btn-outline-mint {
-  border: 1px solid #71ebbe !important;
-  color: #000 !important;
-}
-
-/* 작은 버튼(답변보기, 전체보기 등)도 동일 규격 적용 */
-.btn-sm {
-  width: 130px !important;
-  height: 37px !important;
-  font-size: 13.5px !important;
-  border-radius: 30px !important;
-}
-/* 문구 긴 버튼 전용 */
-.btn-auto {
-  width: auto !important;       /* 글자만큼 자동 확장 */
-  min-width: 130px !important;  /* 최소 너비는 동일 */
-  padding-left: 20px !important;
-  padding-right: 20px !important; /* 너무 붙지 않게 */
-  height: 37px !important;
-  font-size: 13.5px !important;
-  font-weight: 500 !important;
-}
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.4);
-  z-index: 1050;
-}
-.modal-content-custom {
-  width: 90%;
-  max-width: 600px;
-}
-
-</style>
+<style src="@/assets/css/interviewList.css"></style>

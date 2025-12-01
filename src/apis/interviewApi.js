@@ -1,8 +1,38 @@
 import axios from "axios";
 import "./axiosConfig";
 
+// 면접 관련 api
+
 /**
- * 1) AI 예상 질문 생성
+ * 1) 면접 종료 후 종합 피드백 생성
+ */
+function createInterviewFinalFeedback(sessionId) {
+  return axios.post("/interview/final-feedback", null, {
+    params: { sessionId }
+  });
+}
+
+/**
+ * 2) 면접 목록 조회
+ */
+function getInterviewList(memberId) {
+  return axios.get("/interview/list", {
+    params: { memberId }
+  });
+}
+
+/**
+ * 3) 면접 상세 조회
+ */
+function getInterviewDetail(sessionId) {
+  return axios.get("/interview/report", {
+    params: { sessionId }
+  });
+}
+
+
+/**
+ * 4) AI 예상 질문 생성
  */
 function createAiQuestions(formData) {
   return axios.post("/interview/ai-questions", formData, {
@@ -11,7 +41,7 @@ function createAiQuestions(formData) {
 }
 
 /**
- * AI 생성 질문 + 사용자 질문 + 파일 → 면접 세션 저장
+ * 5) AI 생성 질문 + 사용자 질문 + 파일 → 면접 세션 저장
  */
 function saveSession(formData) {
   return axios.post("/interview/session-save", formData, {
@@ -20,7 +50,7 @@ function saveSession(formData) {
 }
 
 /**
- * 기업 검색
+ * 6) 기업 검색
  */
 function searchCompany(query) {
   return axios.get("/interview/search", {
@@ -29,7 +59,7 @@ function searchCompany(query) {
 }
 
 /**
- * 세션 질문 조회
+ * 7) 세션 질문 조회
  */
 function getSessionDetail(sessionId) {
   return axios.get(`/interview/questions`, {
@@ -38,7 +68,16 @@ function getSessionDetail(sessionId) {
 }
 
 /**
- * 사용자 답변 제출 (오디오/비디오)
+ * 8) 사용자 질문 조회
+ */
+function getAllQuestions(memberId) {
+  return axios.get(`/interview/all-questions`, {
+    params: { memberId }
+  });
+}
+
+/**
+ * 9) 사용자 답변 제출 (오디오/비디오)
  */
 function submitAnswer(formData) {
   
@@ -48,7 +87,7 @@ function submitAnswer(formData) {
 }
 
 /**
- * 답변 다시 제출 (제출한 답변 수정)
+ * 10) 답변 다시 제출 (제출한 답변 수정)
  */
 function reSubmitAnswer(formData) {
   
@@ -58,7 +97,7 @@ function reSubmitAnswer(formData) {
 }
 
 /**
- * 답변별 AI 피드백 생성
+ * 11) 답변별 AI 피드백 생성
  */
 function createFeedback(formData) {
   
@@ -68,7 +107,7 @@ function createFeedback(formData) {
 }
 
 /**
- * 면접 질문 기반 답변 조회
+ * 12) 면접 질문 기반 답변 조회
  */
 function getAnswerByQuestionId(questionId) {
   return axios.get("/interview/answer-by-question", {
@@ -77,7 +116,7 @@ function getAnswerByQuestionId(questionId) {
 }
 
 /**
- * 답변 단건 조회
+ *13) 답변 단건 조회
  */
 function getOneAnswer(answerId) {
   return axios.get("/interview/answer-detail", {
@@ -87,10 +126,14 @@ function getOneAnswer(answerId) {
 
 
 export default {
+  createInterviewFinalFeedback,
+  getInterviewList,
+  getInterviewDetail,
   createAiQuestions,
   searchCompany,
   saveSession,
   getSessionDetail,
+  getAllQuestions,
   submitAnswer,
   reSubmitAnswer,
   createFeedback,
