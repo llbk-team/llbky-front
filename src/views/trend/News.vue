@@ -6,8 +6,16 @@
 
       <!-- 검색창 -->
       <div class="search-bar">
-        <input type="text" placeholder="키워드를 입력하세요 (예: 인공지능, 백엔드, AI 개발자)" v-model="keyword" @keyup.enter="searchNews" />
-        <button @click="searchNews">검색</button>
+        <input 
+          type="text" 
+          placeholder="키워드를 입력하세요 (예: 인공지능, 백엔드, AI 개발자)" 
+          v-model="keyword" 
+          @keyup.enter="searchNews"
+          :disabled="loading"
+        />
+        <button @click="searchNews" :disabled="loading">
+          {{ loading ? '검색 중...' : '검색' }}
+        </button>
       </div>
 
       <!-- 🔹 최근 검색어 표시 -->
@@ -24,6 +32,11 @@
           </div>
         </div>
       </div>
+
+      <!-- 에러 메시지 -->
+      <div v-if="apiError" class="error-message">
+        {{ apiError }}
+      </div>
     </section>
 
     <!-- ✅ 필터바 -->
@@ -39,8 +52,17 @@
         객관적인 시장 인사이트를 제공합니다.
       </p>
 
+      <!-- 로딩 상태 -->
+      <div v-if="loading" class="loading-state">
+        <p>뉴스를 불러오는 중...</p>
+      </div>
 
-      <div class="news-grid">
+      <!-- 뉴스 그리드 -->
+      <div v-else class="news-grid">
+        <div v-if="visibleNews.length === 0" class="no-results">
+          검색 결과가 없습니다.
+        </div>
+        
         <div v-for="(item, i) in visibleNews" :key="i" class="news-card" @click="openDetail(item)">
           <!-- 상단 태그 -->
           <div class="tag-row">
@@ -90,11 +112,11 @@
     <NewsDetailModal v-if="selectedNews" :news="selectedNews" @close="selectedNews = null" />
   </div>
 </template>
-
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import FilterBar from "@/components/bar/FilterBar.vue";
 import NewsDetailModal from "@/components/modal/NewsDetailModal.vue";
+import newsApi from "@/apis/newsApi";
 
 const keyword = ref("");
 const recentKeywords = ref([]);
@@ -106,111 +128,12 @@ const filters = ref({
   trustMin: 70,
 });
 
-/* ------------------------------
-   뉴스 데이터 (6개 고정)
------------------------------- */
-const newsList = ref([
-  {
-    title: "AI 인재 확보 경쟁 심화, 스타트업도 대규모 채용",
-    summary_short: `
-AI/머신러닝 관련 채용은 전년 대비 45% 증가했습니다.
-LLM, RAG, MLOps 등 신기술 직군 수요가 꾸준히 확대 중입니다.
-스타트업에서도 연구 인력 채용이 활발히 이루어지고 있습니다.
-`,
-    keywords: ["AI", "LLM", "MLOps", "RAG", "데이터"],
-    trust: 87,
-    sentiment: "positive",
-    sentimentLabel: "긍정적",
-    bias_detected: true,
-    bias_type: "기술 과도 홍보 경향",
-    date: "2025.11.09",
-    source: "ZDNet Korea",
-    source_url: "https://biz.chosun.com/it-science/2025/11/07/ai-data-analyst-hiring/"
-  },
-  {
-    title: "백엔드 개발자 채용 시장 안정세, 경력직 선호",
-    summary_short: `
-백엔드 개발자 채용은 전년 대비 소폭 증가세를 보이고 있습니다.
-신입보다 3년 이상 경력직 선호 현상이 지속되고 있습니다.
-MSA·쿠버네티스 등 인프라 지식 보유자 우대 경향이 나타납니다.
-`,
-    keywords: ["백엔드", "Spring", "Node.js", "MSA", "Kubernetes"],
-    trust: 90,
-    sentiment: "neutral",
-    sentimentLabel: "중립적",
-    bias_detected: false,
-    bias_type: "",
-    date: "2025.11.01",
-    source: "커리어 인사이트",
-    source_url: "https://biz.chosun.com/it-science/2025/11/07/ai-data-analyst-hiring/"
-  },
-  {
-    title: "클라우드 및 DevOps 직군 채용 32% 증가",
-    summary_short: `
-클라우드 아키텍처 및 DevOps 인력 수요가 전년 대비 32% 증가했습니다.
-스타트업 중심으로 인프라 엔지니어 채용이 활발히 진행 중입니다.
-AWS, Azure 등 주요 스택 경험 보유자가 우대받고 있습니다.
-`,
-    keywords: ["클라우드", "DevOps", "AWS", "Azure"],
-    trust: 84,
-    sentiment: "positive",
-    sentimentLabel: "긍정적",
-    bias_detected: false,
-    bias_type: "",
-    date: "2025.11.08",
-    source: "매일경제",
-    source_url: "https://www.mk.co.kr/news/it/11464618"
-  },
-  {
-    title: "보안·블록체인 채용 수요 15% 감소, 시장 조정기 진입",
-    summary_short: `
-보안 및 블록체인 분야 채용은 전년 대비 15% 감소했습니다.
-시장 불확실성과 투자 위축으로 인한 인력 수요 하락이 원인입니다.
-전문가는 내년 중반 이후 회복세를 전망하고 있습니다.
-`,
-    keywords: ["보안", "블록체인", "정보보호", "암호화"],
-    trust: 79,
-    sentiment: "negative",
-    sentimentLabel: "부정적",
-    bias_detected: true,
-    bias_type: "감정적 표현 있음",
-    date: "2025.11.06",
-    source: "디지털데일리",
-    source_url: "https://www.ddaily.co.kr/page/view/2025111113513379096"
-  },
-  {
-    title: "데이터 분석가 채용 수요 급증",
-    summary_short: `
-데이터 기반 의사결정 확산으로 데이터 분석 직군의 수요가 급증했습니다.
-Python, SQL, Tableau 등 기술 스택 활용도가 높습니다.
-AI·BI 툴 활용 능력이 채용 평가의 핵심 지표가 되고 있습니다.
-`,
-    keywords: ["데이터", "SQL", "Tableau", "AI"],
-    trust: 85,
-    sentiment: "positive",
-    sentimentLabel: "긍정적",
-    bias_detected: false,
-    bias_type: "",
-    date: "2025.11.07",
-    source: "조선비즈",
-  },
-  {
-    title: "프론트엔드 시장 안정, 리액트 중심 지속",
-    summary_short: `
-프론트엔드 채용 수요가 전년 대비 비슷한 수준을 유지하고 있습니다.
-React, Vue.js 중심 기술 선호도가 여전히 높습니다.
-UI/UX 복합 역량 보유자의 수요가 증가하고 있습니다.
-`,
-    keywords: ["프론트엔드", "React", "Vue.js", "UI/UX"],
-    trust: 82,
-    sentiment: "neutral",
-    sentimentLabel: "중립적",
-    bias_detected: false,
-    bias_type: "",
-    date: "2025.11.05",
-    source: "IT조선",
-  },
-]);
+const loading = ref(false);
+const apiError = ref(null);
+const newsList = ref([]);
+
+// 하드코딩된 memberId (실제로는 Vuex나 로그인 정보에서 가져와야 함)
+const MEMBER_ID = 1;
 
 /* ------------------------------
    필터 및 검색
@@ -219,7 +142,7 @@ const filteredNews = computed(() =>
   newsList.value.filter((n) => {
     if (filters.value.sentiment && n.sentiment !== filters.value.sentiment)
       return false;
-    if (filters.value.biasOnly && n.bias_detected) return false;
+    if (filters.value.biasOnly && !n.bias_detected) return false;
     if (n.trust < filters.value.trustMin) return false;
     if (
       keyword.value &&
@@ -237,17 +160,96 @@ const filteredNews = computed(() =>
 const visibleNews = computed(() => filteredNews.value.slice(0, 6));
 
 /* ------------------------------
+   API 응답을 화면용 데이터로 변환
+------------------------------ */
+const mapNewsData = (newsItems) => {
+  console.log('🔄 mapNewsData - Input:', newsItems);
+  if (!Array.isArray(newsItems)) {
+    console.log('⚠️ mapNewsData - Invalid input, returning empty array');
+    return [];
+  }
+  
+  const mapped = newsItems.map((n) => ({
+    id: n.id || n.summaryId,
+    title: n.title || n.headline || "제목 없음",
+    summary_short: n.summaryText || n.detailSummary || n.summary_short || "",
+    keywords: Array.isArray(n.keywords) 
+      ? n.keywords.map(k => typeof k === 'string' ? k : k.keyword || k.name || '')
+      : [],
+    trust: n.trustScore ?? n.trust ?? 0,
+    sentiment: n.sentiment || "neutral",
+    sentimentLabel: 
+      n.sentiment === 'positive' ? '긍정적' : 
+      n.sentiment === 'negative' ? '부정적' : '중립적',
+    bias_detected: n.biasDetected ?? n.bias_detected ?? false,
+    bias_type: n.biasType || n.bias_type || "",
+    date: n.publishedAt || n.date || "",
+    source: n.sourceName || n.source || n.publisher || "",
+    source_url: n.sourceUrl || n.source_url || n.url || "",
+  }));
+  
+  console.log('✅ mapNewsData - Output:', mapped);
+  return mapped;
+};
+
+/* ------------------------------
    검색 및 키워드 관련
 ------------------------------ */
-const searchNews = () => {
-  if (!keyword.value.trim()) return;
+const searchNews = async () => {
+  if (!keyword.value.trim()) {
+    alert('검색어를 입력해주세요.');
+    return;
+
+  }
+  
   const term = keyword.value.trim();
+  
+// 최근 검색어 저장
   const saved = JSON.parse(localStorage.getItem("search_keywords") || "[]");
   const updated = [term, ...saved.filter((k) => k !== term)].slice(0, 5);
   localStorage.setItem("search_keywords", JSON.stringify(updated));
   recentKeywords.value = updated;
-};
+  
+  loading.value = true;
+  apiError.value = null;
+  console.log("--------------------");
+  console.log('🔍 searchNews - Request params:', { keywords: [term], memberId: MEMBER_ID });
+  
+  try {
+    // ✅ API 호출
+    const response = await newsApi.searchNews([term], MEMBER_ID);
+    console.log('✅ searchNews - API Response:', response);
+    
+    // ✅ 백엔드 응답 구조: { status: "success", message: "...", analyzed: 3, data: [...] }
+    if (response.status === 'success' && response.data) {
+      const newsItems = Array.isArray(response.data) ? response.data : [];
+      
+      if (newsItems.length > 0) {
+        newsList.value = mapNewsData(newsItems);
+        console.log('✅ newsList 업데이트 완료:', newsList.value);
+      } else {
+        apiError.value = '검색 결과가 없습니다.';
+      }
+    } else {
+      apiError.value = response.message || '검색에 실패했습니다.';
+    }
 
+  } catch (error) {
+    console.error('뉴스 검색 실패:', error);
+    
+    if (error.response?.data?.message) {
+      apiError.value = error.response.data.message;
+    } else {
+      apiError.value = '뉴스 검색에 실패했습니다. 다시 시도해주세요.';
+    }
+    
+    if (error.response) {
+      console.error('서버 응답:', error.response.data);
+    }
+  } finally {
+    loading.value = false;
+  }
+};
 const clickKeyword = (k) => {
   keyword.value = k;
   searchNews();
@@ -263,26 +265,105 @@ const clearAll = () => {
   recentKeywords.value = [];
   localStorage.removeItem("search_keywords");
 };
+/* ------------------------------
+   초기 데이터 로드
+------------------------------ */
+const loadInitialNews = async () => {
+  // ✅ 이미 뉴스가 있으면 로드하지 않음
+  if (newsList.value.length > 0) {
+    console.log('⏭️ loadInitialNews - 이미 뉴스가 있으므로 스킵');
+    return;
+  }
 
-onMounted(() => {
-  recentKeywords.value = JSON.parse(localStorage.getItem("search_keywords") || "[]");
+  loading.value = true;
+  apiError.value = null;
+
+  try {
+    console.log('🌅 loadInitialNews - Loading today\'s news for memberId:', MEMBER_ID);
+    
+    const response = await newsApi.getTodayNews(MEMBER_ID, 6);
+    console.log('✅ loadInitialNews - getTodayNews Response:', response);
+    
+    if (response && response.data) {
+      const newsItems = Array.isArray(response.data.data) 
+        ? response.data.data 
+        : Array.isArray(response.data) 
+          ? response.data 
+          : [];
+          
+      console.log('📊 loadInitialNews - Today\'s news items count:', newsItems.length);
+      
+      if (newsItems.length > 0) {
+        newsList.value = mapNewsData(newsItems);
+      } else {
+        console.log('⏰ loadInitialNews - No today\'s news, falling back to latest news');
+        
+        const latestResponse = await newsApi.getLatestNews(MEMBER_ID, 6);
+        console.log('✅ loadInitialNews - getLatestNews Response:', latestResponse);
+        
+        if (latestResponse && latestResponse.data) {
+          const latestNewsItems = Array.isArray(latestResponse.data.data)
+            ? latestResponse.data.data
+            : Array.isArray(latestResponse.data)
+              ? latestResponse.data
+              : [];
+              
+          console.log('📊 loadInitialNews - Latest news items count:', latestNewsItems.length);
+          
+          if (latestNewsItems.length > 0) {
+            newsList.value = mapNewsData(latestNewsItems);
+          }
+        }
+      }
+    }
+  } catch (error) {
+    console.error('뉴스 로드 실패:', error);
+    apiError.value = '뉴스를 불러오는 데 실패했습니다.';
+    
+    if (error.response) {
+      console.error('서버 응답:', error.response.data);
+    }
+  } finally {
+    loading.value = false;
+  }
+};
+
+onMounted(async () => {
+  // 최근 검색어 불러오기
+   console.log('🚀 onMounted - 컴포넌트 마운트됨');
+  recentKeywords.value = JSON.parse(
+    localStorage.getItem("search_keywords") || "[]"
+  );
+  
+  // 초기 뉴스 로드
+  await loadInitialNews();
+   console.log('✅ onMounted 완료 - newsList 개수:', newsList.value.length);
 });
 
+/* ------------------------------
+   유틸리티 함수
+------------------------------ */
 const formatSummary = (summary) => {
   if (!summary) return "";
+  
+  const lines = summary.trim().split("\n").filter(line => line.trim());
+  
+  if (lines.length === 0) return "";
+  
   return (
     "<ul>" +
-    summary
-      .trim()
-      .split("\n")
-      .map((line) => `<li>${line.trim()}</li>`)
-      .join("") +
+    lines.map((line) => `<li>${line.trim()}</li>`).join("") +
     "</ul>"
   );
 };
 
-const applyFilter = (newFilters) => (filters.value = newFilters);
-const openDetail = (item) => (selectedNews.value = item);
+const applyFilter = (newFilters) => {
+  filters.value = newFilters;
+};
+
+const openDetail = (item) => {
+  selectedNews.value = item;
+};
 </script>
 
 <style scoped>
@@ -585,6 +666,40 @@ const openDetail = (item) => (selectedNews.value = item);
 .delete-icon:hover {
   opacity: 1;
   color: #ff5b5b;
+}
+
+.error-message {
+  background-color: #fee;
+  color: #c33;
+  padding: 12px 20px;
+  border-radius: 8px;
+  margin: 16px 0;
+  text-align: center;
+}
+
+.loading-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #666;
+  font-size: 18px;
+}
+
+.no-results {
+  text-align: center;
+  padding: 60px 20px;
+  color: #999;
+  font-size: 16px;
+  grid-column: 1 / -1;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+input:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
 }
 
 </style>
