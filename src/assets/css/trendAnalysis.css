@@ -116,14 +116,9 @@
 .trend-item .change {
   font-size: 12px;
   font-weight: 500;
-}
-
-.trend-item .change.up {
+  font-size: 12px;
+  font-weight: 600;
   color: #00b37e;
-}
-
-.trend-item .change.down {
-  color: #ff5f5f;
 }
 
 /* Insight Row */
