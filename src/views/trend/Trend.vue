@@ -9,16 +9,13 @@
       <div v-for="(card, i) in summaryCards" :key="i" class="summary-card">
         <p class="label">{{ card.label }}</p>
         <h3 class="value">{{ card.value }}</h3>
-        <span v-if="card.change" class="change" :class="{ up: card.change > 0, down: card.change < 0 }">
-          {{ card.change > 0 ? "+" : "" }}{{ card.change }}%
-        </span>
       </div>
     </div>
 
     <!-- 채용 시장 키워드 트렌드 -->
     <div class="chart-container pretty-trend">
       <h4 class="chart-title">채용 시장 키워드 트렌드</h4>
-      <p class="chart-subtitle">최근 1개월간 주요 기술 및 직무 키워드 변화율</p>
+      <p class="chart-subtitle">최근 7일간 주요 기술 및 직무 키워드 평균 관심도</p>
 
       <div class="chart-wrapper">
         <canvas id="trendChart"></canvas>
@@ -27,9 +24,6 @@
       <div class="trend-stats">
         <div v-for="(item, i) in keywordData" :key="i" class="trend-item">
           <p class="keyword">{{ item.keyword }}</p>
-          <p class="change" :class="{ up: item.change > 0, down: item.change < 0 }">
-            {{ item.change > 0 ? "▲" : "▼" }} {{ Math.abs(item.change) }}%
-          </p>
         </div>
       </div>
     </div>

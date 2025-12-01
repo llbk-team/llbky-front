@@ -32,16 +32,14 @@ export function useTrendAnalysis(memberId = 1) {
     const s = insightJson.summarycard;
     summaryCards.value = [
       { label: "주목 키워드", value: s.majorKeyword },
-      { label: "평균 관심도", value: s.avgInterest, change: parseFloat(s.interestChange) },
-      { label: "분석 키워드 수", value: s.keywordCount + "개" },
-      { label: "시장 활기", value: s.marketActivity + "%" },
+      { label: "전체 평균 관심도", value: s.avgInterest},
+      { label: "분석 키워드 수", value: s.keywordCount + "개" }
     ];
 
     /** 키워드 트렌드 */
     keywordData.value = trendJson.keywords.map((k, i) => ({
       keyword: k,
       score: trendJson.counts[i],
-      change: parseFloat(insightJson.keywordTrend[i]?.match(/(-?\d+)%/)?.[1] || 0)
     }));
 
     /** 산업 분위기 */
@@ -71,12 +69,12 @@ export function useTrendAnalysis(memberId = 1) {
         labels: keywordData.value.map(d => d.keyword),
         datasets: [
           {
+            label: "평균 관심도",
             data: keywordData.value.map(d => d.score),
-            backgroundColor: keywordData.value.map(d =>
-              d.change > 0 ? "#71EBBE" : "#FF9F9F"
-            ),
-            borderRadius: 8,
-            borderSkipped: false,
+            backgroundColor: "#71EBBE",
+            borderRadius: 6,
+            barPercentage: 0.8,
+            categoryPercentage: 0.7
           }
         ]
       },
@@ -84,12 +82,16 @@ export function useTrendAnalysis(memberId = 1) {
         responsive: true,
         maintainAspectRatio: false,
         scales: {
-          y: { beginAtZero: true },
+          y: { beginAtZero: true, max: 100 },
           x: { grid: { display: false } }
         },
-        plugins: { legend: { display: false } }
+        plugins: {
+          legend: { display: false }
+        }
       }
     });
+
+
 
     // --- 산업 분위기 ---
     const ctx2 = document.getElementById("sentimentChart");
