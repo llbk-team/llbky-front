@@ -2,6 +2,22 @@ import axios from "axios";
 import "./axiosConfig";
 
 /**
+ * 관련 뉴스 키워드로 검색
+ */
+async function searchRelatedNews(summaryId, limit = 3) {
+  console.log('🔗 [newsApi.searchRelatedNews] Request:', { summaryId, limit });
+  
+  const response = await axios.get(`/trend/news/${summaryId}/related-search`, {
+    params: { limit }
+  });
+  
+  console.log('✅ [newsApi.searchRelatedNews] Response:', response.data);
+  
+  return response.data;
+}
+
+
+/**
  * 네이버 뉴스 검색
  */
 async function searchNews(keywords, memberId) {
@@ -72,5 +88,6 @@ export default {
   getNewsDetail,
   getLatestNews,
   getCollectionStatus,
-  collectNews
+  collectNews,
+  searchRelatedNews
 };

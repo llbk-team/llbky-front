@@ -47,7 +47,7 @@
               <span v-for="(k, i) in news.keywords" :key="i">#{{ k }}</span>
             </div>
 
-            <!-- ✅ 원문 보기 버튼 -->
+            <!-- 원문 보기 버튼 -->
             <div class="source-btn-box" v-if="news.source_url">
               <button class="source-btn" @click="openSource(news.source_url)">
                 <i class="ri-news-line"></i> 원문 보기
@@ -59,12 +59,41 @@
         <!-- 오른쪽 관련 뉴스 -->
         <div class="right">
           <h4>관련 뉴스</h4>
-          <ul>
-            <li v-for="(item, i) in relatedNews" :key="i">
-              <p class="title">{{ item.title }}</p>
-              <p class="meta">{{ item.source }} · {{ item.date }}</p>
-            </li>
-          </ul>
+          
+          <!-- 로딩 상태 -->
+          <div v-if="loading" class="loading-state">
+            <div class="spinner"></div>
+            <p>관련 뉴스를 불러오는 중...</p>
+          </div>
+          
+          <!-- 에러 상태 -->
+          <div v-else-if="error" class="error-state">
+            <p>{{ error }}</p>
+            <button class="retry-btn" @click="searchRelatedNews">재시도</button>
+          </div>
+          
+          <!-- ✅ 관련 뉴스 목록 -->
+          <div v-else-if="relatedNews.length > 0" class="news-list">
+            <div 
+              v-for="(item, i) in relatedNews" 
+              :key="i"
+              class="news-item"
+              @click="handleNewsClick(item)"
+            >
+              <p class="title">{{ removeHtmlTags(item.title) }}</p>
+              <p class="description">{{ removeHtmlTags(item.description) }}</p>
+              <p class="meta">
+                <span v-if="item.source">{{ item.source }}</span>
+                <span v-if="item.source && item.pubDate"> · </span>
+                <span v-if="item.pubDate">{{ formatDate(item.pubDate) }}</span>
+              </p>
+            </div>
+          </div>
+          
+          <!-- 빈 상태 -->
+          <div v-else class="empty-state">
+            <p>관련 뉴스가 없습니다.</p>
+          </div>
         </div>
       </div>
     </div>
@@ -72,21 +101,104 @@
 </template>
 
 <script setup>
-defineProps({
+import { ref, onMounted } from 'vue';
+import newsApi from '@/apis/newsApi';
+
+const props = defineProps({
   news: { type: Object, required: true },
 });
 
-const relatedNews = [
-  { title: "AI 인재 확보에 나선 글로벌 기업 동향", source: "브릿지경제", date: "2025-11-04" },
-  { title: "클라우드·데이터 인프라 인력 수요 확대", source: "매일경제", date: "2025-11-03" },
-  { title: "HR테크와 AI 면접 솔루션 도입 가속화", source: "머니투데이", date: "2025-11-02" },
-];
+const relatedNews = ref([]);
+const keywords = ref([]);
+const loading = ref(false);
+const error = ref(null);
+
+// ✅ 관련 뉴스 검색
+const searchRelatedNews = async () => {
+  if (!props.news.id && !props.news.summaryId) {
+    console.warn('summaryId가 없어서 관련 뉴스를 불러올 수 없습니다.');
+    error.value = 'summaryId가 없습니다.';
+    return;
+  }
+  
+  try {
+    loading.value = true;
+    error.value = null;
+    
+    const summaryId = props.news.id || props.news.summaryId;
+    const response = await newsApi.searchRelatedNews(summaryId, 3);
+    
+    console.log('🔗 NewsDetailModal - searchRelatedNews response:', response);
+    
+    if (response.status === 'success') {
+      keywords.value = response.keywords || [];
+      relatedNews.value = (response.data || []).slice(0, 3);
+      
+      console.log('📰 관련 뉴스 데이터:', relatedNews.value);
+    } else {
+      error.value = response.message || '관련 뉴스를 불러올 수 없습니다.';
+    }
+    
+  } catch (err) {
+    error.value = err.response?.data?.message || '관련 뉴스 검색 실패';
+    console.error('❌ 관련 뉴스 검색 에러:', err);
+  } finally {
+    loading.value = false;
+  }
+};
 
 // ✅ 원문 보기 함수
 const openSource = (url) => {
   if (!url) return;
-  window.open(url, "_blank");
+  console.log('🔗 원문 열기:', url);
+  window.open(url, "_blank", "noopener,noreferrer");
 };
+
+// ✅ 관련 뉴스 클릭 핸들러
+const handleNewsClick = (item) => {
+  console.log('📰 뉴스 클릭:', item);
+  
+  const url = item.link || item.url || item.originallink;
+  
+  if (!url) {
+    console.warn('❌ 뉴스 링크가 없습니다:', item);
+    alert('뉴스 링크를 찾을 수 없습니다.');
+    return;
+  }
+  
+  console.log('🔗 새 창 열기:', url);
+  window.open(url, "_blank", "noopener,noreferrer");
+};
+
+// ✅ HTML 태그 제거
+const removeHtmlTags = (text) => {
+  if (!text) return '';
+  return text.replace(/<[^>]*>/g, '').trim();
+};
+
+// ✅ 날짜 포맷팅
+const formatDate = (dateString) => {
+  if (!dateString) return '';
+  
+  try {
+    const date = new Date(dateString);
+    
+    if (isNaN(date.getTime())) return dateString;
+    
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    
+    return `${year}-${month}-${day}`;
+  } catch (e) {
+    console.error('날짜 포맷 에러:', e);
+    return dateString;
+  }
+};
+
+onMounted(() => {
+  searchRelatedNews();
+});
 </script>
 
 <style scoped>
@@ -109,7 +221,6 @@ const openSource = (url) => {
   overflow-y: auto;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
   padding: 26px 30px;
-  /* font-family: "Pretendard", sans-serif; */
   animation: scaleIn 0.25s ease;
 }
 
@@ -243,7 +354,7 @@ const openSource = (url) => {
   margin-bottom: 14px;
 }
 
-/* ✅ 원문 버튼 */
+/* 원문 버튼 */
 .source-btn-box {
   margin-top: 16px;
   text-align: right;
@@ -286,27 +397,133 @@ const openSource = (url) => {
   margin-bottom: 12px;
   color: #111;
 }
-.right li {
-  list-style: none;
-  margin-bottom: 12px;
-  padding-bottom: 8px;
-  border-bottom: 1px dashed #eee;
+
+/* ✅ 뉴스 리스트 */
+.news-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
-.right .title {
+
+/* ✅ 뉴스 아이템 - 클릭 가능하게 수정 */
+.news-item {
+  cursor: pointer;
+  transition: all 0.25s ease;
+  padding: 12px;
+  border-radius: 8px;
+  background: #fafafa;
+  border: 1px solid #f0f0f0;
+  /* ✅ 중요: 포인터 이벤트 활성화 */
+  pointer-events: auto;
+  user-select: none;
+}
+
+.news-item:hover {
+  background: #f9fffb;
+  transform: translateX(4px);
+  border-color: #71ebbe;
+  box-shadow: 0 2px 8px rgba(113, 235, 190, 0.15);
+}
+
+.news-item:active {
+  transform: translateX(2px) scale(0.98);
+}
+
+.news-item .title {
   font-size: 13.5px;
   font-weight: 600;
   color: #000;
+  margin-bottom: 6px;
+  line-height: 1.4;
+  /* ✅ 텍스트 선택 방지 */
+  pointer-events: none;
+}
+
+.news-item .description {
+  font-size: 12px;
+  color: #555;
+  margin: 4px 0;
+  line-height: 1.5;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  /* ✅ 텍스트 선택 방지 */
+  pointer-events: none;
+}
+
+.news-item .meta {
+  font-size: 11px;
+  color: #777;
+  margin-top: 6px;
+  /* ✅ 텍스트 선택 방지 */
+  pointer-events: none;
+}
+
+/* 로딩 스피너 */
+.loading-state {
+  text-align: center;
+  padding: 40px 10px;
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #71ebbe;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 12px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-state p {
+  font-size: 13px;
+  color: #00c896;
+  font-weight: 500;
+}
+
+/* 재시도 버튼 */
+.retry-btn {
+  margin-top: 10px;
+  background: #71ebbe;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 14px;
+  color: #000;
+  font-size: 12px;
+  font-weight: 600;
   cursor: pointer;
   transition: 0.2s;
 }
-.right .title:hover {
-  color: #00c896;
-  transform: translateX(2px);
+
+.retry-btn:hover {
+  background: #00c896;
+  transform: translateY(-1px);
 }
-.right .meta {
-  font-size: 11px;
-  color: #777;
-  margin-top: 2px;
+
+/* 에러/빈 상태 */
+.error-state {
+  text-align: center;
+  padding: 20px 10px;
+}
+
+.error-state p {
+  font-size: 13px;
+  color: #e85b5b;
+  margin-bottom: 8px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px 10px;
+  font-size: 13px;
+  color: #999;
 }
 
 /* 애니메이션 */
