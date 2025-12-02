@@ -1,0 +1,123 @@
+/* 면접 리포트 상세보기 페이지 컴포넌트용 css 파일 */
+
+
+/* 큰 제목 */
+h1, h2, h3 {
+  font-size: 28px !important;
+  font-weight: 700 !important;
+}
+h1.text-mint {
+  font-size: 40px !important;
+  line-height: 1.1;
+}
+
+/* 섹션 제목 */
+h4, h5 {
+  font-size: 18px !important;
+  font-weight: 700 !important;
+}
+
+/* 일반 텍스트 */
+p, span, li, div, strong {
+  font-size: 14px !important;
+}
+
+/* small */
+small,
+.text-muted.small {
+  font-size: 12px !important;
+}
+
+.report-detail {
+  background-color: #0b0b0b;
+  min-height: 100vh;
+  color: #fff;
+}
+
+/* 색상 공통 */
+.text-mint { color: #71ebbe !important; }
+.bg-mint { background-color: #71ebbe !important; }
+.border-mint { border: 1px solid #71ebbe55 !important; }
+
+/* 버튼 */
+.btn-mint {
+  background-color: #71ebbe !important;
+  color: #000 !important;
+  border: none !important;
+}
+.btn-mint:hover { background-color: #5cd8ab !important; }
+.btn-outline-mint {
+  border: 1px solid #71ebbe !important;
+  color: #71ebbe !important;
+  background: none !important;
+}
+.btn-outline-mint:hover {
+  background-color: #71ebbe !important;
+  color: #000 !important;
+}
+/* 버튼 기본 규격만 통일 */
+.btn {
+  width: 130px !important;
+  height: 37px !important;
+  font-size: 13.5px !important;
+  font-weight: 500 !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 !important;
+}
+
+/* 둥근 버튼만 둥글게 유지 */
+.btn.rounded-pill {
+  border-radius: 30px !important;
+}
+
+/* 작은 버튼도 동일 규격 */
+.btn-sm {
+  width: 130px !important;
+  height: 37px !important;
+  font-size: 13.5px !important;
+  font-weight: 500 !important;
+  border-radius: 30px !important;
+}
+
+/* 긴 문구만 자동 확장 (색은 그대로) */
+.btn-auto {
+  width: auto !important;
+  min-width: 130px !important;
+  padding-left: 20px !important;
+  padding-right: 20px !important;
+  height: 37px !important;
+  font-size: 13.5px !important;
+  font-weight: 500 !important;
+}
+
+
+/* 질문 선택 */
+.question-item.active {
+  border: 1px solid #71ebbe;
+  background-color: #1a1a1a;
+}
+
+/* 오른쪽 영역 (피드백) */
+.right-panel {
+  flex: 1;
+  background-color: #f9f9f9;
+  border: 1px solid #71ebbe33;
+}
+
+/* 오디오 */
+audio::-webkit-media-controls-panel { background-color: transparent; }
+audio { border-radius: 6px; }
+
+.score-box {
+  white-space: nowrap;   /* 줄바꿈 절대 X */
+  font-size: 20px;       /* 기존 느낌 유지하면서 정렬 */
+  display: flex;
+  align-items: center;   /* 세로 정렬 */
+}
+.score-top {
+  display: flex;
+  justify-content: flex-end; /* 오른쪽 정렬 */
+  margin-bottom: 4px;
+}
