@@ -8,12 +8,6 @@ const routes = [
     path: '/learning/goal',
     component: () => import('@/views/learning/Goal.vue')
   },
-  
-  {
-    path: '/learning/skill',
-    component: () => import('@/views/learning/Skill.vue')
-  },
-
 
   {
     path: '/learning/roadmap',

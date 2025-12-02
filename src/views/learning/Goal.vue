@@ -1,79 +1,199 @@
 <template>
-  <div class="container py-4">
+  <div class="container py-4 main-wrapper">
 
-    <!-- 제목 -->
-    <div class="d-flex justify-content-between align-items-end mb-3">
-      <div>
-        <div class="title">AI 학습 설정</div>
-        <div class="subtitle">목표 직무와 학습 목적을 선택하고 나만의 코칭을 시작해보세요!</div>
-      </div>
+    <!-- 페이지 제목 -->
+    <div>
+      <div class="title">AI 학습 설정</div>
+      <div class="subtitle">목표 직무와 학습 목적을 선택하고 시작해보세요</div>
     </div>
 
     <div class="row g-4">
-      <!-- 왼쪽 -->
-      <div class="col-md-4">
-        <div class="card shadow-sm p-4 card-clean h-45">
-          <h5 class="fw-bold mb-3">내 직무</h5>
+
+      <!-- LEFT: 내 직무 + 주당 공부시간 + 분석 버튼 -->
+      <div class="col-md-4 left-col">
+
+        <!-- 내 직무 -->
+        <div class="card shadow-sm p-4 card-clean mb-3">
+          <h5 class="fw-bold mb-3">내 희망 직무</h5>
           <div class="job-tag-wrapper mb-3">
             <span class="job-tag">백엔드 개발자</span>
           </div>
-          <p class="text-muted small mb-0">직무는 마이페이지에서 변경이 가능합니다.</p>
+          <p class="text-muted small mb-0">직무는 마이페이지에서 변경 가능합니다.</p>
         </div>
+
+        <!-- 하루 공부 가능 시간 박스 -->
+        <div class="card shadow-sm p-3 card-clean study-box mb-3">
+          <h6 class="fw-bold mb-2 text-center">하루 공부 가능 시간</h6>
+
+          <div class="study-time-selector">
+            <button class="btn-circle" @click="decreaseHour">-</button>
+            <span class="study-hour-text">{{ formData.studyHours }} 시간</span>
+            <button class="btn-circle" @click="increaseHour">+</button>
+          </div>
+        </div>
+
       </div>
 
-      <!-- 오른쪽 -->
+      <!-- RIGHT: 학습 목적 -->
       <div class="col-md-8">
-        <div class="card shadow-sm p-4 card-clean">
+        <div class="card shadow-sm p-4 card-clean h-100">
           <h5 class="fw-bold mb-3">학습 목적 (복수 선택)</h5>
+
           <div class="row">
             <div class="col-md-4" v-for="(section, index) in goalSections" :key="index">
               <h6 class="fw-semibold mb-2">{{ section.title }}</h6>
+
               <div v-for="(goal, i) in section.items" :key="i" class="checkbox-item">
                 <input type="checkbox" :id="goal.id" :value="goal.value" v-model="formData[section.model]" />
                 <label :for="goal.id">{{ goal.label }}</label>
               </div>
+
             </div>
           </div>
-          <div class="info-box-mint">여러 개 선택 가능합니다. 목적에 따라 코칭 방향이 달라집니다.</div>
+
+          <div class="info-box-mint mt-3">
+            여러 개 선택 가능합니다. 목적에 따라 코칭 방향이 달라집니다.
+          </div>
+
         </div>
       </div>
+
     </div>
 
-    <!-- 주당 공부 가능 시간 -->
-    <div class="card shadow-sm p-4 card-clean mt-4 mb-4">
-      <h5 class="fw-bold mb-3">주당 공부 가능 시간</h5>
-      <div class="d-flex align-items-center gap-3 mb-3">
-        <input type="range" id="study-hours" min="0" max="50" v-model.number="formData.studyHours" class="slider slider-narrow" @touchmove.prevent @wheel.prevent />
-        <span class="fw-semibold text-mint fs-6">
-          {{ formData.studyHours }} 시간
-        </span>
+    <!-- =======================
+         아래 2열: 부족 역량 + 관심 기술
+    ======================== -->
+    <div class="row g-4 mt-0">
+
+      <!-- 부족 역량 -->
+      <div class="col-md-6">
+        <div class="card shadow-sm p-4 card-clean h-100">
+          <h5 class="fw-bold mb-2">부족 역량 선택</h5>
+          <div class="info-box green-info-light mb-3">직무 기반 추천 기술입니다.</div>
+
+          <div class="skill-scroll-box">
+            <div v-for="skill in recommendedSkills" :key="skill" class="checkbox-item mb-2">
+              <input type="checkbox" :id="'skill-' + skill" :value="skill" v-model="formData.lackingSkills" />
+              <label :for="'skill-' + skill">{{ skill }}</label>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="info-box-mint">현실적으로 가능한 주당 공부 시간을 알려주세요.</div>
+
+      <!-- 관심 기술 -->
+      <div class="col-md-6">
+        <div class="card shadow-sm p-4 card-clean h-100">
+
+          <h5 class="fw-bold mb-2">관심 기술</h5>
+          <div class="info-box green-info-light mb-3">트렌드 저장 기술이 표시될 예정입니다.</div>
+
+          <!-- 선택 가능한 관심 기술 리스트 -->
+          <div class="skill-scroll-box mb-3">
+            <div v-for="tech in interestSkillList" :key="tech" class="checkbox-item mb-2">
+              <input type="checkbox" :id="'interest-' + tech" :value="tech" v-model="formData.interestedSkills" />
+              <label :for="'interest-' + tech">{{ tech }}</label>
+            </div>
+          </div>
+
+          <!-- 새 키워드 추가 -->
+          <div class="add-skill-box">
+            <input type="text" v-model="newInterestSkill" placeholder="기술 키워드 입력..." class="skill-input" @keydown.enter.prevent="addInterestSkill" />
+            <button class="btn add-button" @click="addInterestSkill">추가</button>
+          </div>
+
+        </div>
+      </div>
+
+
+
     </div>
 
-    <router-link :to="`/learning/skill`" class="btn btn-outline-mint w-100">▶ AI 코칭 시작하기</router-link>
+    <!-- 플랜 생성하기 -->
+    <div class="d-flex justify-content-end mt-4">
+      <button class="btn btn-primary" @click="generateRoadmap">
+  AI 플랜 생성하기 ▶
+</button>
+
+    </div>
+
+    <!-- ======================
+         모달 (이력서/자소서/포트폴리오)
+    ====================== -->
+    <div class="modal-backdrop" v-if="showModal" @click.self="closeModal">
+      <div class="resume-modal">
+
+        <button class="modal-close-btn" @click="closeModal">&times;</button>
+        <h4 class="fw-bold mb-2">📄 분석 결과 가져오기</h4>
+        <p class="text-muted small mb-3">이력서 / 자소서 / 포트폴리오 중 선택하세요</p>
+
+        <!-- 탭 -->
+        <div class="doc-tabs mb-3">
+          <button v-for="tab in docTabs" :key="tab.value" class="doc-tab-btn" :class="{ active: selectedTab === tab.value }" @click="selectedTab = tab.value">
+            {{ tab.label }}
+          </button>
+        </div>
+
+        <!-- 리스트 -->
+        <ul class="resume-list">
+          <li v-for="(item, index) in filteredDocuments" :key="index" class="resume-item-new">
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="resume-item-title">{{ item.title }}</span>
+              <input type="checkbox" :value="item" v-model="selectedDocuments" />
+            </div>
+          </li>
+        </ul>
+
+        <button class="btn btn-dark w-100 mt-3" @click="applySelectedDocuments">
+          선택한 문서 적용하기
+        </button>
+
+      </div>
+    </div>
+
   </div>
+
+  <!-- =========================
+      전체 화면 로딩 스피너
+========================= -->
+<div v-if="isLoading" class="loading-overlay">
+  <div class="spinner"></div>
+  <p class="loading-text">AI가 로드맵을 생성 중입니다...</p>
+</div>
+
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
-import { useStore } from "vuex"
+import { ref, computed } from "vue"
+import learningApi from "@/apis/learningApi";
+import { useRouter } from "vue-router";
 
-const store = useStore();
-const selectedGoals = ref([]);
+const router = useRouter();
 
-store.dispatch("learning/updateProgress", 0);
-
-watch(selectedGoals, (newVal) => {
-  store.dispatch("learning/updateProgress", newVal.length > 0 ? 50 : 0);
-});
+const showModal = ref(false)
+const selectedTab = ref("resume")
+const selectedDocuments = ref([])
+const isLoading = ref(false);
 
 const formData = ref({
   careerGoals: [],
   learningGoals: [],
   projectGoals: [],
-  studyHours: 25
+  studyHours: 3,
+  lackingSkills: [],
+  interestedSkills: ["MSA", "Spring Batch", "Redis", "OAuth2"]
 })
+
+/* + / - 버튼 */
+function increaseHour() {
+  if (formData.value.studyHours < 50) formData.value.studyHours++
+}
+function decreaseHour() {
+  if (formData.value.studyHours > 0) formData.value.studyHours--
+}
+
+const recommendedSkills = ref([
+  "SQL", "Spring Security", "REST API", "JPA", "AWS", "Docker", "Kubernetes", "CI/CD", "Linux"
+])
 
 const goalSections = [
   {
@@ -106,145 +226,122 @@ const goalSections = [
     ]
   }
 ]
+
+/* -------------------------
+   모달 문서 리스트 (샘플)
+-------------------------- */
+const allDocuments = ref([
+  { type: "resume", title: "이력서 #1 - Java 백엔드", weaknesses: ["AWS", "Docker"] },
+  { type: "resume", title: "이력서 #2 - 인프라 기반", weaknesses: ["JPA"] },
+  { type: "cover-letter", title: "자소서 #1 - 백엔드 지원", weaknesses: ["근거 부족"] },
+  { type: "portfolio", title: "포트폴리오 #1 - 쇼핑몰", weaknesses: ["테스트 자동화"] },
+])
+
+const docTabs = [
+  { label: "이력서", value: "resume" },
+  { label: "자소서", value: "cover-letter" },
+  { label: "포트폴리오", value: "portfolio" }
+]
+
+const filteredDocuments = computed(() =>
+  allDocuments.value.filter(doc => doc.type === selectedTab.value)
+)
+
+function applySelectedDocuments() {
+  if (selectedDocuments.value.length === 0) {
+    alert("선택된 문서가 없습니다!")
+    return
+  }
+  const combinedWeakness = [...new Set(selectedDocuments.value.flatMap(d => d.weaknesses))]
+  formData.value.lackingSkills = combinedWeakness
+  showModal.value = false
+}
+
+// 정적 관심 기술 + 사용자 추가 기술 리스트
+const interestSkillList = ref([
+  "MSA",
+  "Spring Batch",
+  "Redis",
+  "OAuth2"
+])
+
+// 사용자가 직접 입력하는 값
+const newInterestSkill = ref("")
+
+function addInterestSkill() {
+  const keyword = newInterestSkill.value.trim()
+
+  if (keyword === "") return
+  if (interestSkillList.value.includes(keyword)) {
+    alert("이미 존재하는 키워드입니다.")
+    return
+  }
+
+  // 리스트에 추가
+  interestSkillList.value.push(keyword)
+
+  // 자동 선택도 가능하게 하고 싶으면 아래 주석 해제
+  // formData.value.interestedSkills.push(keyword)
+
+  newInterestSkill.value = ""
+}
+
+async function generateRoadmap() {
+  isLoading.value = true; // 🔥 스피너 켜기
+
+  const memberId = 1;
+  const studyHours = formData.value.studyHours;
+
+  const purposes = [
+    ...formData.value.careerGoals,
+    ...formData.value.learningGoals,
+    ...formData.value.projectGoals
+  ];
+
+  const skills = [
+    ...formData.value.lackingSkills,
+    ...formData.value.interestedSkills
+  ];
+
+  const fd = new FormData();
+  fd.append("memberId", memberId);
+  fd.append("studyHours", studyHours);
+  purposes.forEach(p => fd.append("purposes", p));
+  skills.forEach(s => fd.append("skills", s));
+
+  try {
+    const res = await learningApi.createRoadmap(fd);
+
+    console.log("🔥 생성된 로드맵:", res.data);
+
+    router.push({
+      path: "/learning/roadmap",
+      state: { roadmap: res.data }
+    });
+  } catch (err) {
+    alert("로드맵 생성 중 오류가 발생했습니다.");
+  } finally {
+    isLoading.value = false; // 🔥 스피너 끄기
+  }
+}
+
+
+
+function closeModal() {
+  showModal.value = false
+}
 </script>
 
 <style scoped>
-.goal-page-wrapper {
-  background-color: #F1F2F3;
-  min-height: calc(100vh - 80px);
-  overflow-y: hidden;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding-top: 24px;
+* {
+  font-family: 'Pretendard', 'Inter', sans-serif;
 }
 
-.goal-container {
-  width: 100%;
-  max-width: 1140px;
-  padding-left: 16px;
-  padding-right: 16px;
+.main-wrapper {
+  max-width: 1150px;
 }
 
-.text-mint {
-  color: #71EBBE;
-}
-
-.card-clean {
-  border-radius: 16px;
-  border: 1px solid #EAEBEC;
-  background-color: #FFFFFF;
-  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.05);
-}
-
-.checkbox-item {
-  display: flex;
-  align-items: center;
-  margin-bottom: 12px;
-  padding: 10px 12px;
-  border: 1px solid #EAEBEC;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: 0.2s;
-  height: 37px;
-  font-size: 13.5px;
-  font-weight: 500;
-}
-
-.checkbox-item:hover {
-  background-color: #F1F2F3;
-}
-
-.checkbox-item:has(input[type='checkbox']:checked) {
-  background-color: #DDF3EB;
-  border-color: #71EBBE;
-}
-
-.checkbox-item label {
-  margin-left: 6px;
-}
-
-.job-tag {
-  display: inline-block;
-  background-color: #111111;
-  color: #FFFFFF;
-  padding: 8px 16px;
-  border-radius: 30px;
-  font-size: 13.5px;
-  font-weight: 500;
-  height: 37px;
-}
-
-.slider {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 100%;
-  height: 8px;
-  background: #EAEBEC;
-  border-radius: 5px;
-  outline: none;
-}
-
-.slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 24px;
-  height: 24px;
-  background: #71EBBE;
-  border-radius: 50%;
-  border: 4px solid #FFFFFF;
-  cursor: pointer;
-}
-
-.btn-green {
-  background-color: #71EBBE;
-  border: 1px solid #71EBBE;
-  color: #111111;
-  border-radius: 12px;
-  transition: 0.2s;
-}
-
-.btn-green:hover {
-  background-color: #A2F1D6;
-  border-color: #A2F1D6;
-}
-
-.btn-dark-solid {
-  background-color: #111111;
-  border: 1px solid #111111;
-  color: #FFFFFF;
-  border-radius: 12px;
-  transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
-}
-
-.btn-dark-solid:hover {
-  background-color: #000000;
-  border-color: #000000;
-  color: #FFFFFF;
-  transform: translateY(-1px);
-}
-
-.slider-narrow {
-  width: 94%;
-  flex-shrink: 0;
-}
-
-.btn-outline-mint {
-  height: 37px;
-  border: 2px solid #A2F1D6;
-  border-radius: 6px;
-  font-size: 13.5px;
-  background-color: transparent;
-  border-radius: 9.6px;
-  transition: all 0.2s ease;
-  font-weight: 700;
-}
-
-.btn-outline-mint:hover {
-  background-color: #111111;
-  color: #FFFFFF;
-  border-color: #111111;
-}
-
+/* 제목 */
 .title {
   font-weight: 700;
   font-size: 28px;
@@ -253,19 +350,248 @@ const goalSections = [
 .subtitle {
   color: #6C757D;
   font-size: 16px;
-  margin-bottom: 0px;
+  margin-bottom: 16px;
 }
 
-.info-box-mint {
-  display: inline-flex;
+/* 카드 */
+.card-clean {
+  border-radius: 14px;
+  border: 1px solid #EAEBEC;
+  background-color: #FFFFFF;
+}
+
+/* 직무 태그 */
+.job-tag {
+  background: #111;
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+}
+
+/* 주당 공부 박스 */
+.study-box {
+  text-align: center;
+}
+
+.study-time-selector {
+  display: flex;
+  justify-content: center;
   align-items: center;
-  padding: 5px 16px;
+  gap: 18px;
+  margin-top: 8px;
+}
+
+.btn-circle {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #F3F4F6;
+  border: 1px solid #DDD;
+  font-size: 20px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-circle:hover {
+  background: #E5E7EB;
+}
+
+.study-hour-text {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+/* 체크박스 */
+.checkbox-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+  border: 1px solid #EAEBEC;
   border-radius: 6px;
-  font-size: 13.5px;
-  height: 37px;
-  background-color: #DDF3EB;
+  margin-bottom: 6px;
+  cursor: pointer;
+}
+
+.checkbox-item:hover {
+  background: #F6F6F6;
+}
+
+.checkbox-item input {
+  margin-right: 10px;
+}
+
+/* info 박스 */
+.info-box-mint {
+  padding: 6px 14px;
+  background: #f0fcf7;
   border: 1px solid #71EBBE;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.green-info-light {
+  background: #f0fcf7;
+  border: 1px solid #71EBBE;
+  padding: 12px;
+  border-radius: 6px;
+}
+
+/* 스크롤 박스 */
+.skill-scroll-box {
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+/* 관심 기술 */
+.added-skills-list {
+  list-style: none;
+  padding: 0;
+}
+
+.added-skills-list li {
+  background: #F9FAFB;
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+}
+
+/* 플랜 버튼 */
+.btn-primary {
+  background: #111827;
+  height: 37px;
+  font-size: 14px;
+}
+
+.btn-primary:hover {
+  background: #374151;
+}
+
+/* 모달 */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.resume-modal {
+  background: #fff;
+  width: 90%;
+  max-width: 650px;
+  padding: 30px;
+  border-radius: 10px;
+  max-height: 80vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  background: none;
+  border: none;
+  font-size: 26px;
+  cursor: pointer;
+}
+
+/* 탭 */
+.doc-tab-btn {
+  height: 37px;
+  border-radius: 6px;
+  padding: 6px 16px;
+  background: #f1f1f1;
+  border: 1px solid #ddd;
+  cursor: pointer;
+  margin-right: 6px;
+}
+
+.doc-tab-btn.active {
+  background: #DDF3EB;
+  border-color: #71EBBE;
+}
+
+/* 리스트 */
+.resume-list {
+  list-style: none;
+  padding: 0;
+}
+
+.resume-item-new {
+  background: #F9FAFB;
+  border: 1px solid #EEE;
+  padding: 14px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+}
+
+.add-skill-box {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.skill-input {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid #D1D5DB;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.add-button {
+  background-color: #A2F1D6;
+  border: none;
+  padding: 0 16px;
+  border-radius: 6px;
+  font-size: 14px;
   font-weight: 500;
+  cursor: pointer;
+}
+
+.add-button:hover {
+  background-color: #71EBBE;
+}
+
+/* --------------------------
+      전체 화면 로딩 스피너
+--------------------------- */
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(3px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+/* 원형 스피너 */
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 5px solid #e5e7eb;
+  border-top-color: #10b981; /* 초록 포인트 */
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-text {
+  margin-top: 14px;
+  font-size: 15px;
+  font-weight: 500;
+  color: #111827;
 }
 
 </style>

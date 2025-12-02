@@ -14,17 +14,28 @@
 
     <div class="row">
 
-      <div class="col-md-6 mb-4" v-for="week in roadmapData" :key="week.week">
-        <div class="week-card shadow-sm">
-          <h4>{{ week.title }}</h4>
-          <ul class="topic-list list-unstyled">
-            <li v-for="topic in week.topics" :key="topic">{{ topic }}</li>
-          </ul>
-          <div class="alert alert-mint-light week-note mb-0">
-            {{ week.note }}
-          </div>
-        </div>
-      </div>
+      <div class="col-md-6 mb-4" v-for="week in roadmapData.weeks" :key="week.weekNumber">
+  <div class="week-card shadow-sm">
+
+    <h4>{{ week.title }}</h4>
+
+    <!-- 주차 목표 -->
+    <p class="week-goal"><strong>🎯 목표:</strong> {{ week.goal }}</p>
+
+    <!-- 주차 요약 -->
+    <p class="week-summary"><strong>📌 요약:</strong> {{ week.learningWeekSummary }}</p>
+
+    <!-- 하루 계획 리스트 -->
+    <ul class="topic-list list-unstyled">
+      <li v-for="day in week.days" :key="day.dayNumber">
+        <strong>{{ day.dayNumber }}일차 — {{ day.title }}</strong><br/>
+        <small>{{ day.content }}</small>
+      </li>
+    </ul>
+
+  </div>
+</div>
+
     </div>
 
     <!-- AI 질문 모달 -->
@@ -51,7 +62,7 @@
     </div>
 
     <div class="bottom-actions d-flex justify-content-between align-items-center">
-      <router-link :to="`/learning/skill`" class="btn btn-secondary">← 이전</router-link>
+      <router-link :to="`/learning/goal`" class="btn btn-secondary">← 이전</router-link>
       <div class="d-flex gap-2">
         <button type="button" class="btn btn-mint" @click="openAiModal">플랜 수정하기</button>
         <button type="button" class="btn btn-dark" @click="openSaveModal">플랜 저장</button>
@@ -83,56 +94,18 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref } from "vue";
+import { useRoute } from "vue-router";
 
+const route = useRoute();
+const roadmapData = ref(route.state?.roadmap || {});
+
+console.log("로드맵 데이터:", roadmapData.value);
+
+// 모달 부분 기존 코드 그대로 유지
 const showAiModal = ref(false);
 const aiInput = ref("");
 const showSaveModal = ref(false);
-
-// 로드맵 데이터를 동적으로 관리
-const roadmapData = ref([
-  {
-    week: 1,
-    title: '[1주차] SQL 기본 문법',
-    topics: [
-      '데이터베이스 구조 이해 & 쿼리 작성',
-      '[K-MOOC] 데이터베이스 입문',
-      '[HRD-Net] SQL 실습 과정',
-      'SQLD'
-    ],
-    note: 'SQL 문법과 데이터 조작을 중심으로 실습에 집중해보세요!'
-  },
-  {
-    week: 2,
-    title: '[2주차] Spring Security 인증 구조',
-    topics: [
-      '로그인 및 인증 흐름 이해',
-      '[Inflearn] 스프링 시큐리티 완전 정복',
-      '정보보안기사'
-    ],
-    note: '백엔드 보안 구조를 익히면 포트폴리오의 경쟁력이 높아집니다.'
-  },
-  {
-    week: 3,
-    title: '[3주차] REST API와 서버 배포',
-    topics: [
-      '심화 API 서버 구축 및 AWS 배포',
-      '[K-MOOC] 클라우드 서비스 기초',
-      'AWS Certified Practitioner'
-    ],
-    note: 'AWS 배포 경험을 포트폴리오에 기록해두세요.'
-  },
-  {
-    week: 4,
-    title: '[4주차] Docker & CI/CD',
-    topics: [
-      '자동화된 배포 환경 구축',
-      '[Udemy] Docker 완벽 가이드',
-      'Docker Certified'
-    ],
-    note: '자동화 배포는 협업에서 필수 기술입니다!'
-  }
-]);
 
 function openAiModal() {
   showAiModal.value = true;
@@ -140,7 +113,6 @@ function openAiModal() {
 function closeAiModal() {
   showAiModal.value = false;
 }
-
 
 function openSaveModal() {
   showSaveModal.value = true;
@@ -150,15 +122,13 @@ function closeSaveModal() {
 }
 
 function startLearning() {
-  console.log("학습 시작 페이지로 이동");
   showSaveModal.value = false;
 }
-
 function goToMyLearning() {
-  console.log("내 학습함 페이지로 이동");
   showSaveModal.value = false;
 }
 </script>
+
 
 <style scoped>
 .roadmap-container {
