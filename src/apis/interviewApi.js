@@ -59,7 +59,16 @@ function searchCompany(query) {
 }
 
 /**
- * 7) 세션 질문 조회
+ * 7) 기업 검색
+ */
+function idealTalent(companyName) {
+  return axios.get(`/interview/company-ideal`, {
+    params: {companyName}
+  })
+}
+
+/**
+ * 8) 세션 질문 조회
  */
 function getSessionDetail(sessionId) {
   return axios.get(`/interview/questions`, {
@@ -68,7 +77,7 @@ function getSessionDetail(sessionId) {
 }
 
 /**
- * 8) 사용자 질문 조회
+ * 9) 사용자 질문 조회
  */
 function getAllQuestions(memberId) {
   return axios.get(`/interview/all-questions`, {
@@ -77,7 +86,7 @@ function getAllQuestions(memberId) {
 }
 
 /**
- * 9) 사용자 답변 제출 (오디오/비디오)
+ * 10) 사용자 답변 제출 (오디오/비디오)
  */
 function submitAnswer(formData) {
   
@@ -87,7 +96,7 @@ function submitAnswer(formData) {
 }
 
 /**
- * 10) 답변 다시 제출 (제출한 답변 수정)
+ * 11) 답변 다시 제출 (제출한 답변 수정)
  */
 function reSubmitAnswer(formData) {
   
@@ -97,7 +106,7 @@ function reSubmitAnswer(formData) {
 }
 
 /**
- * 11) 답변별 AI 피드백 생성
+ * 12) 답변별 AI 피드백 생성
  */
 function createFeedback(formData) {
   
@@ -107,7 +116,7 @@ function createFeedback(formData) {
 }
 
 /**
- * 12) 면접 질문 기반 답변 조회
+ * 13) 면접 질문 기반 답변 조회
  */
 function getAnswerByQuestionId(questionId) {
   return axios.get("/interview/answer-by-question", {
@@ -116,7 +125,7 @@ function getAnswerByQuestionId(questionId) {
 }
 
 /**
- *13) 답변 단건 조회
+ *14) 답변 단건 조회
  */
 function getOneAnswer(answerId) {
   return axios.get("/interview/answer-detail", {
@@ -131,6 +140,7 @@ export default {
   getInterviewDetail,
   createAiQuestions,
   searchCompany,
+  idealTalent,
   saveSession,
   getSessionDetail,
   getAllQuestions,
