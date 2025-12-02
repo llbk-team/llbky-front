@@ -28,6 +28,7 @@ function useInterviewProgress(sessionId) {
   const feedback = ref(null);
   const feedbackMap = ref({}); // 질문별 피드백 저장
   const aiLoading = ref(false);
+  const saveLoading = ref(false); // 저장 로딩 상태
 
   let ffmpeg = null;
 
@@ -293,8 +294,21 @@ function useInterviewProgress(sessionId) {
     }
   };
 
-  const finishInterview = () => {
-    router.push(`/interview/report/${sessionId}`);
+  // 면접 종료 후 종합 피드백 생성해서 상세 페이지로 이동
+  const finishInterview = async () => {
+    try {
+      saveLoading.value = true;
+
+      await interviewApi.createInterviewFinalFeedback(sessionId);
+      
+      router.push(`/interview/report/detail?sessionId=${sessionId}`);
+    
+    } catch (err) {
+      console.error("종합 피드백 생성 실패:", err);
+    
+    } finally {
+      saveLoading.value = false;
+    }
   };
 
   const formatTime = (sec) => {
@@ -321,6 +335,7 @@ function useInterviewProgress(sessionId) {
     feedback,
     feedbackMap,
     aiLoading,
+    saveLoading,
 
     loadQuestions,
     toggleRecording,
