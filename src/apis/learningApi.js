@@ -21,7 +21,17 @@ function saveRoadmap(roadmap) {
   return axios.post("/learning/roadmap/save", roadmap);
 }
 
+/**
+ * 학습 리스트 조회
+ */
+function getLearningList(memberId, status) {
+  return axios.get("/learning/list", {
+    params: { memberId, status }
+  });
+}
+
 export default {
   createRoadmap,
-  saveRoadmap
+  saveRoadmap,
+  getLearningList
 };
