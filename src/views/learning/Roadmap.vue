@@ -96,13 +96,14 @@
       <router-link :to="`/learning/goal`" class="btn btn-secondary">← 이전</router-link>
       <div class="d-flex gap-2">
         <button type="button" class="btn btn-mint" @click="openAiModal">플랜 수정하기</button>
-        <button type="button" class="btn btn-dark" @click="openSaveModal">플랜 저장</button>
+        <button type="button" class="btn btn-dark" @click="saveRoadmap">플랜 저장</button>
+
       </div>
     </div>
 
 
     <!-- 저장 완료 모달 -->
-    <div v-if="showSaveModal" class="save-modal-overlay" @click.self="closeSaveModal">
+    <div v-if="showSaveModal" class="save-modal-overlay">
       <div class="save-modal-content shadow-lg text-center">
         <h4 class="fw-bold mb-3">플랜이 저장되었습니다!</h4>
 
@@ -125,6 +126,7 @@
 </template>
 
 <script setup>
+import learningApi from "@/apis/learningApi";
 import { ref, watch } from "vue";
 import { useStore } from "vuex";
 
@@ -147,6 +149,26 @@ watch(
 
 
 console.log("로드맵 데이터:", roadmapData.value);
+
+async function saveRoadmap() {
+  try {
+    const payload = {
+      memberId: 1,
+      title: roadmapData.value.title,
+      weeks: roadmapData.value.weeks
+    };
+
+    const res = await learningApi.saveRoadmap(payload);
+    console.log("로드맵 저장 성공:", res.data);
+
+    showSaveModal.value = true;
+
+  } catch (error) {
+    console.error("로드맵 저장 실패:", error);
+    alert("로드맵 저장 중 오류 발생");
+  }
+}
+
 
 // 모달 부분 기존 코드 그대로 유지
 const showAiModal = ref(false);
@@ -463,8 +485,8 @@ function closeWeekModal() {
   border-radius: 14px;
   animation: fadeIn 0.25s ease;
   overflow-y: auto;
-  box-shadow: 0 8px 28px rgba(0,0,0,0.15);
-  
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.15);
+
 }
 
 /* header */
@@ -519,7 +541,8 @@ function closeWeekModal() {
 .day-card-content {
   font-size: 14px;
   color: #4B5563;
-  white-space: pre-line;   /* 줄바꿈 적용 핵심 */
+  white-space: pre-line;
+  /* 줄바꿈 적용 핵심 */
   line-height: 1.55;
 }
 
