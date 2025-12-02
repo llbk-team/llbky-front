@@ -197,7 +197,6 @@
 
 <script setup>
 import interviewList from '@/utils/interviewList';
-import { useStore } from 'vuex';
 
 const memberId = 1;
 
