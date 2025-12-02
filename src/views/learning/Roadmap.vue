@@ -15,28 +15,56 @@
     <div class="row">
 
       <div class="col-md-6 mb-4" v-for="week in roadmapData.weeks" :key="week.weekNumber">
-  <div class="week-card shadow-sm">
+        <div class="week-card shadow-sm clickable-card" @click="openWeekModal(week)">
+          <h4>{{ week.title }}</h4>
 
-    <h4>{{ week.title }}</h4>
+          <p class="week-goal"><strong>🎯 목표:</strong> {{ week.goal }}</p>
+          <p class="week-summary"><strong>📌 요약:</strong> {{ week.learningWeekSummary }}</p>
 
-    <!-- 주차 목표 -->
-    <p class="week-goal"><strong>🎯 목표:</strong> {{ week.goal }}</p>
+          <ul class="topic-list list-unstyled">
+            <li v-for="day in week.days" :key="day.dayNumber">
+              <span class="day-title">{{ day.dayNumber }}일차 — {{ day.title }}</span><br />
+            </li>
+          </ul>
+        </div>
 
-    <!-- 주차 요약 -->
-    <p class="week-summary"><strong>📌 요약:</strong> {{ week.learningWeekSummary }}</p>
-
-    <!-- 하루 계획 리스트 -->
-    <ul class="topic-list list-unstyled">
-      <li v-for="day in week.days" :key="day.dayNumber">
-        <strong>{{ day.dayNumber }}일차 — {{ day.title }}</strong><br/>
-        <small>{{ day.content }}</small>
-      </li>
-    </ul>
-
-  </div>
-</div>
-
+      </div>
     </div>
+
+
+    <!-- 📘 주차 상세 모달 -->
+    <div v-if="showWeekModal" class="week-modal-overlay" @click.self="closeWeekModal">
+      <div class="week-modal-content shadow-lg">
+
+        <!-- Header -->
+        <div class="modal-header-row">
+          <h4 class="fw-bold">{{ selectedWeek.title }}</h4>
+          <button class="btn-close" @click="closeWeekModal"></button>
+        </div>
+
+        <!-- Week Summary -->
+        <p class="week-summary-text">{{ selectedWeek.learningWeekSummary }}</p>
+
+        <!-- Divider -->
+        <hr class="modal-divider" />
+
+        <!-- Day detail list -->
+        <div class="day-list-wrapper">
+          <div v-for="day in selectedWeek.days" :key="day.dayNumber" class="day-card">
+            <div class="day-card-title">
+              {{ day.dayNumber }}일차 — {{ day.title }}
+            </div>
+
+            <div class="day-card-content">
+              {{ day.content }}
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+
 
     <!-- AI 질문 모달 -->
     <div v-if="showAiModal" class="ai-modal-overlay" @click.self="closeAiModal">
@@ -46,7 +74,10 @@
           <button class="btn-close" @click="closeAiModal"></button>
         </div>
         <ul class="list-group mb-3">
-          <li v-for="week in roadmapData" :key="week.week" class="list-group-item">{{ week.week }}주차: {{ week.title.replace(/\[.*?\]\s*/, '') }}</li>
+          <li v-for="week in roadmapData.weeks" :key="week.weekNumber" class="list-group-item">
+            {{ week.weekNumber }}주차: {{ week.title.replace(/\[.*?\]\s*/, '') }}
+          </li>
+
         </ul>
 
         <p class="text-center text-muted mb-3">
@@ -94,11 +125,26 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
-import { useRoute } from "vue-router";
+import { ref, watch } from "vue";
+import { useStore } from "vuex";
 
-const route = useRoute();
-const roadmapData = ref(route.state?.roadmap || {});
+const store = useStore();
+
+const roadmapData = ref({
+  weeks: []
+});
+
+// store 값이 들어오면 갱신되도록 watch 추가
+watch(
+  () => store.getters["learning/getRoadmap"],
+  (newVal) => {
+    if (newVal) {
+      roadmapData.value = newVal;
+    }
+  },
+  { immediate: true }
+);
+
 
 console.log("로드맵 데이터:", roadmapData.value);
 
@@ -127,6 +173,19 @@ function startLearning() {
 function goToMyLearning() {
   showSaveModal.value = false;
 }
+
+const showWeekModal = ref(false);
+const selectedWeek = ref(null);
+
+function openWeekModal(week) {
+  selectedWeek.value = week;
+  showWeekModal.value = true;
+}
+
+function closeWeekModal() {
+  showWeekModal.value = false;
+}
+
 </script>
 
 
@@ -365,6 +424,107 @@ function goToMyLearning() {
   border: 1px solid #EAEBEC;
   line-height: 1.6;
 }
+
+.day-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #6B7280;
+}
+
+.clickable-card {
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.clickable-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0px 8px 18px rgba(0, 0, 0, 0.08);
+}
+
+/* 모달 배경 */
+.week-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 5000;
+  backdrop-filter: blur(3px);
+}
+
+/* 모달 본문 */
+.week-modal-content {
+  background: #ffffff;
+  width: 92%;
+  max-width: 600px;
+  max-height: 85vh;
+  padding: 26px 28px;
+  border-radius: 14px;
+  animation: fadeIn 0.25s ease;
+  overflow-y: auto;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.15);
+  
+}
+
+/* header */
+.modal-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.week-summary-text {
+  color: #6B7280;
+  font-size: 14px;
+  margin-top: 6px;
+  margin-bottom: 16px;
+}
+
+.modal-divider {
+  border: none;
+  border-top: 1px solid #E5E7EB;
+  margin: 10px 0 18px 0;
+}
+
+/* 일차 카드 리스트 wrappper */
+.day-list-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* 일차 카드 */
+.day-card {
+  background: #F9FAFB;
+  border: 1px solid #E5E7EB;
+  border-radius: 10px;
+  padding: 14px 16px;
+  transition: all 0.15s ease;
+}
+
+.day-card:hover {
+  background: #F3F4F6;
+}
+
+/* 일차 제목 */
+.day-card-title {
+  font-weight: 600;
+  font-size: 15px;
+  margin-bottom: 6px;
+  color: #111827;
+}
+
+/* 일차 내용 */
+.day-card-content {
+  font-size: 14px;
+  color: #4B5563;
+  white-space: pre-line;   /* 줄바꿈 적용 핵심 */
+  line-height: 1.55;
+}
+
+
+
 
 @keyframes fadeIn {
   from {
