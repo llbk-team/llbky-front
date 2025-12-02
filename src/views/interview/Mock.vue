@@ -162,6 +162,7 @@ const {
   companyLoading,
   searchCompany,
   selectCompany,
+  idealTalent,
 
   selectedKeywords,
   keywordList,
