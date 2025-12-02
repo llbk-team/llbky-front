@@ -280,13 +280,6 @@ function useInterviewProgress(sessionId) {
 
       submitted.value[questionId] = true;
 
-      // 다음 질문 이동
-      if (current.value < total.value) {
-        current.value++;
-        const nextId = questionIds.value[current.value - 1];
-        feedback.value = feedbackMap.value[nextId] || null;
-      }
-
       lastRecordedBlob.value = null;
     } catch (err) {
       console.error("답변 제출 오류:", err);
