@@ -7,7 +7,7 @@ import "./axiosConfig";
  * AI 학습 로드맵 생성
  */
 function createRoadmap(formData) {
-  return axios.post("/learning/roadmap/create", formData, {
+  return axios.post("/learning/roadmap-create", formData, {
     headers: {
       "Content-Type": "multipart/form-data"
     }
@@ -18,7 +18,7 @@ function createRoadmap(formData) {
  * AI 학습 로드맵 저장
  */
 function saveRoadmap(roadmap) {
-  return axios.post("/learning/roadmap/save", roadmap);
+  return axios.post("/learning/roadmap-save", roadmap);
 }
 
 /**

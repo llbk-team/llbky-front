@@ -46,21 +46,13 @@
 
           <!-- 🔥 학습 있을 때 -->
           <div v-else>
-            <div
-              v-for="(plan, i) in pagedOngoingPlans"
-              :key="i"
-              class="card border-light mb-3 sub-card"
-            >
+            <div v-for="(plan, i) in pagedOngoingPlans" :key="i" class="card border-light mb-3 sub-card">
               <div class="card-body">
                 <h6 class="fw-semibold">{{ plan.title }}</h6>
                 <p class="text-secondary small">{{ plan.period }}</p>
 
                 <div class="progress mb-2" style="height: 6px;">
-                  <div
-                    class="progress-bar"
-                    role="progressbar"
-                    :style="{ width: plan.progress + '%', backgroundColor: '#71EBBE' }"
-                  ></div>
+                  <div class="progress-bar" role="progressbar" :style="{ width: plan.progress + '%', backgroundColor: '#71EBBE' }"></div>
                 </div>
 
                 <p class="text-secondary small mb-2">진행률 {{ plan.progress }}%</p>
@@ -95,12 +87,7 @@
 
           <!-- 🔥 완료된 학습 있을 때 -->
           <div v-else>
-            <div
-              v-for="(plan, i) in pagedCompletedPlans"
-              :key="i"
-              class="card border-light mb-3 sub-card clickable"
-              @click="goToReport(plan)"
-            >
+            <div v-for="(plan, i) in pagedCompletedPlans" :key="i" class="card border-light mb-3 sub-card clickable" @click="goToReport(plan)">
               <div class="card-body">
                 <h6 class="fw-semibold">{{ plan.title }}</h6>
                 <p class="text-secondary small mb-1">{{ plan.period }}</p>
@@ -145,7 +132,7 @@
           <table class="table text-center small mb-0">
             <thead>
               <tr>
-                <th v-for="d in ['일','월','화','수','목','금','토']" :key="d">{{ d }}</th>
+                <th v-for="d in ['일', '월', '화', '수', '목', '금', '토']" :key="d">{{ d }}</th>
               </tr>
             </thead>
             <tbody>
@@ -331,16 +318,19 @@ body {
   background-color: #F1F2F3;
   color: #111111;
 }
+
 .card-clean {
   border-radius: 16px;
   border: 1px solid #EAEBEC;
   background-color: #FFFFFF;
 }
+
 .sub-card {
   border-radius: 12px;
   border: 1px solid #EAEBEC;
   background-color: #F8FAF9;
 }
+
 .btn-green {
   display: inline-flex;
   align-items: center;
@@ -352,10 +342,12 @@ body {
   font-size: 13.5px;
   font-weight: 500;
 }
+
 .btn-green:hover {
   background-color: #A2F1D6;
   border-color: #A2F1D6;
 }
+
 .btn-outline-green {
   display: inline-flex;
   align-items: center;
@@ -367,29 +359,36 @@ body {
   font-size: 13.5px;
   font-weight: 500;
 }
+
 .btn-outline-green:hover {
   background-color: #71EBBE;
   color: #111111;
 }
+
 .shadow-sm {
   box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.05) !important;
 }
+
 .nav-tabs .nav-link {
   color: #111111;
   border: none;
   font-weight: 500;
 }
+
 .nav-tabs .nav-link.active {
   border-bottom: 3px solid #71EBBE;
   color: #111111;
 }
+
 .clickable {
   cursor: pointer;
   transition: background-color 0.2s;
 }
+
 .clickable:hover {
   background-color: #E9FAF5;
 }
+
 .page-btn {
   border: none;
   background: transparent;
@@ -399,34 +398,42 @@ body {
   padding: 0px 8px;
   transition: color 0.2s;
 }
+
 .page-btn:hover:not(:disabled) {
   color: #00C896;
 }
+
 .page-btn:disabled {
   color: #CCCCCC;
   cursor: default;
 }
+
 .title {
   font-weight: 700;
   font-size: 28px;
 }
+
 .subtitle {
   color: #6C757D;
   font-size: 16px;
   margin-bottom: 0px;
 }
+
 .ongoing-container {
   min-height: 660px;
 }
+
 .ongoing-container-finish {
   min-height: 520px;
 }
+
 .calendar-today {
   background-color: #DDF3EB;
   border-radius: 6px;
   font-weight: 700;
   color: #111111;
 }
+
 .stats-bar {
   padding: 8px 12px;
   border: 1px solid #EAEBEC;
