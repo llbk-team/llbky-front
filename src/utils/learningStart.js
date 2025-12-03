@@ -206,34 +206,6 @@ function useLearningStart() {
   // 파싱된 메모
   const parsedMemo = computed(() => parseMarkDown(fixedMemo.value));
 
-  /*-------------------------------------------------------
-    학습 타이머
-  -------------------------------------------------------*/
-  const timer = ref(0); // 총 시간(초)
-  const timerRunning = ref(false);
-  let timerInterval = null;
-
-  const formattedTime = computed(() => {
-    const h = String(Math.floor(timer.value / 3600)).padStart(2, "0");
-    const m = String(Math.floor((timer.value % 3600) / 60)).padStart(2, "0");
-    const s = String(timer.value % 60).padStart(2, "0");
-    return `${h}:${m}:${s}`;
-  });
-
-  const startTimer = () => {
-    if (timerRunning.value) return;
-    timerRunning.value = true;
-
-    timerInterval = setInterval(() => {
-      timer.value++;
-    }, 1000);
-  }
-
-  const pauseTimer = () => {
-    timerRunning.value = false;
-    clearInterval(timerInterval);
-  }
-
   onMounted(() => {
     loadWeeklyItems(27);
     // loadWeeklyItems(currentWeek.value);
@@ -270,13 +242,6 @@ function useLearningStart() {
     selectItem,
     cancelMemo,
     submitMemo,
-
-    // 타이머
-    timer,
-    timerRunning,
-    formattedTime,
-    startTimer,
-    pauseTimer,
   };
 }
 

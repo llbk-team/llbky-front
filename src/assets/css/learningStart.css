@@ -4,9 +4,20 @@
   color: #111111;
 }
 
+/* 왼쪽 높이 = 오른쪽 높이 유지 */
+.learning-progress .row {
+  align-items: stretch !important;
+}
+
+/* 메모 박스 전체 높이를 자동 확장 */
+.col-lg-4 .memo-box {
+  height: 100%;
+}
+
 .memo-box {
   background-color: #FFFFFF;
   border: 1px solid #E5E7EB;
+  padding: 28px 24px !important;
   min-height: 550px;
   transition: 0.3s;
   margin-top: 10px;
@@ -15,6 +26,8 @@
 
 .memo-box textarea {
   resize: none;
+  height: calc(100% - 20px); /* 메모 박스 안에서 꽉 차도록 */
+  max-height: 500px;
 }
 
 .week-card {
@@ -169,10 +182,11 @@
   border: 1px solid #A2F1D6; 
   border-radius: 10px;
   padding: 18px 22px;
-  max-height: 360px; /* 내용 많을 경우를 대비 */
+  height: calc(100% - 20px); /* 메모 박스 안에서 꽉 차도록 */
+  max-height: 530px;
   overflow-y: auto; /* 세로 스크롤만 */
   overflow-x: hidden; /* 가로 스크롤 제거 */
-  margin-bottom: 18px;
+  margin-bottom: 10px;
   box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.05);
 }
 

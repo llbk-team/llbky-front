@@ -86,18 +86,6 @@
       <!-- 오른쪽 영역 (메모 입력) -->
       <div class="col-lg-4">
 
-        <!-- 스톱워치 -->
-        <div class="timer-box shadow-sm p-3" style="margin-top: 65px;">
-          <div class="d-flex justify-content-between align-items-center">
-            <h6 class="fw-bold">⏱ 학습 타이머</h6>
-            <span class="timer-display">{{ formattedTime }}</span>
-          </div>
-          <div class="d-flex mt-1">
-            <button class="btn btn-sm btn-mint me-2" @click="startTimer" :disabled="timerRunning">▶︎</button>
-            <button class="btn btn-sm btn-outline-secondary me-2" @click="pauseTimer" :disabled="!timerRunning">⏸︎</button>
-          </div>
-        </div>
-
         <div class="memo-box shadow-sm p-4">
           <div v-if="selectedItem">
             <h6 class="fw-bold mb-3">📝 {{ selectedItem.title }} 학습 노트</h6>
@@ -108,14 +96,14 @@
 
             <!-- 검증 성공 + 새로운 메모 저장됐을 때 -->
             <div v-if="fixedMemo">
-              <div class="ai-memo-box bg-light rounded border mb-3">
+              <div class="ai-memo-box bg-light rounded border mt-4">
                 <div class="ai-memo-content" v-html="parsedMemo"></div>
               </div>
             </div>
 
             <!-- 입력 모드일 때 -->
             <div v-else>
-              <textarea v-model="memoContent" rows="14" class="form-control mb-3" placeholder="예: Session vs JWT 차이점 정리..."></textarea>
+              <textarea v-model="memoContent" rows="14" class="form-control mb-3 mt-4" placeholder="예: Session vs JWT 차이점 정리..."></textarea>
   
               <div class="d-flex justify-content-between align-items-center">
                 <small class="text-muted">{{ memoContent.length }}/500자</small>
@@ -174,12 +162,6 @@ const {
     cancelMemo,
     submitMemo,
 
-    // 타이머
-    timer,
-    timerRunning,
-    formattedTime,
-    startTimer,
-    pauseTimer,
 } = learningStart.useLearningStart();
 
 </script>
