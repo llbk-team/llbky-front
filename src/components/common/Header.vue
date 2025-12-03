@@ -82,8 +82,7 @@ const subMenus = {
   ],
   learning: [
     { label: "학습 코치", path: "/learning/coach" },
-    { label: "로드맵", path: "/learning/goal" },
-    { label: "학습하기", path: "/learning/start" },
+    { label: "로드맵", path: "/learning/goal" }
   ],
   trend: [
     { label: "뉴스 요약", path: "/trend/news" },
