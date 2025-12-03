@@ -23,7 +23,10 @@ function deleteKeyword(savedKeywordId){
 }
 
 const jobInsightApi = {
-  getJobInsight
+  getJobInsight,
+  savekeyword,
+  getSavedKeywords,
+  deleteKeyword
 }
 
 export default jobInsightApi;
