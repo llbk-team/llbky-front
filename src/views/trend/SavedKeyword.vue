@@ -10,44 +10,50 @@
 
     <!-- 키워드 추가 -->
     <div class="add-keyword-box">
-      <input v-model="newKeyword"
-             @keyup.enter="addKeyword"
-             type="text"
-             class="add-input"
-             placeholder="새 키워드를 입력하세요" />
-
+      <input 
+        v-model="newKeyword"
+        @keyup.enter="addKeyword"
+        type="text"
+        class="add-input"
+        placeholder="새 키워드를 입력하세요"
+      />
       <button class="add-btn" @click="addKeyword">추가</button>
     </div>
 
     <!-- 카테고리 -->
-    <div v-if="Object.keys(filteredKeywords).length > 0"
-         class="keyword-container">
-      <div class="category"
-           v-for="(group, category) in filteredKeywords"
-           :key="category">
+    <div 
+      v-if="Object.keys(filteredGroups).length > 0"
+      class="keyword-container"
+    >
+      <div 
+        class="category"
+        v-for="(list, label) in filteredGroups"
+        :key="label"
+      >
 
         <div class="category-header">
-          <h3>{{ category }}</h3>
-          <span>{{ group.length }}개</span>
+          <h3>{{ label }}</h3>
+          <span>{{ list.length }}개</span>
         </div>
 
         <div class="keyword-list">
-          <div class="keyword-card"
-               v-for="(k, i) in group"
-               :key="i">
-
+          <div 
+            class="keyword-card"
+            v-for="item in list"
+            :key="item.savedKeywordId"
+          >
             <div class="top">
-              <span class="word">{{ k }}</span>
+              <span class="word">{{ item.keyword }}</span>
 
-              <!-- 삭제 버튼 이모지 -->
-              <button class="delete-btn" @click="deleteKeyword(k)">
+              <!-- 삭제 -->
+              <button class="delete-btn" @click="deleteKeyword(item.savedKeywordId)">
                 ❌
               </button>
             </div>
-
-            <small>{{ today }}</small>
+            <small>{{ formatDate(item.createdAt) }}</small>
           </div>
         </div>
+
       </div>
     </div>
 
@@ -63,13 +69,15 @@
         <p>총 저장 키워드</p>
         <h3>{{ keywords.length }}개</h3>
       </div>
+
       <div class="stat">
         <p>카테고리 수</p>
-        <h3>{{ Object.keys(filteredKeywords).length }}개</h3>
+        <h3>{{ Object.keys(filteredGroups).length }}개</h3>
       </div>
+
       <div class="stat">
         <p>최근 저장</p>
-        <h3>{{ today }}</h3>
+        <h3>{{ latestDate }}</h3>
       </div>
     </div>
 
@@ -77,88 +85,130 @@
     <div class="actions" v-if="keywords.length > 0">
       <button class="clear-all-btn" @click="clearAll">전체 삭제</button>
     </div>
+
   </div>
 </template>
 
 
 <script setup>
 import { ref, computed, onMounted } from "vue";
+import jobInsightApi from "@/apis/jobInsightApi";
 
-const keywords = ref([]);
+const memberId = 1;
+
+/* ============================
+    상태
+=============================*/
+const keywords = ref([]);     // [{savedKeywordId, keyword, sourceLabel, createdAt}]
 const newKeyword = ref("");
-const today = new Date().toISOString().split("T")[0];
 
-onMounted(() => {
-  keywords.value = JSON.parse(localStorage.getItem("user_keywords") || "[]");
+/* ============================
+    날짜 포맷
+=============================*/
+const formatDate = (dt) => dt?.split("T")[0] || "-";
+
+const latestDate = computed(() => {
+  if (keywords.value.length === 0) return "-";
+  return formatDate(
+    keywords.value.map(k => k.createdAt).sort().reverse()[0]
+  );
 });
 
-// ✅ 키워드 추가
-const addKeyword = () => {
-  const kw = newKeyword.value.trim();
-  if (!kw) return alert("키워드를 입력해주세요.");
-  if (keywords.value.includes(kw)) return alert("이미 추가된 키워드입니다.");
-  keywords.value.push(kw);
-  localStorage.setItem("user_keywords", JSON.stringify(keywords.value));
-  newKeyword.value = "";
-  alert(`'${kw}' 키워드가 추가되었습니다 ✅`);
+/* ============================
+    DB 저장 키워드 불러오기
+=============================*/
+const loadKeywords = async () => {
+  const res = await jobInsightApi.getSavedKeywords(memberId);
+  keywords.value = res.data;
 };
 
-// ✅ 기본 카테고리별 분류
-const groupedKeywords = computed(() => {
-  const groups = {
-    "AI 엔지니어": [],
-    "클라우드 엔지니어": [],
-    "데이터 사이언티스트": [],
-    "보안 전문가": [],
-    "내가 추가한 키워드": [],
-  };
-  keywords.value.forEach((k) => {
-    if (["Python", "TensorFlow", "LLM", "MLOps"].includes(k))
-      groups["AI 엔지니어"].push(k);
-    else if (["AWS", "Kubernetes", "Docker", "DevOps"].includes(k))
-      groups["클라우드 엔지니어"].push(k);
-    else if (["Pandas", "SQL", "Machine Learning", "Visualization"].includes(k))
-      groups["데이터 사이언티스트"].push(k);
-    else if (["Security", "Encryption", "Firewall"].includes(k))
-      groups["보안 전문가"].push(k);
-    else groups["내가 추가한 키워드"].push(k);
+/* ============================
+    키워드 추가(DB 저장)
+=============================*/
+const addKeyword = async () => {
+  const kw = newKeyword.value.trim();
+  if (!kw) return alert("키워드를 입력해주세요.");
+
+  // 중복 체크
+  if (keywords.value.some(k => k.keyword === kw)) {
+    return alert("이미 저장된 키워드입니다.");
+  }
+
+  await jobInsightApi.saveKeyword({
+    memberId,
+    keyword: kw,
+    sourceLabel: "직접추가",
   });
+
+  await loadKeywords();
+  newKeyword.value = "";
+  alert(`'${kw}' 키워드가 추가되었습니다!`);
+};
+
+/* ============================
+    키워드 삭제(DB)
+=============================*/
+const deleteKeyword = async (savedKeywordId) => {
+  if (!confirm("삭제하시겠습니까?")) return;
+
+  await jobInsightApi.deleteKeyword(savedKeywordId);
+  await loadKeywords();
+};
+
+/* ============================
+    전체 삭제
+=============================*/
+const clearAll = async () => {
+  if (!confirm("저장된 모든 키워드를 삭제하시겠습니까?")) return;
+
+  for (const item of keywords.value) {
+    await jobInsightApi.deleteKeyword(item.savedKeywordId);
+  }
+  await loadKeywords();
+};
+
+/* ============================
+    카테고리 그룹(sourceLabel 기준)
+=============================*/
+const grouped = computed(() => {
+  const groups = {};
+
+  keywords.value.forEach(item => {
+    const label = item.sourceLabel || "기타";
+
+    if (!groups[label]) groups[label] = [];
+    groups[label].push(item);
+  });
+
   return groups;
 });
 
-// ✅ 내가 추가한 키워드 맨 위
-const filteredKeywords = computed(() => {
-  const filtered = {};
-  const order = [
-    "내가 추가한 키워드",
-    "AI 엔지니어",
-    "클라우드 엔지니어",
-    "데이터 사이언티스트",
-    "보안 전문가",
-  ];
-  order.forEach((cat) => {
-    if (groupedKeywords.value[cat]?.length > 0)
-      filtered[cat] = groupedKeywords.value[cat];
-  });
-  return filtered;
+/* ============================
+    그룹 정렬: 직접추가 → 나머지 알파벳순
+=============================*/
+const filteredGroups = computed(() => {
+  const result = {};
+
+  const direct = "직접추가";
+
+  // 직접추가 최상단
+  if (grouped.value[direct]) {
+    result[direct] = grouped.value[direct];
+  }
+
+  // 나머지 카테고리 정렬
+  Object.keys(grouped.value)
+    .filter(label => label !== direct)
+    .sort()
+    .forEach(label => { result[label] = grouped.value[label] });
+
+  return result;
 });
 
-// ✅ 키워드 삭제
-const deleteKeyword = (word) => {
-  if (confirm(`'${word}' 키워드를 삭제하시겠습니까?`)) {
-    const updated = keywords.value.filter((k) => k !== word);
-    localStorage.setItem("user_keywords", JSON.stringify(updated));
-    keywords.value = updated;
-  }
-};
-
-// ✅ 전체 삭제
-const clearAll = () => {
-  if (confirm("저장된 모든 키워드를 삭제하시겠습니까?")) {
-    localStorage.removeItem("user_keywords");
-    keywords.value = [];
-  }
-};
+/* ============================
+    초기 로딩
+=============================*/
+onMounted(loadKeywords);
 </script>
 
 <style scoped>
