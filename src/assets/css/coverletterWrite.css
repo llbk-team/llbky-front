@@ -418,28 +418,37 @@
   gap: 10px;
 }
 
-.ai-action-btn {
-  background: #f8f9fa;
-  border: 1px solid #e5e5e5;
-  color: #333;
-  padding: 12px 16px;
-  border-radius: 6px;
-  font-size: 12px;
-  cursor: pointer;
-  text-align: left;
-  transition: all 0.2s;
-  width: 100%;
-  margin-bottom: 8px;
-}
-
-.ai-action-btn:hover {
-  background: #f0f0f0;
-  border-color: #ddd;
-}
-
 /* 반응형 */
 @media (max-width: 1200px) {
   .ai-coaching-panel {
     display: none;
   }
 }
+
+.keyword-box {
+  background: #f8f9fa;
+  border: 1px solid #e5e5e5;
+  padding: 12px;
+  border-radius: 6px;
+}
+
+.keyword-title {
+  font-weight: 600;
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+.keyword-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.keyword-item {
+  background: #e6fff4;
+  border: 1px solid #a8f5d1;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+}
+

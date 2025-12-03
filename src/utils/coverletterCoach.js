@@ -2,7 +2,7 @@
 import { ref, reactive, computed } from "vue";
 import coverletterApi from "@/apis/coverletterApi";
 
-function useCoverLetterCoach(introFields) {
+function useCoverLetterCoach(introFields, selectedKeywords) {
 
   // 오른쪽 AI 패널 ON/OFF
   const showAICoaching = ref(true);
@@ -58,7 +58,8 @@ function useCoverLetterCoach(introFields) {
       const { data } = await coverletterApi.coach({
         memberId: 1,
         section: mapped,
-        content: content
+        content: content,
+        keywords: selectedKeywords?.value || [] // 키워드 추가
       });
 
       feedbackBoxes[mapped] = {

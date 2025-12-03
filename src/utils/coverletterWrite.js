@@ -1,13 +1,21 @@
 // 자소서 작성 페이지 컴포넌트용 js 파일
 import coverletterApi from "@/apis/coverletterApi";
-import { reactive, ref } from "vue";
+import { onMounted, reactive, ref } from "vue";
 import router from "@/router";
+import jobInsightApi from "@/apis/jobInsightApi";
 
 // 자소서 작성
 function useCoverletterWrite() {
 
     // 제목
     const coverTitle = ref("");
+
+    // 저장한 키워드
+    const savedKeywords = ref([]);
+
+    // 저장한 키워드 선택
+    const selectedKeywords = ref([]);
+
     // 저장 로딩 상태
     const saveLoading = ref(false);
 
@@ -61,13 +69,32 @@ function useCoverletterWrite() {
         }
     }
 
+    // 저장 키워드 로딩
+
+    const loadKeywords = async () => {
+        try{
+            const res = await jobInsightApi.getSavedKeywords(1);
+            savedKeywords.value = res.data.map(k => k.keyword);
+        } catch(e){
+            console.error("저장 키워드 로딩 실패", e);
+        }
+    };
+
+    // 페이지 로딩 시 자동 실행
+    onMounted(() => {
+        loadKeywords();
+    });
+
     return { 
         coverTitle,
         introFields, 
         sections, 
         saveLoading,
         toggleSection, 
-        saveCoverLetter 
+        saveCoverLetter,
+        savedKeywords,
+        loadKeywords,
+        selectedKeywords
     }; 
 }
 
