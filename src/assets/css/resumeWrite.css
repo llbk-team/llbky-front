@@ -649,3 +649,55 @@ textarea {
   border-radius: 8px;
   margin-top: 16px;
 }
+
+/* ============================
+저장된 키워드 박스
+============================ */
+.keyword-box {
+  background: #f8f9fa;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 20px;
+  
+  /* 🔥 크기 줄이기 (원하면 숫자 조절 가능) */
+  max-height: 150px;      /* 전체 박스 높이 */
+  overflow-y: auto;       /* 내부 스크롤 */
+}
+
+/* 스크롤바 스타일 */
+.keyword-box::-webkit-scrollbar {
+  width: 6px;
+}
+
+.keyword-box::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+/* 제목 */
+.keyword-title {
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+/* 각 항목 */
+.keyword-box .form-check {
+  display: flex;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.keyword-box .form-check-input {
+  margin-right: 8px;
+  cursor: pointer;
+}
+
+.keyword-box .form-check-label {
+  font-size: 12px;
+  color: #444;
+  cursor: pointer;
+}
+

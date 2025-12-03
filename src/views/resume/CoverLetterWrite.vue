@@ -126,7 +126,7 @@
 
         <!-- 저장된 키워드 -->
         <div class="keyword-box">
-          <p class="keyword-title">저장된 키워드</p>
+          <p class="keyword-title">저장된 키워드 반영하기</p>
 
           <div v-if="savedKeywords && savedKeywords.length > 0">
             <div v-for="(k, i) in savedKeywords" :key="i" class="form-check mb-1">
