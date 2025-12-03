@@ -5,7 +5,7 @@ const routes = [
     component: () => import(/*webpackChunkName: "interviewRouting"*/ "@/views/interview/Report.vue")
   },
   {
-    path: "/interview/report/:id",
+    path: "/interview/report/detail",
     name: "ReportDetail",
     component: () => import(/*webpackChunkName: "interviewRouting"*/ "@/views/interview/ReportDetail.vue")
   },

@@ -142,7 +142,8 @@ function useInterviewList(memberId) {
         selectedQuestion.value = {
             text: question.text,
             type: answer?.videoFileData ? "video" : "audio",
-            answerUrl: makeMediaUrl(answer)
+            answerUrl: makeMediaUrl(answer),
+            sessionId: question.sessionId
         };
 
         showModal.value = true;
@@ -170,7 +171,7 @@ function useInterviewList(memberId) {
         
         if (!item || !item.sessionId) return;
 
-        router.push(`/interview/report?sessionId=${item.sessionId}`);
+        router.push(`/interview/report/detail?sessionId=${item.sessionId}`);
     };
 
 

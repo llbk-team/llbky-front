@@ -63,11 +63,24 @@ function useInterviewMock() {
     }, 300);
   };
 
-  const selectCompany = (c) => {
-    selectedCompany.value = c;
-    companyQuery.value = c;
+  const idealTalent = ref(null); // 기업 인재상 저장
+
+  const selectCompany = async (company) => {
+    selectedCompany.value = company;
+    companyQuery.value = company;
     companyResults.value = [];
+
+    try {
+      // 기업 인재상 요약 API 호출
+      const res = await interviewApi.idealTalent(company);
+      idealTalent.value = res.data;
+
+      console.log("기업 인재상 요약:", idealTalent.value);
+    } catch (err) {
+      console.error("기업 인재상 요약 오류:", err);
+    }
   };
+
 
   // --- 질문 추가 ---
   const addQuestion = () => {

@@ -166,6 +166,8 @@
 import { ref, computed } from "vue"
 import learningApi from "@/apis/learningApi";
 import { useRouter } from "vue-router";
+import { useStore } from "vuex";
+const store = useStore();
 
 const router = useRouter();
 
@@ -287,7 +289,7 @@ function addInterestSkill() {
 }
 
 async function generateRoadmap() {
-  isLoading.value = true; // 🔥 스피너 켜기
+  isLoading.value = true; // 스피너 켜기
 
   const memberId = 1;
   const studyHours = formData.value.studyHours;
@@ -303,6 +305,7 @@ async function generateRoadmap() {
     ...formData.value.interestedSkills
   ];
 
+  // 🔥🔥 여기 FormData 선언이 있어야 함
   const fd = new FormData();
   fd.append("memberId", memberId);
   fd.append("studyHours", studyHours);
@@ -314,14 +317,14 @@ async function generateRoadmap() {
 
     console.log("🔥 생성된 로드맵:", res.data);
 
-    router.push({
-      path: "/learning/roadmap",
-      state: { roadmap: res.data }
-    });
+    store.dispatch("learning/saveRoadmap", res.data);
+
+    router.push("/learning/roadmap");
+
   } catch (err) {
     alert("로드맵 생성 중 오류가 발생했습니다.");
   } finally {
-    isLoading.value = false; // 🔥 스피너 끄기
+    isLoading.value = false;
   }
 }
 
