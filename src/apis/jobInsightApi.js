@@ -7,7 +7,7 @@ function getJobInsight(memberId){
 }
 
 // 키워드 저장
-function savekeyword(data){
+function saveKeyword(data){
   return axios.post("/keyword/create", data);
 }
 
@@ -24,7 +24,7 @@ function deleteKeyword(savedKeywordId){
 
 const jobInsightApi = {
   getJobInsight,
-  savekeyword,
+  saveKeyword,
   getSavedKeywords,
   deleteKeyword
 }
