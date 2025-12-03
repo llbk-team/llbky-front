@@ -31,6 +31,24 @@ function getLearningList(memberId, status) {
 }
 
 /**
+ * 일일 학습 조회 (주차별)
+ */
+function getLearningDayByWeek(weekId) {
+  return axios.get("/learning/day-by-week", {
+    params: { weekId }
+  });
+}
+
+/**
+ * 일일 학습 조회 (일차별)
+ */
+function getLearningDayByDayId(dayId) {
+  return axios.get("/learning/day-by-day", {
+    params: { dayId }
+  });
+}
+
+/**
  * AI 일일 학습 정리 제출
  */
 function submitLearningDaySummary(dayId, learningDaySummary) {
@@ -44,5 +62,7 @@ export default {
   createRoadmap,
   saveRoadmap,
   getLearningList,
+  getLearningDayByWeek,
+  getLearningDayByDayId,
   submitLearningDaySummary
 };
