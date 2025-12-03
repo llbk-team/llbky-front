@@ -40,9 +40,20 @@ function getLearningList(memberId, status) {
   });
 }
 
+/**
+ * AI 일일 학습 정리 제출
+ */
+function submitLearningDaySummary(dayId, learningDaySummary) {
+  return axios.post("/learning/submit-day-summary", null, {
+    params: { dayId, learningDaySummary }
+  });
+}
+
+
 export default {
   createRoadmap,
   saveRoadmap,
+  getLearningList,
+  submitLearningDaySummary,
   recommendSkills,
-  getLearningList
 };
