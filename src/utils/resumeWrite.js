@@ -1,7 +1,8 @@
 // 이력서 작성 페이지 전용 JS 파일
-import { ref, reactive } from "vue";
-import { useRouter } from "vue-router";
+import jobInsightApi from "@/apis/jobInsightApi";
 import resumeApi from "@/apis/resumeApi";
+import { onMounted, reactive, ref } from "vue";
+import { useRouter } from "vue-router";
 
 function useResumeWrite() {
     const router = useRouter();
@@ -15,6 +16,10 @@ function useResumeWrite() {
         activities: false,
         certificates: false,
     });
+    
+    // 저장된 키워드
+    const savedKeywords = ref([]);
+    const selectedKeywords = ref([]);
 
     /* 🔥 AI 관련 */
     const aiFeedback = ref([]);
@@ -164,6 +169,7 @@ function useResumeWrite() {
                 memberId: 1,
                 section,
                 content,
+                keywords: selectedKeywords?.value || [] // 키워드 추가
             };
 
             const { data } = await resumeApi.coach(payload);
@@ -184,6 +190,16 @@ function useResumeWrite() {
             aiLoading.value = false;
         }
     };
+
+    // 키워드 불러오기 함수
+    const loadSavedKeywords = async () => {
+    try {
+        const res = await jobInsightApi.getSavedKeywords(1);
+        savedKeywords.value = res.data.map(k => k.keyword);
+    } catch (e) {
+        console.error("키워드 로딩 실패:", e);
+    }
+};
 
     /* 🔥 개선문 적용 */
     const applyImprovedToResume = (item) => {
@@ -221,6 +237,10 @@ function useResumeWrite() {
         }
     };
 
+    onMounted(() => {
+        loadSavedKeywords();
+    })
+
     return {
         // 데이터
         sections,
@@ -228,6 +248,9 @@ function useResumeWrite() {
         aiLoading,
         saveLoading,
         resumeData,
+        savedKeywords,
+        selectedKeywords,
+        loadSavedKeywords,
 
         // 입력/토글/추가삭제
         toggleSection,

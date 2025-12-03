@@ -18,21 +18,12 @@
         <!-- 자기소개서 제목 -->
         <div class="form-group">
           <label style="font-weight:600;">&nbsp;&nbsp;자기소개서 제목</label>
-          <input 
-            type="text"
-            v-model="coverTitle"
-            class="form-control mb-4"
-            placeholder="예: 백엔드 개발자 지원 자기소개서"
-          />
+          <input type="text" v-model="coverTitle" class="form-control mb-4" placeholder="예: 백엔드 개발자 지원 자기소개서" />
         </div>
 
         <!-- 자기소개서 항목 -->
-        <div
-          v-for="(value, key) in introFields"
-          :key="key"
-          class="form-section"
-          :class="{ expanded: sections[key], active: sections[key] }"
-        >
+        <div v-for="(value, key) in introFields" :key="key" class="form-section"
+          :class="{ expanded: sections[key], active: sections[key] }">
           <div class="section-header" @click="toggleSection(key)">
             <div class="section-info">
               <h3>{{ key }}</h3>
@@ -46,19 +37,12 @@
           <div class="section-content" v-show="sections[key]">
             <div class="form-group">
               <label>{{ key }} 내용</label>
-              <textarea
-                v-model="introFields[key]"
-                class="form-control"
-                rows="5"
-                placeholder="이 항목에 대한 자기소개 내용을 작성하세요."
-              ></textarea>
+              <textarea v-model="introFields[key]" class="form-control" rows="5"
+                placeholder="이 항목에 대한 자기소개 내용을 작성하세요."></textarea>
             </div>
 
             <div class="btn-wrapper">
-              <button 
-                class="btn btn-outline-success btn-sm mt-4"
-                @click="getSectionFeedback(key, introFields[key])"
-              >
+              <button class="btn btn-outline-success btn-sm mt-4" @click="getSectionFeedback(key, introFields[key])">
                 피드백 받기
               </button>
             </div>
@@ -116,11 +100,7 @@
         </div>
 
         <!-- 실시간 피드백 -->
-        <div
-          class="ai-feedback-box"
-          v-for="item in visibleFeedbackList"
-          :key="item.key"
-        >
+        <div class="ai-feedback-box" v-for="item in visibleFeedbackList" :key="item.key">
           <h4>📝 {{ reverseSectionMap[item.key] }} 항목 코칭</h4>
           <p><strong>요약:</strong> {{ item.box.summary }}</p>
           <p><strong>잘한 점:</strong> {{ item.box.strengths }}</p>
@@ -130,25 +110,32 @@
             <h5>✨ AI 수정본</h5>
             <p>{{ item.box.improvedText }}</p>
             <div class="btn-wrapper">
-              <button 
-                class="btn btn-outline-success btn-sm mt-4"
-                @click="applyImprovedText(item.key)"
-              >
+              <button class="btn btn-outline-success btn-sm mt-4" @click="applyImprovedText(item.key)">
                 수정본 적용하기
               </button>
             </div>
           </div>
         </div>
 
-        
+
         <!-- AI 분석 중 스피너 -->
         <div v-if="aiLoading" class="spinner-container mt-3 mb-3">
           <div class="spinner"></div>
           <p class="text-muted mt-2">AI가 분석 중입니다...</p>
         </div>
 
-        <div class="ai-actions">
-          <button class="ai-action-btn">📋 관련 키워드</button>
+        <!-- 저장된 키워드 -->
+        <div class="keyword-box">
+          <p class="keyword-title">저장된 키워드 반영하기</p>
+
+          <div v-if="savedKeywords && savedKeywords.length > 0">
+            <div v-for="(k, i) in savedKeywords" :key="i" class="form-check mb-1">
+              <input type="checkbox" class="form-check-input" :id="'kw' + i" v-model="selectedKeywords" :value="k" />
+              <label class="form-check-label" :for="'kw' + i">{{ k }}</label>
+            </div>
+          </div>
+
+          <p v-else class="text-muted small">저장된 키워드가 없습니다.</p>
         </div>
       </div>
     </div>
@@ -177,7 +164,9 @@ const {
   sections,
   saveLoading,
   toggleSection,
-  saveCoverLetter
+  saveCoverLetter,
+  savedKeywords,
+  selectedKeywords
 } = coverletterWrite.useCoverletterWrite();
 
 const {
@@ -189,8 +178,8 @@ const {
   toggleAICoaching,
   getSectionFeedback,
   visibleFeedbackList,
-  applyImprovedText
-} = coverletterCoach.useCoverLetterCoach(introFields);
+  applyImprovedText,
+} = coverletterCoach.useCoverLetterCoach(introFields, selectedKeywords);
 </script>
 
 <style src="@/assets/css/coverletterWrite.css"></style>
