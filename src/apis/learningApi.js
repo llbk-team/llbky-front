@@ -15,6 +15,13 @@ function createRoadmap(formData) {
 }
 
 /**
+ * AI 학습 로드맵 수정
+ */
+function refineRoadmap(payload) {
+  return axios.post("/learning/roadmap-refine", payload);
+}
+
+/**
  * AI 부족 역량 추천
  */
 function recommendSkills(memberId) {
@@ -88,6 +95,7 @@ function submitLearningDaySummary(dayId, learningDaySummary) {
 
 export default {
   createRoadmap,
+  refineRoadmap,
   saveRoadmap,
   getLearningList,
   getWeekListByLearningId,
