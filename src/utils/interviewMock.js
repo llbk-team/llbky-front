@@ -1,7 +1,8 @@
 // src/utils/interviewMock.js
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import router from "@/router";
 import interviewApi from "@/apis/interviewApi";
+import jobInsightApi from "@/apis/jobInsightApi";
 
 function useInterviewMock() {
   // --- 상태값 ---
@@ -13,7 +14,7 @@ function useInterviewMock() {
 
   const selectedCompany = ref("");
   const selectedKeywords = ref([]);
-  const keywordList = ref(["Spring AI", "Oracle", "Vue.js", "Python"]);
+  const keywordList = ref([]);
 
   const questions = ref([]);
   const aiQuestions = ref([]);
@@ -163,7 +164,23 @@ function useInterviewMock() {
       console.error("세션 저장 오류:", err);
       router.push("/interview/progress");
     }
+
+
   };
+
+  // 저장한 키워드 불러오기
+  async function loadSavedKeywords() {
+    try {
+      const res = await jobInsightApi.getSavedKeywords(1);
+      keywordList.value = res.data.map(k => k.keyword);
+    } catch (e) {
+      console.error("키워드 로딩 실패:", e);
+    }
+  }
+
+  onMounted(() => {
+    loadSavedKeywords();
+  });
 
   return {
     // 면접 유형
