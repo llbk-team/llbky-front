@@ -9,7 +9,7 @@
 
     <div class="row g-4">
 
-      <!-- LEFT: 내 직무 + 주당 공부시간 + 분석 버튼 -->
+      <!-- LEFT: 내 직무 + 주당 공부시간 -->
       <div class="col-md-4 left-col">
 
         <!-- 내 직무 -->
@@ -21,7 +21,7 @@
           <p class="text-muted small mb-0">직무는 마이페이지에서 변경 가능합니다.</p>
         </div>
 
-        <!-- 하루 공부 가능 시간 박스 -->
+        <!-- 하루 공부 가능 시간 -->
         <div class="card shadow-sm p-3 card-clean study-box mb-3">
           <h6 class="fw-bold mb-2 text-center">하루 공부 가능 시간</h6>
 
@@ -65,13 +65,15 @@
     ======================== -->
     <div class="row g-4 mt-0">
 
-      <!-- 부족 역량 -->
+      <!-- 부족 역량 리스트 -->
       <div class="col-md-6">
         <div class="card shadow-sm p-4 card-clean h-100">
           <h5 class="fw-bold mb-2">부족 역량 선택</h5>
-          <div class="info-box green-info-light mb-3">직무 기반 추천 기술입니다.</div>
+          <div class="info-box green-info-light mb-3">AI가 문서를 기반으로 추천한 기술입니다.</div>
 
           <div class="skill-scroll-box">
+            <div v-if="recommendedSkills.length === 0" class="text-muted small">AI 추천 로딩 중...</div>
+
             <div v-for="skill in recommendedSkills" :key="skill" class="checkbox-item mb-2">
               <input type="checkbox" :id="'skill-' + skill" :value="skill" v-model="formData.lackingSkills" />
               <label :for="'skill-' + skill">{{ skill }}</label>
@@ -85,9 +87,8 @@
         <div class="card shadow-sm p-4 card-clean h-100">
 
           <h5 class="fw-bold mb-2">관심 기술</h5>
-          <div class="info-box green-info-light mb-3">트렌드 저장 기술이 표시될 예정입니다.</div>
+          <div class="info-box green-info-light mb-3">트렌드 기반 기술입니다.</div>
 
-          <!-- 선택 가능한 관심 기술 리스트 -->
           <div class="skill-scroll-box mb-3">
             <div v-for="tech in interestSkillList" :key="tech" class="checkbox-item mb-2">
               <input type="checkbox" :id="'interest-' + tech" :value="tech" v-model="formData.interestedSkills" />
@@ -95,7 +96,6 @@
             </div>
           </div>
 
-          <!-- 새 키워드 추가 -->
           <div class="add-skill-box">
             <input type="text" v-model="newInterestSkill" placeholder="기술 키워드 입력..." class="skill-input" @keydown.enter.prevent="addInterestSkill" />
             <button class="btn add-button" @click="addInterestSkill">추가</button>
@@ -104,21 +104,16 @@
         </div>
       </div>
 
-
-
     </div>
 
     <!-- 플랜 생성하기 -->
     <div class="d-flex justify-content-end mt-4">
       <button class="btn btn-primary" @click="generateRoadmap">
-  AI 플랜 생성하기 ▶
-</button>
-
+        AI 플랜 생성하기 ▶
+      </button>
     </div>
 
-    <!-- ======================
-         모달 (이력서/자소서/포트폴리오)
-    ====================== -->
+    <!-- 모달 -->
     <div class="modal-backdrop" v-if="showModal" @click.self="closeModal">
       <div class="resume-modal">
 
@@ -133,7 +128,7 @@
           </button>
         </div>
 
-        <!-- 리스트 -->
+        <!-- 문서 리스트 -->
         <ul class="resume-list">
           <li v-for="(item, index) in filteredDocuments" :key="index" class="resume-item-new">
             <div class="d-flex justify-content-between align-items-center">
@@ -152,30 +147,55 @@
 
   </div>
 
-  <!-- =========================
-      전체 화면 로딩 스피너
-========================= -->
-<div v-if="isLoading" class="loading-overlay">
-  <div class="spinner"></div>
-  <p class="loading-text">AI가 로드맵을 생성 중입니다...</p>
-</div>
-
+  <!-- 전체 화면 스피너 -->
+  <div v-if="isLoading" class="loading-overlay">
+    <div class="spinner"></div>
+    <p class="loading-text">AI가 로드맵을 생성 중입니다...</p>
+  </div>
 </template>
 
 <script setup>
-import { ref, computed } from "vue"
+import { ref, computed, onMounted } from "vue"
 import learningApi from "@/apis/learningApi";
 import { useRouter } from "vue-router";
 import { useStore } from "vuex";
-const store = useStore();
 
+const store = useStore();
 const router = useRouter();
 
-const showModal = ref(false)
-const selectedTab = ref("resume")
-const selectedDocuments = ref([])
+const showModal = ref(false);
+const selectedTab = ref("resume");
+const selectedDocuments = ref([]);
 const isLoading = ref(false);
 
+// ----------------------------
+// AI 추천 기술 저장 리스트
+// ----------------------------
+const recommendedSkills = ref([]);
+
+// ----------------------------
+// 부족 역량 추천 API 호출
+// ----------------------------
+async function loadRecommendedSkills() {
+  const memberId = 1;
+
+  try {
+    const res = await learningApi.recommendSkills(memberId);
+
+    console.log("🔥 AI 추천 기술:", res.data);
+
+    // 백엔드 응답 형식: { skills: [...] }
+    recommendedSkills.value = res.data.skills || [];
+
+  } catch (err) {
+    console.error("AI 추천 기술 로딩 실패:", err);
+    recommendedSkills.value = [];
+  }
+}
+
+// ----------------------------
+// 폼 데이터
+// ----------------------------
 const formData = ref({
   careerGoals: [],
   learningGoals: [],
@@ -183,20 +203,15 @@ const formData = ref({
   studyHours: 3,
   lackingSkills: [],
   interestedSkills: ["MSA", "Spring Batch", "Redis", "OAuth2"]
-})
+});
 
-/* + / - 버튼 */
-function increaseHour() {
-  if (formData.value.studyHours < 50) formData.value.studyHours++
-}
-function decreaseHour() {
-  if (formData.value.studyHours > 0) formData.value.studyHours--
-}
+// 시간 증가/감소
+function increaseHour() { if (formData.value.studyHours < 50) formData.value.studyHours++; }
+function decreaseHour() { if (formData.value.studyHours > 0) formData.value.studyHours--; }
 
-const recommendedSkills = ref([
-  "SQL", "Spring Security", "REST API", "JPA", "AWS", "Docker", "Kubernetes", "CI/CD", "Linux"
-])
-
+// ----------------------------
+// 학습 목적 섹션
+// ----------------------------
 const goalSections = [
   {
     title: '커리어',
@@ -227,69 +242,63 @@ const goalSections = [
       { id: 'proj-explore', label: '진로 탐색', value: 'explore' }
     ]
   }
-]
+];
 
-/* -------------------------
-   모달 문서 리스트 (샘플)
--------------------------- */
+// ----------------------------
+// 관심 기술
+// ----------------------------
+const interestSkillList = ref(["MSA", "Spring Batch", "Redis", "OAuth2"]);
+const newInterestSkill = ref("");
+
+function addInterestSkill() {
+  const keyword = newInterestSkill.value.trim();
+
+  if (!keyword) return;
+  if (interestSkillList.value.includes(keyword)) {
+    alert("이미 존재하는 키워드입니다.");
+    return;
+  }
+
+  interestSkillList.value.push(keyword);
+  newInterestSkill.value = "";
+}
+
+// ----------------------------
+// 문서 모달
+// ----------------------------
 const allDocuments = ref([
   { type: "resume", title: "이력서 #1 - Java 백엔드", weaknesses: ["AWS", "Docker"] },
   { type: "resume", title: "이력서 #2 - 인프라 기반", weaknesses: ["JPA"] },
   { type: "cover-letter", title: "자소서 #1 - 백엔드 지원", weaknesses: ["근거 부족"] },
   { type: "portfolio", title: "포트폴리오 #1 - 쇼핑몰", weaknesses: ["테스트 자동화"] },
-])
+]);
 
 const docTabs = [
   { label: "이력서", value: "resume" },
   { label: "자소서", value: "cover-letter" },
   { label: "포트폴리오", value: "portfolio" }
-]
+];
 
 const filteredDocuments = computed(() =>
   allDocuments.value.filter(doc => doc.type === selectedTab.value)
-)
+);
 
 function applySelectedDocuments() {
   if (selectedDocuments.value.length === 0) {
-    alert("선택된 문서가 없습니다!")
-    return
-  }
-  const combinedWeakness = [...new Set(selectedDocuments.value.flatMap(d => d.weaknesses))]
-  formData.value.lackingSkills = combinedWeakness
-  showModal.value = false
-}
-
-// 정적 관심 기술 + 사용자 추가 기술 리스트
-const interestSkillList = ref([
-  "MSA",
-  "Spring Batch",
-  "Redis",
-  "OAuth2"
-])
-
-// 사용자가 직접 입력하는 값
-const newInterestSkill = ref("")
-
-function addInterestSkill() {
-  const keyword = newInterestSkill.value.trim()
-
-  if (keyword === "") return
-  if (interestSkillList.value.includes(keyword)) {
-    alert("이미 존재하는 키워드입니다.")
-    return
+    alert("선택된 문서가 없습니다!");
+    return;
   }
 
-  // 리스트에 추가
-  interestSkillList.value.push(keyword)
-
-  // 자동 선택도 가능하게 하고 싶으면 아래 주석 해제
-  // formData.value.interestedSkills.push(keyword)
-
-  newInterestSkill.value = ""
+  const combined = [...new Set(selectedDocuments.value.flatMap(d => d.weaknesses))];
+  formData.value.lackingSkills = combined;
+  showModal.value = false;
 }
 
+// ----------------------------
+// 로드맵 생성
+// ----------------------------
 async function generateRoadmap() {
-  isLoading.value = true; // 스피너 켜기
+  isLoading.value = true;
 
   const memberId = 1;
   const studyHours = formData.value.studyHours;
@@ -305,7 +314,6 @@ async function generateRoadmap() {
     ...formData.value.interestedSkills
   ];
 
-  // 🔥🔥 여기 FormData 선언이 있어야 함
   const fd = new FormData();
   fd.append("memberId", memberId);
   fd.append("studyHours", studyHours);
@@ -318,7 +326,6 @@ async function generateRoadmap() {
     console.log("🔥 생성된 로드맵:", res.data);
 
     store.dispatch("learning/saveRoadmap", res.data);
-
     router.push("/learning/roadmap");
 
   } catch (err) {
@@ -328,12 +335,18 @@ async function generateRoadmap() {
   }
 }
 
-
-
 function closeModal() {
-  showModal.value = false
+  showModal.value = false;
 }
+
+// ----------------------------
+// 페이지 진입 시 AI 추천 기술 불러오기
+// ----------------------------
+onMounted(() => {
+  loadRecommendedSkills();
+});
 </script>
+
 
 <style scoped>
 * {
