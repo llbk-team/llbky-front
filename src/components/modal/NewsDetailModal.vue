@@ -26,15 +26,15 @@
           <!-- 감정 비율 -->
           <div class="sentiment-box">
             <div class="sentiment-item positive">
-              <div class="circle">49%</div>
+              <div class="circle">{{ newsDetail?.sentimentScores?.positive||0 }}%</div>
               <span>긍정</span>
             </div>
             <div class="sentiment-item neutral">
-              <div class="circle">37%</div>
+              <div class="circle">{{ newsDetail?.sentimentScores?.neutral ||0}}%</div>
               <span>중립</span>
             </div>
             <div class="sentiment-item negative">
-              <div class="circle">14%</div>
+              <div class="circle">{{ newsDetail?.sentimentScores?.negative||0 }}%</div>
               <span>부정</span>
             </div>
           </div>
@@ -136,7 +136,7 @@ const detailLoading = ref(false);
 // 뉴스 상세 정보 가져오기
 const getNewsDetail = async () => {
   if (!props.news.id && !props.news.summaryId) {
-    console.warn("뉴스 ID가 없어서 상세 정보를 불러올 수 없습니다");
+    
     return;
   }
   
@@ -146,23 +146,17 @@ const getNewsDetail = async () => {
     
     const summaryId = props.news.id || props.news.summaryId;
     const response = await newsApi.getNewsDetail(summaryId);
-    console.log("뉴스 상세 API 응답:", response);
+  
 
     if (response.data.status === "success") {
       newsDetail.value = response.data.data;
-      console.log('📰 상세 데이터:', newsDetail.value);
+    
 
        if (newsDetail.value) {
       const sentiment = newsDetail.value.sentiment;
       const scores = newsDetail.value.sentimentScores;
       
-      console.log('😊 감정 분석 결과:', {
-        주요감정: sentiment,
-        긍정점수: scores?.positive + '%',
-        중립점수: scores?.neutral + '%', 
-        부정점수: scores?.negative + '%',
-        전체점수: scores
-      });
+    
     }
 
     } else {
@@ -190,12 +184,12 @@ const searchRelatedNews = async () => {
     const summaryId = props.news.id || props.news.summaryId;
     const response = await newsApi.searchRelatedNews(summaryId, 3);
     
-    console.log('🔗 관련 뉴스 응답:', response);
+    // console.log('🔗 관련 뉴스 응답:', response);
     
     if (response.status === 'success') {
       keywords.value = response.keywords || [];
       relatedNews.value = (response.data || []).slice(0, 3);
-      console.log('📰 관련 뉴스 데이터:', relatedNews.value);
+     
     } else {
       error.value = response.message || '관련 뉴스를 불러올 수 없습니다.';
     }
@@ -211,13 +205,13 @@ const searchRelatedNews = async () => {
 // ✅ 원문 보기 함수
 const openSource = (url) => {
   if (!url) return;
-  console.log('🔗 원문 열기:', url);
+  // console.log('🔗 원문 열기:', url);
   window.open(url, "_blank", "noopener,noreferrer");
 };
 
 // ✅ 관련 뉴스 클릭 핸들러
 const handleNewsClick = (item) => {
-  console.log('📰 뉴스 클릭:', item);
+  // console.log('📰 뉴스 클릭:', item);
   
   const url = item.link || item.url || item.originallink;
   

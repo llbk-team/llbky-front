@@ -184,10 +184,10 @@ const visibleNews = computed(() => filteredNews.value.slice(0, 6));
    API 응답을 화면용 데이터로 변환
 ------------------------------ */
 const mapNewsData = (newsItems) => {
-  console.log('🔄 mapNewsData - Input:', newsItems);
+  // console.log('🔄 mapNewsData - Input:', newsItems);
   
   if (!Array.isArray(newsItems)) {
-    console.log('⚠️ mapNewsData - Invalid input');
+    // console.log('⚠️ mapNewsData - Invalid input');
     return [];
   }
   
@@ -214,7 +214,7 @@ const mapNewsData = (newsItems) => {
     source_url: n.sourceUrl || n.source_url || "",
   }));
   
-  console.log('✅ mapNewsData - Output:', mapped);
+  // console.log('✅ mapNewsData - Output:', mapped);
   return mapped;
 };
 
@@ -238,19 +238,19 @@ const searchNews = async () => {
   loading.value = true;
   apiError.value = null;
   
-  console.log('🔍 searchNews - Request:', { keywords: [term], memberId: MEMBER_ID });
+  // console.log('🔍 searchNews - Request:', { keywords: [term], memberId: MEMBER_ID });
   
   try {
     // ✅ API 호출 (백엔드에서 최근 1개월 데이터 가져옴)
     const response = await newsApi.searchNews([term], MEMBER_ID);
-    console.log('✅ searchNews - Response:', response);
+    // console.log('✅ searchNews - Response:', response);
     
     if (response.status === 'success' && response.data) {
       const newsItems = Array.isArray(response.data) ? response.data : [];
       
       if (newsItems.length > 0) {
         newsList.value = mapNewsData(newsItems);
-        console.log('✅ newsList 업데이트:', newsList.value.length, '건');
+        // console.log('✅ newsList 업데이트:', newsList.value.length, '건');
       } else {
         apiError.value = '검색 결과가 없습니다.';
       }
@@ -286,7 +286,7 @@ const clearAll = () => {
 ------------------------------ */
 const loadInitialNews = async () => {
   if (newsList.value.length > 0) {
-    console.log('⏭️ 이미 뉴스가 있으므로 스킵');
+    // console.log('⏭️ 이미 뉴스가 있으므로 스킵');
     return;
   }
 
@@ -294,7 +294,7 @@ const loadInitialNews = async () => {
   apiError.value = null;
 
   try {
-    console.log('🌅 loadInitialNews - memberId:', MEMBER_ID);
+    // console.log('🌅 loadInitialNews - memberId:', MEMBER_ID);
     
     // ✅ 최근 1개월 데이터 로드 (충분히 넓은 범위)
     const response = await newsApi.getLatestNews(MEMBER_ID, 30);
