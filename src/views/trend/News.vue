@@ -48,7 +48,7 @@
       <p class="desc">
         AI가 사용자의 직무와 관심 키워드를 기반으로,
         관련성이 높은 채용·기술 뉴스를 자동 추천합니다.<br />
-        각 뉴스는 신뢰도·감정·편향 여부까지 함께 분석되어
+        각 뉴스는 신뢰도·감정 여부까지 함께 분석되어
         객관적인 시장 인사이트를 제공합니다.
       </p>
 
@@ -83,13 +83,6 @@
             <span v-for="(k, j) in item.keywords" :key="j">#{{ k }}</span>
           </div>
 
-          <!-- 편향 감지 -->
-          <div class="bias">
-            <span class="bias-label">편향 감지</span>
-            <span class="bias-status" :class="{ biasYes: item.bias_detected, biasNo: !item.bias_detected }">
-              {{ item.bias_detected ? item.bias_type : "없음" }}
-            </span>
-          </div>
 
           <!-- 신뢰도 + 출처 -->
           <div class="card-footer">
@@ -124,7 +117,6 @@ const selectedNews = ref(null);
 const filters = ref({
   period: "week",
   sentiment: "",
-  biasOnly: false,
   trustMin: 70,
 });
 
@@ -132,30 +124,59 @@ const loading = ref(false);
 const apiError = ref(null);
 const newsList = ref([]);
 
-// 하드코딩된 memberId (실제로는 Vuex나 로그인 정보에서 가져와야 함)
 const MEMBER_ID = 1;
+
+/* ------------------------------
+   날짜 필터링 유틸리티
+------------------------------ */
+const calculateStartDate = (period) => {
+  const today = new Date();
+  
+  switch (period) {
+    case "today":
+      today.setHours(0, 0, 0, 0);
+      return today;
+    case "week":
+      return new Date(today.setDate(today.getDate() - 7));
+    case "month":
+      return new Date(today.setMonth(today.getMonth() - 1));
+    default:
+      return new Date(0); // 전체
+  }
+};
 
 /* ------------------------------
    필터 및 검색
 ------------------------------ */
-const filteredNews = computed(() =>
-  newsList.value.filter((n) => {
-    if (filters.value.sentiment && n.sentiment !== filters.value.sentiment)
-      return false;
-    if (filters.value.biasOnly && !n.bias_detected) return false;
-    if (n.trust < filters.value.trustMin) return false;
-    if (
-      keyword.value &&
-      !(
-        n.title.includes(keyword.value) ||
-        n.summary_short.includes(keyword.value) ||
-        n.keywords.some((k) => k.includes(keyword.value))
-      )
-    )
-      return false;
-    return true;
-  })
-);
+const filteredNews = computed(() => {
+  let filtered = newsList.value;
+  
+  // ✅ 1. 날짜 필터링 (period)
+  const startDate = calculateStartDate(filters.value.period);
+  filtered = filtered.filter(n => {
+    const newsDate = new Date(n.date || n.publishedAt);
+    return newsDate >= startDate;
+  });
+  
+  // ✅ 2. 감정 필터링
+  if (filters.value.sentiment) {
+    filtered = filtered.filter(n => n.sentiment === filters.value.sentiment);
+  }
+  
+  // ✅ 3. 신뢰도 필터링
+  filtered = filtered.filter(n => n.trust >= filters.value.trustMin);
+  
+  // ✅ 4. 키워드 검색
+  if (keyword.value) {
+    filtered = filtered.filter(n =>
+      n.title.includes(keyword.value) ||
+      n.summary_short.includes(keyword.value) ||
+      n.keywords.some(k => k.includes(keyword.value))
+    );
+  }
+  
+  return filtered;
+});
 
 const visibleNews = computed(() => filteredNews.value.slice(0, 6));
 
@@ -164,17 +185,22 @@ const visibleNews = computed(() => filteredNews.value.slice(0, 6));
 ------------------------------ */
 const mapNewsData = (newsItems) => {
   console.log('🔄 mapNewsData - Input:', newsItems);
+  
   if (!Array.isArray(newsItems)) {
-    console.log('⚠️ mapNewsData - Invalid input, returning empty array');
+    console.log('⚠️ mapNewsData - Invalid input');
     return [];
   }
   
   const mapped = newsItems.map((n) => ({
     id: n.id || n.summaryId,
-    title: n.title || n.headline || "제목 없음",
-    summary_short: n.summaryText || n.detailSummary || n.summary_short || "",
+    title: n.title || "제목 없음",
+    summary_short: n.summaryText || n.summary_short || "",
     keywords: Array.isArray(n.keywords) 
-      ? n.keywords.map(k => typeof k === 'string' ? k : k.keyword || k.name || '')
+      ? n.keywords.map(k => {
+          if (typeof k === 'string') return k;
+          if (typeof k === 'object') return k.keyword || k.name || k.value || JSON.stringify(k);
+          return String(k);
+        })
       : [],
     trust: n.trustScore ?? n.trust ?? 0,
     sentiment: n.sentiment || "neutral",
@@ -184,8 +210,8 @@ const mapNewsData = (newsItems) => {
     bias_detected: n.biasDetected ?? n.bias_detected ?? false,
     bias_type: n.biasType || n.bias_type || "",
     date: n.publishedAt || n.date || "",
-    source: n.sourceName || n.source || n.publisher || "",
-    source_url: n.sourceUrl || n.source_url || n.url || "",
+    source: n.sourceName || n.source || "",
+    source_url: n.sourceUrl || n.source_url || "",
   }));
   
   console.log('✅ mapNewsData - Output:', mapped);
@@ -193,18 +219,17 @@ const mapNewsData = (newsItems) => {
 };
 
 /* ------------------------------
-   검색 및 키워드 관련
+   검색
 ------------------------------ */
 const searchNews = async () => {
   if (!keyword.value.trim()) {
     alert('검색어를 입력해주세요.');
     return;
-
   }
   
   const term = keyword.value.trim();
   
-// 최근 검색어 저장
+  // 최근 검색어 저장
   const saved = JSON.parse(localStorage.getItem("search_keywords") || "[]");
   const updated = [term, ...saved.filter((k) => k !== term)].slice(0, 5);
   localStorage.setItem("search_keywords", JSON.stringify(updated));
@@ -212,21 +237,20 @@ const searchNews = async () => {
   
   loading.value = true;
   apiError.value = null;
-  console.log("--------------------");
-  console.log('🔍 searchNews - Request params:', { keywords: [term], memberId: MEMBER_ID });
+  
+  console.log('🔍 searchNews - Request:', { keywords: [term], memberId: MEMBER_ID });
   
   try {
-    // ✅ API 호출
+    // ✅ API 호출 (백엔드에서 최근 1개월 데이터 가져옴)
     const response = await newsApi.searchNews([term], MEMBER_ID);
-    console.log('✅ searchNews - API Response:', response);
+    console.log('✅ searchNews - Response:', response);
     
-    // ✅ 백엔드 응답 구조: { status: "success", message: "...", analyzed: 3, data: [...] }
     if (response.status === 'success' && response.data) {
       const newsItems = Array.isArray(response.data) ? response.data : [];
       
       if (newsItems.length > 0) {
         newsList.value = mapNewsData(newsItems);
-        console.log('✅ newsList 업데이트 완료:', newsList.value);
+        console.log('✅ newsList 업데이트:', newsList.value.length, '건');
       } else {
         apiError.value = '검색 결과가 없습니다.';
       }
@@ -236,16 +260,7 @@ const searchNews = async () => {
 
   } catch (error) {
     console.error('뉴스 검색 실패:', error);
-    
-    if (error.response?.data?.message) {
-      apiError.value = error.response.data.message;
-    } else {
-      apiError.value = '뉴스 검색에 실패했습니다. 다시 시도해주세요.';
-    }
-    
-    if (error.response) {
-      console.error('서버 응답:', error.response.data);
-    }
+    apiError.value = error.response?.data?.message || '뉴스 검색에 실패했습니다.';
   } finally {
     loading.value = false;
   }
@@ -265,13 +280,13 @@ const clearAll = () => {
   recentKeywords.value = [];
   localStorage.removeItem("search_keywords");
 };
+
 /* ------------------------------
    초기 데이터 로드
 ------------------------------ */
 const loadInitialNews = async () => {
-  // ✅ 이미 뉴스가 있으면 로드하지 않음
   if (newsList.value.length > 0) {
-    console.log('⏭️ loadInitialNews - 이미 뉴스가 있으므로 스킵');
+    console.log('⏭️ 이미 뉴스가 있으므로 스킵');
     return;
   }
 
@@ -279,10 +294,11 @@ const loadInitialNews = async () => {
   apiError.value = null;
 
   try {
-    console.log('🌅 loadInitialNews - Loading today\'s news for memberId:', MEMBER_ID);
+    console.log('🌅 loadInitialNews - memberId:', MEMBER_ID);
     
-    const response = await newsApi.getTodayNews(MEMBER_ID, 6);
-    console.log('✅ loadInitialNews - getTodayNews Response:', response);
+    // ✅ 최근 1개월 데이터 로드 (충분히 넓은 범위)
+    const response = await newsApi.getLatestNews(MEMBER_ID, 30);
+    console.log('✅ loadInitialNews - Response:', response);
     
     if (response && response.data) {
       const newsItems = Array.isArray(response.data.data) 
@@ -291,53 +307,27 @@ const loadInitialNews = async () => {
           ? response.data 
           : [];
           
-      console.log('📊 loadInitialNews - Today\'s news items count:', newsItems.length);
-      
       if (newsItems.length > 0) {
         newsList.value = mapNewsData(newsItems);
-      } else {
-        console.log('⏰ loadInitialNews - No today\'s news, falling back to latest news');
-        
-        const latestResponse = await newsApi.getLatestNews(MEMBER_ID, 6);
-        console.log('✅ loadInitialNews - getLatestNews Response:', latestResponse);
-        
-        if (latestResponse && latestResponse.data) {
-          const latestNewsItems = Array.isArray(latestResponse.data.data)
-            ? latestResponse.data.data
-            : Array.isArray(latestResponse.data)
-              ? latestResponse.data
-              : [];
-              
-          console.log('📊 loadInitialNews - Latest news items count:', latestNewsItems.length);
-          
-          if (latestNewsItems.length > 0) {
-            newsList.value = mapNewsData(latestNewsItems);
-          }
-        }
       }
     }
   } catch (error) {
     console.error('뉴스 로드 실패:', error);
     apiError.value = '뉴스를 불러오는 데 실패했습니다.';
-    
-    if (error.response) {
-      console.error('서버 응답:', error.response.data);
-    }
   } finally {
     loading.value = false;
   }
 };
 
 onMounted(async () => {
-  // 최근 검색어 불러오기
-   console.log('🚀 onMounted - 컴포넌트 마운트됨');
+  console.log('🚀 onMounted');
+  
   recentKeywords.value = JSON.parse(
     localStorage.getItem("search_keywords") || "[]"
   );
   
-  // 초기 뉴스 로드
   await loadInitialNews();
-   console.log('✅ onMounted 완료 - newsList 개수:', newsList.value.length);
+  console.log('✅ onMounted 완료 - newsList:', newsList.value.length, '건');
 });
 
 /* ------------------------------
@@ -357,8 +347,11 @@ const formatSummary = (summary) => {
   );
 };
 
+// ✅ 필터 변경 시 호출 (API 재호출 없이 클라이언트 필터링만)
 const applyFilter = (newFilters) => {
+  console.log('🔧 필터 변경:', newFilters);
   filters.value = newFilters;
+  // filteredNews computed가 자동으로 재계산됨
 };
 
 const openDetail = (item) => {
@@ -599,10 +592,7 @@ const openDetail = (item) => {
   margin-bottom: 8px;
 }
 
-.bias-label {
-  font-size: 12px;
-  color: #666;
-}
+
 
 .bias-status {
   font-size: 12px;

@@ -7,7 +7,20 @@
         <button class="close-btn" @click="$emit('close')">✕</button>
       </div>
 
-      <div class="modal-body">
+      <!-- 로딩 상태 -->
+      <div v-if="detailLoading" class="loading-state">
+        <div class="spinner"></div>
+        <p>상세 정보를 불러오는 중...</p>
+      </div>
+
+      <!-- 에러 상태 -->
+      <div v-else-if="error && !newsDetail" class="error-state">
+        <p>{{ error }}</p>
+        <button class="retry-btn" @click="getNewsDetail">재시도</button>
+      </div>
+
+      <!-- 메인 콘텐츠 -->
+      <div v-else class="modal-body">
         <!-- 왼쪽 분석 영역 -->
         <div class="left">
           <!-- 감정 비율 -->
@@ -30,26 +43,28 @@
           <div class="trust-box">
             <span class="trust-label">신뢰도</span>
             <div class="trust-bar">
-              <div class="trust-fill" :style="{ width: news.trust + '%' }"></div>
+              <div class="trust-fill" :style="{ width: (newsDetail?.trustScore || news.trust) + '%' }"></div>
             </div>
-            <span class="trust-score">{{ news.trust }}%</span>
+            <span class="trust-score">{{ newsDetail?.trustScore || news.trust }}%</span>
           </div>
 
           <!-- 기사 내용 -->
           <div class="article">
-            <h3>{{ news.title }}</h3>
+            <h3>{{ newsDetail?.title || news.title }}</h3>
             <div class="meta">
-              <span>{{ news.source }}</span> · <span>{{ news.date }}</span>
+              <span>{{ newsDetail?.sourceName || news.source }}</span> · 
+              <span>{{ formatDate(newsDetail?.publishedAt || news.date) }}</span>
             </div>
-            <p>{{ news.summary_long || news.summary_short }}</p>
+            <!-- ✅ detailSummary 우선, 없으면 summary_short -->
+            <p>{{ newsDetail?.detailSummary || newsDetail?.summaryText || news.summary_short || '요약 내용이 없습니다.' }}</p>
 
             <div class="keywords">
-              <span v-for="(k, i) in news.keywords" :key="i">#{{ k }}</span>
+              <span v-for="(k, i) in formatKeywords(newsDetail?.keywords || news.keywords)" :key="i">#{{ k }}</span>
             </div>
 
             <!-- 원문 보기 버튼 -->
-            <div class="source-btn-box" v-if="news.source_url">
-              <button class="source-btn" @click="openSource(news.source_url)">
+            <div class="source-btn-box" v-if="newsDetail?.sourceUrl || news.source_url">
+              <button class="source-btn" @click="openSource(newsDetail?.sourceUrl || news.source_url)">
                 <i class="ri-news-line"></i> 원문 보기
               </button>
             </div>
@@ -72,7 +87,7 @@
             <button class="retry-btn" @click="searchRelatedNews">재시도</button>
           </div>
           
-          <!-- ✅ 관련 뉴스 목록 -->
+          <!-- 관련 뉴스 목록 -->
           <div v-else-if="relatedNews.length > 0" class="news-list">
             <div 
               v-for="(item, i) in relatedNews" 
@@ -101,23 +116,70 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import newsApi from '@/apis/newsApi';
 
 const props = defineProps({
   news: { type: Object, required: true },
 });
+const emit = defineEmits(['close']);
 
 const relatedNews = ref([]);
 const keywords = ref([]);
 const loading = ref(false);
 const error = ref(null);
+// 상세 뉴스데이터
+const newsDetail = ref(null);
+const detailLoading = ref(false);
 
-// ✅ 관련 뉴스 검색
+
+// 뉴스 상세 정보 가져오기
+const getNewsDetail = async () => {
+  if (!props.news.id && !props.news.summaryId) {
+    console.warn("뉴스 ID가 없어서 상세 정보를 불러올 수 없습니다");
+    return;
+  }
+  
+  try {
+    detailLoading.value = true;
+    error.value = null;
+    
+    const summaryId = props.news.id || props.news.summaryId;
+    const response = await newsApi.getNewsDetail(summaryId);
+    console.log("뉴스 상세 API 응답:", response);
+
+    if (response.data.status === "success") {
+      newsDetail.value = response.data.data;
+      console.log('📰 상세 데이터:', newsDetail.value);
+
+       if (newsDetail.value) {
+      const sentiment = newsDetail.value.sentiment;
+      const scores = newsDetail.value.sentimentScores;
+      
+      console.log('😊 감정 분석 결과:', {
+        주요감정: sentiment,
+        긍정점수: scores?.positive + '%',
+        중립점수: scores?.neutral + '%', 
+        부정점수: scores?.negative + '%',
+        전체점수: scores
+      });
+    }
+
+    } else {
+      error.value = response.data.message || '상세 정보를 불러올 수 없습니다.';
+    }
+  } catch (err) {
+    error.value = err.response?.data?.message || '상세 정보 조회 실패';
+    console.error('❌ 뉴스 상세 조회 에러:', err);
+  } finally {
+    detailLoading.value = false;
+  }
+}
+
+// 관련 뉴스 검색
 const searchRelatedNews = async () => {
   if (!props.news.id && !props.news.summaryId) {
     console.warn('summaryId가 없어서 관련 뉴스를 불러올 수 없습니다.');
-    error.value = 'summaryId가 없습니다.';
     return;
   }
   
@@ -128,12 +190,11 @@ const searchRelatedNews = async () => {
     const summaryId = props.news.id || props.news.summaryId;
     const response = await newsApi.searchRelatedNews(summaryId, 3);
     
-    console.log('🔗 NewsDetailModal - searchRelatedNews response:', response);
+    console.log('🔗 관련 뉴스 응답:', response);
     
     if (response.status === 'success') {
       keywords.value = response.keywords || [];
       relatedNews.value = (response.data || []).slice(0, 3);
-      
       console.log('📰 관련 뉴스 데이터:', relatedNews.value);
     } else {
       error.value = response.message || '관련 뉴스를 불러올 수 없습니다.';
@@ -176,6 +237,17 @@ const removeHtmlTags = (text) => {
   return text.replace(/<[^>]*>/g, '').trim();
 };
 
+// ✅ 키워드 포맷팅
+const formatKeywords = (keywords) => {
+  if (!keywords || !Array.isArray(keywords)) return [];
+  
+  return keywords.map(k => {
+    if (typeof k === 'string') return k;
+    if (typeof k === 'object') return k.keyword || k.name || k.value || '';
+    return String(k);
+  }).filter(k => k); // 빈 문자열 제거
+};
+
 // ✅ 날짜 포맷팅
 const formatDate = (dateString) => {
   if (!dateString) return '';
@@ -197,6 +269,7 @@ const formatDate = (dateString) => {
 };
 
 onMounted(() => {
+  getNewsDetail();
   searchRelatedNews();
 });
 </script>

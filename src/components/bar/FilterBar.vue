@@ -20,11 +20,7 @@
       </select>
     </div>
 
-    <div class="filter-item">
-      <label>편향</label>
-      <input type="checkbox" v-model="biasOnly" />
-      <span class="check-label">편향 없는 뉴스만</span>
-    </div>
+  
 
     <div class="filter-item trust-item">
       <label>신뢰도</label>
