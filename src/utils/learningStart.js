@@ -1,13 +1,13 @@
 // 학습 진행 페이지 컴포넌트용 js 파일
 
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import learningApi from "@/apis/learningApi";
 import WeekDetailModal from "@/components/modal/LearningWeekDetailModal.vue";
 
 function useLearningStart() {
 
   /*-------------------------------------
-    상태 정의
+    공통 상태 정의
   -------------------------------------*/
   const weeklyHours = ref(25);
   const currentWeek = ref(2); 
@@ -72,16 +72,15 @@ function useLearningStart() {
     },
   ]); // 주차별 학습 진행
 
-  // 현재 주차 - 일차 목록
-  const weeklyItems = ref([
-    { day: "1일차", title: "인증/인가 개념 이해", status: "완료" },
-    { day: "2일차", title: "AuthenticationManager 학습", status: "완료" },
-    { day: "3일차", title: "Security 필터 체인 구조", status: "진행 중" },
-    { day: "4일차", title: "JWT 발급/검증 로직 구현", status: "진행 중" },
-    { day: "5일차", title: "OAuth2 로그인 실습", status: "예정" },
-    { day: "6일차", title: "AccessDeniedHandler 적용", status: "예정" },
-    { day: "7일차", title: "테스트 및 마무리", status: "예정" },
-  ]);
+  /*-------------------------------------------------------
+    현재 주차 + 일차 목록
+  -------------------------------------------------------*/
+  const weeklyItems = ref([]);
+
+  const loadWeeklyItems = async (weekId) => {
+    const { data } = await learningApi.getLearningDayByWeek(weekId);
+    weeklyItems.value = data;
+  }
 
   const currentPage = ref(1); // 현재 페이지
   const itemsPerPage = 4; // 첫 페이지에 1~4일차, 두 번째 페이지에 5~7일차
@@ -92,7 +91,9 @@ function useLearningStart() {
 
   const paginatedItems = computed(() => {
     if (!weeklyItems.value) return [];
+
     const start = (currentPage.value - 1) * itemsPerPage;
+    
     return weeklyItems.value.slice(start, start + itemsPerPage);
   });
 
@@ -124,10 +125,23 @@ function useLearningStart() {
   -------------------------------------------------------*/
   const selectedItem = ref(null);
   const memoContent = ref("");
+  const fixedMemo = ref("");  // 최종 메모
 
-  const selectItem = (item) => {
+  const selectItem = async (item) => {
     selectedItem.value = item;
-    memoContent.value = "";
+
+    const { data } = await learningApi.getLearningDayByDayId(item.dayId);
+
+    // DB에 summary가 있으면 읽기 모드
+    if (data.learningDaySummary && !data.learningDaySummary.startsWith("[학습 기록 거부 안내]")) {
+      fixedMemo.value = data.learningDaySummary;
+      memoContent.value = "";
+
+    } else {
+      // 새 메모가 비어있거나 거부 안내문이면 다시 입력
+      fixedMemo.value = "";
+      memoContent.value = data.learningDaySummary || "";
+    }
   }
 
   const cancelMemo = () => {
@@ -154,16 +168,43 @@ function useLearningStart() {
         learningDaySummary
       );
 
-      // 상태 업데이트
-      selectedItem.value.status = data.status;
-
-      // 입력창 초기화
-      memoContent.value = "";
+      if (!data.learningDaySummary.startsWith("[학습 기록 거부 안내]")) {
+        fixedMemo.value = data.learningDaySummary;
+        selectedItem.value.status = data.status;  // 상태 업데이트
+        memoContent.value = "";  // 입력창 초기화
+        
+      } else {
+        fixedMemo.value = "";
+        memoContent.value = data.learningDaySummary; 
+      }
+   
 
     } catch (err) {
       console.error("메모 검증 실패:", err);
     }
   };
+
+  // 새로 만들어진 학습 메모 마크다운언어로 파싱
+  const parseMarkDown = (text) => {
+    return text
+      // 굵게 **text**
+      .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+      // # 제목
+      .replace(/^### (.*$)/gm, "<h3>$1</h3>")
+      .replace(/^## (.*$)/gm, "<h2>$1</h2>")
+      .replace(/^# (.*$)/gm, "<h1>$1</h1>")
+      // 번호 리스트
+      .replace(/^\d+\.\s(.*$)/gm, "<li class='num'>$1</li>")
+      // 불릿 리스트
+      // .replace(/^- (.*$)/gm, "<li class='bullet'>$1</li>")
+      // 인용문
+      .replace(/^> (.*$)/gm, "<blockquote>$1</blockquote>")
+      // 줄바꿈
+      .replace(/\n/g, "<br>");
+  }
+
+  // 파싱된 메모
+  const parsedMemo = computed(() => parseMarkDown(fixedMemo.value));
 
   /*-------------------------------------------------------
     학습 타이머
@@ -193,6 +234,11 @@ function useLearningStart() {
     clearInterval(timerInterval);
   }
 
+  onMounted(() => {
+    loadWeeklyItems(27);
+    // loadWeeklyItems(currentWeek.value);
+  });
+
   return {
     // 기본 정보
     weeklyHours,
@@ -202,6 +248,7 @@ function useLearningStart() {
     // 진행률 & 내용
     weeklyProgress,
     weeklyItems,
+    loadWeeklyItems,
     currentPage,
     itemsPerPage,
     totalPages,
@@ -217,6 +264,9 @@ function useLearningStart() {
     // 메모 작성
     selectedItem,
     memoContent,
+    fixedMemo,
+    parseMarkDown,
+    parsedMemo,
     selectItem,
     cancelMemo,
     submitMemo,

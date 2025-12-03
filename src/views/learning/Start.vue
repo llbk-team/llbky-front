@@ -63,7 +63,7 @@
           <!-- 일차별 카드 -->
           <div class="row g-3">
             <div v-for="(item, index) in paginatedItems || []" :key="index" class="col-md-6" @click="selectItem(item)">
-              <div class="day-card rounded-3" :class="{ active: selectedItem && selectedItem.title === item.title }">
+              <div class="day-card rounded-3" :class="{ active: selectedItem && selectedItem.dayId === item.dayId }">
                 <div class="d-flex justify-content-between align-items-center">
                   <div>
                     <span class="fw-semibold">{{ item.title }}</span>
@@ -102,15 +102,30 @@
           <div v-if="selectedItem">
             <h6 class="fw-bold mb-3">📝 {{ selectedItem.title }} 학습 노트</h6>
             <p class="text-muted small mb-2">학습한 내용을 자유롭게 작성하세요. AI가 내용을 검토해드립니다.</p>
-            <textarea v-model="memoContent" rows="14" class="form-control mb-3" placeholder="예: Session vs JWT 차이점 정리..."></textarea>
+            <div v-if="memoContent.startsWith('[학습 기록 거부 안내]')" class="alert alert-warning small">
+              ⚠️ 학습 기록이 거부되었습니다. 내용을 다시 확인해주세요.
+            </div>
 
-            <div class="d-flex justify-content-between align-items-center">
-              <small class="text-muted">{{ memoContent.length }}/500자</small>
-              <div>
-                <button class="btn btn-outline-secondary me-2" @click="cancelMemo">취소</button>
-                <button class="btn btn-mint" @click="submitMemo">⚡ AI 검증 받기</button>
+            <!-- 검증 성공 + 새로운 메모 저장됐을 때 -->
+            <div v-if="fixedMemo">
+              <div class="ai-memo-box bg-light rounded border mb-3">
+                <div class="ai-memo-content" v-html="parsedMemo"></div>
               </div>
             </div>
+
+            <!-- 입력 모드일 때 -->
+            <div v-else>
+              <textarea v-model="memoContent" rows="14" class="form-control mb-3" placeholder="예: Session vs JWT 차이점 정리..."></textarea>
+  
+              <div class="d-flex justify-content-between align-items-center">
+                <small class="text-muted">{{ memoContent.length }}/500자</small>
+                <div>
+                  <button class="btn btn-outline-secondary me-2" @click="cancelMemo">취소</button>
+                  <button class="btn btn-mint" @click="submitMemo">⚡ AI 검증 받기</button>
+                </div>
+              </div>
+            </div>
+
           </div>
           <div v-else class="text-center text-muted py-5 rounded-6">
             <p>왼쪽에서 학습 항목을 선택하면<br />여기에 정리 노트를 작성할 수 있습니다 ✍️</p>
@@ -136,6 +151,7 @@ const {
     // 진행률 & 내용
     weeklyProgress,
     weeklyItems,
+    loadWeeklyItems,
     currentPage,
     itemsPerPage,
     totalPages,
@@ -151,6 +167,9 @@ const {
     // 메모 작성
     selectedItem,
     memoContent,
+    fixedMemo,
+    parseMarkDown,
+    parsedMemo,
     selectItem,
     cancelMemo,
     submitMemo,

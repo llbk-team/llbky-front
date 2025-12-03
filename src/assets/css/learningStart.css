@@ -157,3 +157,42 @@
   font-weight: 700;
   color: #00C896;
 }
+
+.ai-memo-content br + br {
+  display: block;
+  margin-bottom: 10px;
+  content: "";
+}
+
+.ai-memo-box {
+  background: #A2F1D6; /* 연한 민트 */
+  border: 1px solid #A2F1D6; 
+  border-radius: 10px;
+  padding: 18px 22px;
+  max-height: 360px; /* 내용 많을 경우를 대비 */
+  overflow-y: auto; /* 세로 스크롤만 */
+  overflow-x: hidden; /* 가로 스크롤 제거 */
+  margin-bottom: 18px;
+  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.ai-memo-content {
+  white-space: pre-wrap;
+  word-break: keep-all;
+  font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+  font-size: 15px;
+  line-height: 1.75;
+  color: #065f46; /* 더 눈에 편한 그린 */
+}
+
+/* 리스트 들여쓰기 정리 */
+.ai-memo-content ul,
+.ai-memo-content ol {
+  padding-left: 1.4rem;   /* 글자/점이 살짝 안쪽으로 들어오게 */
+  margin-left: 0.2rem;
+}
+
+/* 리스트 아이템 간 간격 */
+.ai-memo-content li {
+  margin-bottom: 4px;
+}
