@@ -41,6 +41,24 @@ function getLearningList(memberId, status) {
 }
 
 /**
+ * 학습 ID 기준 주차 학습 전체 조회
+ */
+function getWeekListByLearningId(learningId) {
+  return axios.get("/learning/weeks-by-roadmap", {
+    params: { learningId }
+  });
+}
+
+/**
+ * 주차 학습 상세 조회
+ */
+function getLearningWeekDetail(weekId) {
+  return axios.get("/learning/week-detail", {
+    params: { weekId }
+  });
+}
+
+/**
  * 일일 학습 조회 (주차별)
  */
 function getLearningDayByWeek(weekId) {
@@ -72,6 +90,8 @@ export default {
   createRoadmap,
   saveRoadmap,
   getLearningList,
+  getWeekListByLearningId,
+  getLearningWeekDetail,
   getLearningDayByWeek,
   getLearningDayByDayId,
   submitLearningDaySummary,

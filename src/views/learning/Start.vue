@@ -128,7 +128,12 @@
 </template>
 
 <script setup>
+import { useRoute } from 'vue-router';
 import learningStart from '@/utils/learningStart';
+import WeekDetailModal from "@/components/modal/LearningWeekDetailModal.vue";
+
+const route = useRoute();
+const learningId = Number(route.query.learningId);
 
 const {
     // 기본 정보
@@ -139,6 +144,7 @@ const {
     // 진행률 & 내용
     weeklyProgress,
     weeklyItems,
+    loadWeeks,
     loadWeeklyItems,
     currentPage,
     itemsPerPage,
@@ -162,7 +168,7 @@ const {
     cancelMemo,
     submitMemo,
 
-} = learningStart.useLearningStart();
+} = learningStart.useLearningStart(learningId);
 
 </script>
 

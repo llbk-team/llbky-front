@@ -15,7 +15,7 @@ const routes = [
   },
 
   {
-    path: '/learning/start/:id',
+    path: '/learning/start',
     component: () => import('@/views/learning/Start.vue')
   },
 

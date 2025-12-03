@@ -56,7 +56,7 @@
                 </div>
 
                 <p class="text-secondary small mb-2">진행률 {{ plan.progress }}%</p>
-                <router-link :to="`/learning/start/${plan.id}`" class="btn btn-outline-green">
+                <router-link :to="`/learning/start?learningId=${plan.id}`" class="btn btn-outline-green">
                   학습 이어하기 →
                 </router-link>
               </div>
