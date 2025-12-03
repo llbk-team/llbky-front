@@ -15,6 +15,16 @@ function createRoadmap(formData) {
 }
 
 /**
+ * AI 부족 역량 추천
+ */
+function recommendSkills(memberId) {
+  return axios.post("/learning/recommend-skills", null, {
+    params: { memberId }
+  });
+}
+
+
+/**
  * AI 학습 로드맵 저장
  */
 function saveRoadmap(roadmap) {
@@ -33,5 +43,6 @@ function getLearningList(memberId, status) {
 export default {
   createRoadmap,
   saveRoadmap,
+  recommendSkills,
   getLearningList
 };
