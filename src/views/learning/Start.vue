@@ -149,12 +149,13 @@ const route = useRoute();
 const learningId = Number(route.query.learningId);
 
 const {
-    // 기본 정보
-    goal,
-    isLoading,
-    totalWeeks,
-    currentWeek,
-    overallProgress,
+  // 기본 정보
+  isLoading,
+  learningTitle,
+  loadLearningInfo,
+  totalWeeks,
+  currentWeek,
+  overallProgress,
 
   // 진행률 & 내용
   weeklyProgress,
@@ -183,6 +184,10 @@ const {
   selectItem,
   cancelMemo,
   submitMemo,
+
+  showCongrats,
+  spawnFirework,
+  burstFireworks,
 
 } = learningStart.useLearningStart(learningId);
 
