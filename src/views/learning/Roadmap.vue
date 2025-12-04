@@ -87,7 +87,15 @@
 
         <div class="ai-input">
           <input v-model="aiInput" type="text" class="form-control" placeholder="Spring Security가 어려워요. 다른 순서로 바꿀 수 있나요?" />
-          <button class="btn btn-mint ms-2">전송</button>
+          <button class="btn btn-mint ms-2" @click="sendRefineRequest" :disabled="isSending">
+            <span v-if="!isSending">전송</span>
+
+            <!-- 로딩 스피너 -->
+            <span v-else>
+              <div class="spinner-border spinner-border-sm text-success" role="status"></div>
+            </span>
+          </button>
+
         </div>
       </div>
     </div>
@@ -122,6 +130,15 @@
       </div>
     </div>
 
+    <!-- AI 수정 로딩 오버레이 -->
+    <div v-if="isRefining" class="refine-loading-overlay">
+      <div class="refine-loading-box">
+        <div class="spinner-border text-success mb-3" role="status"></div>
+        <div class="loading-text">AI가 로드맵을 다시 구성하고 있어요...</div>
+      </div>
+    </div>
+
+
   </div>
 </template>
 
@@ -135,6 +152,10 @@ const store = useStore();
 const roadmapData = ref({
   weeks: []
 });
+
+const isSending = ref(false); // 로딩 상태
+const isRefining = ref(false);
+
 
 // store 값이 들어오면 갱신되도록 watch 추가
 watch(
@@ -207,6 +228,34 @@ function openWeekModal(week) {
 function closeWeekModal() {
   showWeekModal.value = false;
 }
+
+async function sendRefineRequest() {
+  if (!aiInput.value) return;
+
+  try {
+    isRefining.value = true; // ⬅️ 오버레이 띄우기
+
+    const payload = {
+      memberId: 1,
+      currentRoadmap: roadmapData.value,
+      userFeedback: aiInput.value
+    };
+
+    const res = await learningApi.refineRoadmap(payload);
+
+    roadmapData.value = res.data;
+    showAiModal.value = false;
+
+  } catch (err) {
+    console.error("로드맵 수정 실패:", err);
+    alert("AI 수정 중 오류 발생");
+  } finally {
+    isRefining.value = false; // ⬅️ 오버레이 제거
+  }
+}
+
+
+
 
 </script>
 
@@ -544,6 +593,38 @@ function closeWeekModal() {
   white-space: pre-line;
   /* 줄바꿈 적용 핵심 */
   line-height: 1.55;
+}
+
+.refine-loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.refine-loading-box {
+  background: #ffffff;
+  padding: 30px 40px;
+  border-radius: 14px;
+  border: 1px solid #D1D5DB;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.refine-loading-box .spinner-border {
+  width: 3rem;
+  height: 3rem;
+}
+
+.loading-text {
+  font-size: 16px;
+  font-weight: 600;
+  color: #166534; /* Mint 계열 */
+  margin-top: 10px;
 }
 
 

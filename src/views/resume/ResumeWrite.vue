@@ -378,6 +378,20 @@
           <span>AI가 분석 중입니다...</span>
         </div>
 
+        <!-- 저장된 키워드 -->
+        <div class="keyword-box">
+          <p class="keyword-title">저장된 키워드 반영하기</p>
+
+          <div v-if="savedKeywords && savedKeywords.length > 0">
+            <div v-for="(k, i) in savedKeywords" :key="i" class="form-check mb-1">
+              <input type="checkbox" class="form-check-input" :id="'kw' + i" v-model="selectedKeywords" :value="k" />
+              <label class="form-check-label" :for="'kw' + i">{{ k }}</label>
+            </div>
+          </div>
+
+          <p v-else class="text-muted small">저장된 키워드가 없습니다.</p>
+        </div>
+
         <!-- 🔥 피드백 박스 (자소서 UI 동일) -->
         <div class="ai-feedback-box" v-for="item in aiFeedback" :key="item.timestamp">
           <h4>📝 {{ getSectionLabel(item.section) }} 항목 코칭</h4>
@@ -423,6 +437,9 @@ const {
   aiLoading,
   saveLoading,
   resumeData,
+  savedKeywords,
+  selectedKeywords,
+  loadSavedKeywords,
 
   toggleSection,
   onInputChange,
