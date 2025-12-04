@@ -8,8 +8,12 @@ function useLearningStart(learningId) {
   /*-------------------------------------
     공통 상태 정의
   -------------------------------------*/
-  const goal = ref("여기는 학습 목표 들어갈 자리입니다 예를 들면 취업 준비");  // 학습 목표
-  const isLoading = ref(false);
+  const isLoading = ref(false); // AI 응답 로딩 스피너용
+  const learningTitle = ref("");  // 학습 타이틀
+  const loadLearningInfo = async () => {
+    const { data } = await learningApi.getLearningDetail(learningId);
+    learningTitle.value = data.title;
+  }
 
   /*-------------------------------------------------------
     현재 주차 + 일차 목록
@@ -249,6 +253,9 @@ function useLearningStart(learningId) {
 
   onMounted(async () => {
 
+    // 전체 정보 불러오기
+    await loadLearningInfo();
+
     // 주차 정보 불러오기
     await loadWeeks(learningId);
 
@@ -267,8 +274,9 @@ function useLearningStart(learningId) {
 
   return {
     // 기본 정보
-    goal,
     isLoading,
+    learningTitle,
+    loadLearningInfo,
     totalWeeks,
     currentWeek,
     overallProgress,
