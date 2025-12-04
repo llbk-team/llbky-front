@@ -310,6 +310,11 @@ const aiComment = {
   main: "SQL 학습 플랜을 잘 진행 중이에요! 이번 주 목표는 Spring Security를 공부해봐요.",
   tip: "하루 30분만 더 투자하면 목표 자격증 합격 확률이 높아져요!"
 };
+
+function goToReport(plan) {
+  router.push(`/learning/report?learningId=${plan.id}`);
+}
+
 </script>
 
 <style scoped>

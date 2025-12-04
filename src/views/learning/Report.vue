@@ -4,7 +4,7 @@
     <div class="d-flex justify-content-between align-items-end mb-3">
       <div>
         <div class="title">학습 리포트</div>
-        <div class="subtitle">백엔드 취업 준비 · 총 4주 / 28일 학습 기록</div>
+        <div class="subtitle">{{ learningTitle }}</div>
       </div>
       <router-link to="/learning/coach?tab=completed" class="btn btn-outline-green">← 돌아가기</router-link>
     </div>
@@ -53,76 +53,59 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
+import { useRoute } from "vue-router";
+import learningApi from "@/apis/learningApi";
 
+const route = useRoute();
+const learningId = route.query.learningId;
+
+const learningTitle = ref("");
+const weeks = ref([]);
 const selectedWeekIndex = ref(0);
 
-const weeks = ref([
-  {
-    label: "1주차",
-    topic: "Spring Boot 기본기 다지기",
-    days: [
-      { label: "1일차", title: "프로젝트 세팅", date: "2025-01-01", memo: "Spring Initializr로 기본 구조 생성", open: false },
-      { label: "2일차", title: "Controller 학습", date: "2025-01-02", memo: "REST API 개념 정리", open: false },
-      { label: "3일차", title: "Service 계층 구현", date: "2025-01-03", memo: "비즈니스 로직 구조 설계", open: false },
-      { label: "4일차", title: "Repository 학습", date: "2025-01-04", memo: "JPA 기본 문법 복습", open: false },
-      { label: "5일차", title: "DB 연동 테스트", date: "2025-01-05", memo: "CRUD 테스트 수행", open: false },
-      { label: "6일차", title: "예외 처리", date: "2025-01-06", memo: "ControllerAdvice로 전역 예외 처리", open: false },
-      { label: "7일차", title: "정리 및 복습", date: "2025-01-07", memo: "1주차 핵심 개념 요약", open: false },
-    ],
-  },
-  {
-    label: "2주차",
-    topic: "Spring Security 심화",
-    days: [
-      { label: "1일차", title: "SecurityConfig", date: "2025-01-08", memo: "인증/인가 흐름 파악", open: false },
-      { label: "2일차", title: "JWT 발급", date: "2025-01-09", memo: "JWT 구조 이해 및 발급 로직 구현", open: false },
-      { label: "3일차", title: "필터 체인 분석", date: "2025-01-10", memo: "FilterChainProxy 구조 학습", open: false },
-      { label: "4일차", title: "로그인 기능 구현", date: "2025-01-11", memo: "Custom AuthenticationProvider 적용", open: false },
-      { label: "5일차", title: "회원가입", date: "2025-01-12", memo: "BCryptPasswordEncoder 적용", open: false },
-      { label: "6일차", title: "리프레시 토큰", date: "2025-01-13", memo: "Access/Refresh Token 재발급 로직 추가", open: false },
-      { label: "7일차", title: "2주차 복습", date: "2025-01-14", memo: "Security 전반 흐름 정리", open: false },
-    ],
-  },
-  {
-    label: "3주차",
-    topic: "JPA와 QueryDSL로 데이터 다루기",
-    days: [
-      { label: "1일차", title: "JPA 기초 복습", date: "2025-01-15", memo: "EntityManager 동작 이해", open: false },
-      { label: "2일차", title: "연관관계 매핑", date: "2025-01-16", memo: "1:N, N:M 관계 매핑 실습", open: false },
-      { label: "3일차", title: "JPQL과 NativeQuery", date: "2025-01-17", memo: "쿼리 최적화 실습", open: false },
-      { label: "4일차", title: "QueryDSL 설정", date: "2025-01-18", memo: "Q클래스 생성 및 빌더 문법 학습", open: false },
-      { label: "5일차", title: "조건 검색", date: "2025-01-19", memo: "BooleanBuilder 활용", open: false },
-      { label: "6일차", title: "페이징 처리", date: "2025-01-20", memo: "Pageable 사용법 익히기", open: false },
-      { label: "7일차", title: "정리", date: "2025-01-21", memo: "JPA와 QueryDSL 차이 비교", open: false },
-    ],
-  },
-  {
-    label: "4주차",
-    topic: "프로젝트 마무리 및 리팩토링",
-    days: [
-      { label: "1일차", title: "Controller 리팩토링", date: "2025-01-22", memo: "응답 DTO 구조 정리", open: false },
-      { label: "2일차", title: "에러 코드 일원화", date: "2025-01-23", memo: "Custom Exception 개선", open: false },
-      { label: "3일차", title: "테스트 코드 작성", date: "2025-01-24", memo: "JUnit5 / MockMVC 활용", open: false },
-      { label: "4일차", title: "Swagger 문서화", date: "2025-01-25", memo: "API 문서 자동화 설정", open: false },
-      { label: "5일차", title: "CI/CD 설정", date: "2025-01-26", memo: "GitHub Actions 배포 자동화", open: false },
-      { label: "6일차", title: "서버 배포", date: "2025-01-27", memo: "AWS EC2 배포 테스트", open: false },
-      { label: "7일차", title: "최종 회고", date: "2025-01-28", memo: "전체 학습 리뷰 및 개선점 정리", open: false },
-    ],
-  },
-]);
+async function loadReport() {
+  try {
+    // 🌟 이제는 단 하나의 API로 전체 로드!
+    const res = await learningApi.getLearningDetail(learningId);
+    const data = res.data;
 
-const currentWeek = computed(() => weeks.value[selectedWeekIndex.value]);
+    learningTitle.value = data.title;
+
+    // 프론트에서 쓰기 쉬운 구조로 변환
+    weeks.value = data.weeks.map(week => ({
+      label: `${week.weekNumber}주차`,
+      topic: week.title,
+      days: week.days.map(day => ({
+        label: `${day.dayNumber}일차`,
+        title: day.title,
+        date: day.learningDate ?? "",   // DB 컬럼 이름에 따라 수정 가능
+        memo: day.learningDaySummary,
+        open: false
+      }))
+    }));
+
+  } catch (err) {
+    console.error("리포트 로딩 실패:", err);
+  }
+}
+
+onMounted(loadReport);
+
+const currentWeek = computed(() =>
+  weeks.value[selectedWeekIndex.value] || { days: [] }
+);
 
 function selectWeek(index) {
   selectedWeekIndex.value = index;
 }
 
 function toggleDay(index) {
-  const day = currentWeek.value.days[index];
-  day.open = !day.open;
+  currentWeek.value.days[index].open =
+    !currentWeek.value.days[index].open;
 }
 </script>
+
 
 <style scoped>
 .card-clean {

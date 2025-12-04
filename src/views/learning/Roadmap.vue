@@ -157,6 +157,7 @@ const isSending = ref(false); // 로딩 상태
 const isRefining = ref(false);
 
 
+
 // store 값이 들어오면 갱신되도록 watch 추가
 watch(
   () => store.getters["learning/getRoadmap"],

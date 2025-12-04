@@ -50,7 +50,7 @@ function getLearningList(memberId, status) {
 /**
  * 학습 상세 조회
  */
-function getLearningWeekDetail(learningId) {
+function getLearningDetail(learningId) {
   return axios.get("/learning/detail", {
     params: { learningId }
   });
@@ -107,6 +107,7 @@ export default {
   refineRoadmap,
   saveRoadmap,
   getLearningList,
+  getLearningDetail,
   getWeekListByLearningId,
   getLearningWeekDetail,
   getLearningDayByWeek,
