@@ -125,7 +125,7 @@
 
             </div>
           </div>
-          
+
           <div v-else class="text-center text-muted py-5 rounded-6">
             <p>왼쪽에서 학습 항목을 선택하면<br />여기에 정리 노트를 작성할 수 있습니다 ✍️</p>
           </div>
@@ -153,8 +153,8 @@ const learningId = Number(route.query.learningId);
 const {
     // 기본 정보
     goal,
+    isLoading,
     totalWeeks,
-    completedWeeks,
     currentWeek,
     overallProgress,
 

@@ -19,15 +19,31 @@ function useLearningStart(learningId) {
   const loadWeeks = async () => {
     const { data } = await learningApi.getWeekListByLearningId(learningId);
 
-    weeklyProgress.value = data.map(w => ({
-      weekId: w.weekId,
-      weekNumber: w.weekNumber,
-      label: `${w.weekNumber}주차`,
-      topic: w.title,
-      progress: w.status === "완료" ? 100 : (w.status === "진행 중" ? 50 : 0),
-      status: w.status,
-      summary: w.learningWeekSummary
-    }));
+    const results = [];
+
+    for (const w of data) {
+      const daysRes = await learningApi.getLearningDayByWeek(w.weekId);
+      const days = daysRes.data;
+
+      const total = days.length;
+      const done = days.filter(d => d.status === "완료").length;
+      const ongoing = days.filter(d => d.status === "진행 중").length;
+
+      const progress = Math.round((done / total) * 100);
+
+      results.push({
+        weekId: w.weekId,
+        weekNumber: w.weekNumber,
+        label: `${w.weekNumber}주차`,
+        topic: w.title,
+        progress,
+        status: w.status,
+        summary: w.learningWeekSummary,
+        days
+      });
+    }
+
+    weeklyProgress.value = results;
   };
 
   const weeklyItems = ref([]);
@@ -43,13 +59,13 @@ function useLearningStart(learningId) {
   const totalWeeks = computed(() => weeklyProgress.value.length); // 전체 주 수 계산
   
   // 완료된 주 수
-  const completedWeeks = computed(() => {
-    return weeklyProgress.value.reduce((acc, w) => {
-      if (w.status === "완료") return acc + 1;
-      if (w.status === "진행 중") return acc + 0.5;
-      return acc;
-    }, 0);
-  });
+  // const completedWeeks = computed(() => {
+  //   return weeklyProgress.value.reduce((acc, w) => {
+  //     if (w.status === "완료") return acc + 1;
+  //     if (w.status === "진행 중") return acc + 0.5;
+  //     return acc;
+  //   }, 0);
+  // });
 
   // 현재 진행 중인 주차
   const currentWeek = computed(() => {
@@ -65,10 +81,16 @@ function useLearningStart(learningId) {
     return (weeklyProgress.value.length > 0) ? (weeklyProgress.value[weeklyProgress.value.length - 1].weekNumber) : 1;
   }); 
 
-  // 전체 진행률
   const overallProgress = computed(() => {
-    if (totalWeeks.value === 0) return 0;
-    return Math.round((completedWeeks.value / totalWeeks.value) * 100);
+    // 전체 Day
+    const allDays = weeklyProgress.value.flatMap(w => w.days || []);
+
+    const total = allDays.length;
+    if (total === 0) return 0;
+
+    const done = allDays.filter(d => d.status === "완료").length;
+
+    return Math.round((done / total) * 100);
   });
 
 
@@ -171,6 +193,7 @@ function useLearningStart(learningId) {
 
     try {
       isLoading.value = true;
+      fixedMemo.value = "";
 
       const dayId = selectedItem.value.dayId; // 일일 학습 ID
       const learningDaySummary = memoContent.value; // 정리 내용
@@ -189,8 +212,8 @@ function useLearningStart(learningId) {
         await loadWeeks(learningId);  // 업데이트된 주차/진행률 다시 불러오기
         
       } else {
-        fixedMemo.value = "";
         memoContent.value = data.learningDaySummary; 
+        await loadWeeks(learningId);
       }
    
 
@@ -245,8 +268,8 @@ function useLearningStart(learningId) {
   return {
     // 기본 정보
     goal,
+    isLoading,
     totalWeeks,
-    completedWeeks,
     currentWeek,
     overallProgress,
 
