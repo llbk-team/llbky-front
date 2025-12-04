@@ -1,9 +1,27 @@
 // src/views/learning/learningRoadmap.js
-import { ref, watch } from "vue";
+import { ref, watch, computed } from "vue";
 import { useStore } from "vuex";
 import learningApi from "@/apis/learningApi";
 
 function learningRoadmap() {
+
+  const PURPOSE_LABELS = {
+    "job-prep": "취업 준비",
+    "job-change": "이직 준비",
+    "job-switch": "커리어 전환",
+
+    "certification": "자격증 취득",
+    "basics": "기초 다지기",
+    "deepen": "기술 심화",
+    "self-dev": "자기계발",
+
+    "portfolio": "포트폴리오",
+    "side-project": "사이드 프로젝트",
+    "study-main": "학습 루틴",
+    "explore": "진로 탐색"
+  };
+
+
   const store = useStore();
 
   const roadmapData = ref({ weeks: [] });
@@ -15,7 +33,12 @@ function learningRoadmap() {
   const showWeekModal = ref(false);
 
   const selectedWeek = ref(null);
-  const purposes = store.getters["learning/getPurposes"];
+  const purposes = ref(store.getters["learning/getPurposes"] || []);
+
+  const purposeLabels = computed(() =>
+    purposes.value.map(p => PURPOSE_LABELS[p] || p)
+  );
+
 
   // store에서 로드맵 받기
   watch(
@@ -105,7 +128,8 @@ function learningRoadmap() {
 
     sendRefineRequest,
 
-    purposes
+    purposes,
+    purposeLabels
   };
 }
 

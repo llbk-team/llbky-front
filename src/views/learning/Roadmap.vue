@@ -2,7 +2,7 @@
   <div class="roadmap-container container py-5">
 
     <div class="title mb-3 text-center">나의 맞춤 학습 로드맵</div>
-    <div class="alert alert-mint shadow-sm" role="alert">AI 학습 코치가 선택하신 기술을 바탕으로<strong>'{{ purposes.join(" + ") }}'</strong> 플랜을 생성했어요!
+    <div class="alert alert-mint shadow-sm" role="alert">AI 학습 코치가 선택하신 기술을 바탕으로 <strong>'{{ purposeLabels.join(" + ") }}'</strong> 플랜을 생성했어요!
     </div>
 
     <div class="d-flex flex-wrap justify-content-center gap-3 my-4">
@@ -150,7 +150,10 @@ const {
   startLearning,
   goToMyLearning,
 
-  sendRefineRequest
+  sendRefineRequest,
+
+  purposes,
+  purposeLabels
 } = learningRoadmap();
 </script>
 
