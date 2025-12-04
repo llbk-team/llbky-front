@@ -102,7 +102,20 @@
 
     <div class="hint-box">💾 클릭한 키워드는 저장됩니다.</div>
   </div>
+
+  <!-- 작성 완료 로딩 오버레이 -->
+  <div v-if="saveLoading" class="save-loading-overlay">
+    <div class="save-loading-box">
+      <div class="spinner-container">
+        <div class="spinner"></div>
+      </div>
+      <p>직무 인사이트를 생성하고 있습니다</p>
+      <p class="sub">AI 분석이 자동으로 실행돼요!</p>
+    </div>
+  </div>
 </template>
+
+
 
 <script setup>
 import jobInsight from "@/utils/jobInsightAnalysis";
@@ -111,6 +124,7 @@ const memberId = 1;
 
 const {
   loading,
+  saveLoading,
   error,
   savedKeywords,
   savedCount,

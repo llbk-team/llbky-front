@@ -168,6 +168,9 @@ const selectedTab = ref("resume");
 const selectedDocuments = ref([]);
 const isLoading = ref(false);
 
+const selectedGoal = ref(""); // 예: "백엔드 개발자", "SQLD", "Redis 공부"
+
+
 // ----------------------------
 // AI 추천 기술 저장 리스트
 // ----------------------------
@@ -206,8 +209,8 @@ const formData = ref({
 });
 
 // 시간 증가/감소
-function increaseHour() { if (formData.value.studyHours < 50) formData.value.studyHours++; }
-function decreaseHour() { if (formData.value.studyHours > 0) formData.value.studyHours--; }
+function increaseHour() { if (formData.value.studyHours < 15) formData.value.studyHours++; }
+function decreaseHour() { if (formData.value.studyHours > 1) formData.value.studyHours--; }
 
 // ----------------------------
 // 학습 목적 섹션
@@ -298,16 +301,22 @@ function applySelectedDocuments() {
 // 로드맵 생성
 // ----------------------------
 async function generateRoadmap() {
-  isLoading.value = true;
-
-  const memberId = 1;
-  const studyHours = formData.value.studyHours;
-
+  // 1. 목적 체크
   const purposes = [
     ...formData.value.careerGoals,
     ...formData.value.learningGoals,
     ...formData.value.projectGoals
   ];
+
+  if (purposes.length === 0) {
+    alert("학습 목적을 최소 1개 이상 선택해주세요!");
+    return;
+  }
+
+  isLoading.value = true;
+
+  const memberId = 1;
+  const studyHours = formData.value.studyHours;
 
   const skills = [
     ...formData.value.lackingSkills,
@@ -334,6 +343,7 @@ async function generateRoadmap() {
     isLoading.value = false;
   }
 }
+
 
 function closeModal() {
   showModal.value = false;
