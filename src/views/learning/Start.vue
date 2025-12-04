@@ -2,8 +2,7 @@
   <div class="learning-progress container py-4">
     <div class="d-flex justify-content-between align-items-end mb-1">
       <div>
-        <div class="title">백엔드 개발자 학습 코칭</div>
-        <div class="subtitle">{{ goal }}</div>
+        <div class="title">{{ learningTitle }}</div>
       </div>
       <div class="fs-5">{{ overallProgress }}% 전체 진행률</div>
     </div>
@@ -150,12 +149,12 @@ const route = useRoute();
 const learningId = Number(route.query.learningId);
 
 const {
-  // 기본 정보
-  goal,
-  isLoading,
-  totalWeeks,
-  currentWeek,
-  overallProgress,
+    // 기본 정보
+    goal,
+    isLoading,
+    totalWeeks,
+    currentWeek,
+    overallProgress,
 
   // 진행률 & 내용
   weeklyProgress,
