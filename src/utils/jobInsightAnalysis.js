@@ -14,6 +14,7 @@ function useJobInsight(memberId) {
 
     const growth = ref(null);         // 성장 제안
     const jobs = ref([]);             // 연관 직무 카드
+    const saveLoading = ref(false); // 스피너
 
     const loading = ref(true);
     const error = ref(null);
@@ -47,6 +48,8 @@ function useJobInsight(memberId) {
     -------------------------------------*/
     const loadJobInsight = async () => {
         try {
+            saveLoading.value = true;
+
             const res = await jobInsightApi.getJobInsight(memberId);
             const data = res.data;
 
@@ -73,6 +76,7 @@ function useJobInsight(memberId) {
             error.value = "직무 인사이트 불러오기 실패";
         } finally {
             loading.value = false;
+            saveLoading.value = false;
         }
     };
 
@@ -92,6 +96,8 @@ function useJobInsight(memberId) {
     -------------------------------------*/
     const toggleKeyword = async (tag, jobRole) => {
         try {
+            saveLoading.value = true;
+
             // 저장된 상태면 → 삭제
             if (isSaved(tag)) {
                 const target = savedKeywords.value.find(k => k.keyword === tag);
@@ -111,14 +117,20 @@ function useJobInsight(memberId) {
             // DB 다시 로딩 → UI 갱신
             await loadKeywordsFromDB();
 
+            // 직무 인사이트 다시 로딩 (가장 중요)
+            await loadJobInsight();
+
         } catch (e) {
             console.error("toggle keyword error", e);
+        } finally {
+            saveLoading.value = false;
         }
     };
 
 
     return {
         loading,
+        saveLoading,
         error,
         savedKeywords,
         savedCount,
