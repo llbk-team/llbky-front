@@ -101,6 +101,14 @@ function submitLearningDaySummary(dayId, learningDaySummary) {
   });
 }
 
+/**
+ * 학습 개수 조회 (진행중/완료)
+ */
+function getLearningCount(memberId) {
+  return axios.get("/learning/count", {
+    params: { memberId }
+  });
+}
 
 export default {
   createRoadmap,
@@ -114,4 +122,5 @@ export default {
   getLearningDayByDayId,
   submitLearningDaySummary,
   recommendSkills,
+  getLearningCount,
 };

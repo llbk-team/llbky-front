@@ -19,10 +19,8 @@
     </ul>
 
     <div class="row g-4">
-
       <!-- 왼쪽 -->
       <div class="col-md-8">
-
         <!-- ======================== -->
         <!--   진행중 탭 (ongoing)     -->
         <!-- ======================== -->
@@ -38,15 +36,15 @@
             </div>
           </div>
 
-          <!-- 🔥 학습 없음 표시 -->
+          <!-- 학습 없음 표시 -->
           <div v-if="pagedOngoingPlans.length === 0" class="text-center py-5 text-muted">
             <p class="mb-2">🚀 아직 시작한 학습이 없어요.</p>
             <p class="small">새 학습을 시작해 보세요!</p>
           </div>
 
-          <!-- 🔥 학습 있을 때 -->
+          <!-- 학습 있을 때 -->
           <div v-else>
-            <div v-for="(plan, i) in pagedOngoingPlans" :key="i" class="card border-light mb-3 sub-card">
+            <div v-for="(plan, i) in pagedOngoingPlans" :key="i" class="card mb-3 sub-card">
               <div class="card-body">
                 <h6 class="fw-semibold">{{ plan.title }}</h6>
                 <p class="text-secondary small">{{ plan.period }}</p>
@@ -79,15 +77,15 @@
             </div>
           </div>
 
-          <!-- 🔥 완료 없음 표시 -->
+          <!-- 완료 없음 표시 -->
           <div v-if="pagedCompletedPlans.length === 0" class="text-center py-5 text-muted">
             <p class="mb-2">📘 아직 완료된 학습이 없어요.</p>
             <p class="small">학습을 모두 마치면 여기에 표시돼요!</p>
           </div>
 
-          <!-- 🔥 완료된 학습 있을 때 -->
+          <!-- 완료된 학습 있을 때 -->
           <div v-else>
-            <div v-for="(plan, i) in pagedCompletedPlans" :key="i" class="card border-light mb-3 sub-card clickable" @click="goToReport(plan)">
+            <div v-for="(plan, i) in pagedCompletedPlans" :key="i" class="card mb-3 sub-card" @click="goToReport(plan)">
               <div class="card-body">
                 <h6 class="fw-semibold">{{ plan.title }}</h6>
                 <p class="text-secondary small mb-1">{{ plan.period }}</p>
@@ -112,15 +110,6 @@
           </div>
         </div>
 
-        <!-- AI 코멘트 -->
-        <div class="card shadow-sm p-4 mb-3 card-clean">
-          <h5 class="fw-bold mb-3">AI 코멘트</h5>
-          <div class="p-3 rounded border mb-2" style="background-color:#DDF3EB; border-color:#71EBBE;">
-            <p class="small mb-0">“{{ aiComment.main }}”</p>
-          </div>
-          <p class="text-muted small">참고: {{ aiComment.tip }} 💪</p>
-        </div>
-
         <!-- 캘린더 -->
         <div class="card shadow-sm p-4 mt-3 card-clean">
           <div class="calendar-header d-flex justify-content-between align-items-center mb-2">
@@ -143,306 +132,52 @@
               </tr>
             </tbody>
           </table>
-
-          <p class="small text-muted mt-2">✓ 오늘 학습 완료 시 자동 표시됩니다</p>
+          <p class="small text-muted mt-2">✓ 오늘 하루도 화이팅!</p>
         </div>
 
       </div>
     </div>
-
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
-import { useRouter, useRoute } from "vue-router";
-import learningApi from "@/apis/learningApi";
+import { useLearningCoach } from "@/utils/learningCoach";
 
-const router = useRouter();
-const route = useRoute();
+const memberId = 1;
+const {
+  ongoingPlans,
+  completedPlans,
+  pagedOngoingPlans,
+  pagedCompletedPlans,
 
-const memberId = 1; // 로그인 연동 후 교체
+  // 페이지네이션
+  ongoingPage,
+  completedPage,
+  totalOngoingPages,
+  totalCompletedPages,
+  nextPage,
+  prevPage,
 
-// ===============================
-//        🔥 학습 리스트 로드
-// ===============================
-const ongoingPlans = ref([]);
-const completedPlans = ref([]);
+  // 탭
+  currentTab,
+  setTab,
 
-async function loadLearningList() {
-  try {
-    const ongoingRes = await learningApi.getLearningList(memberId, "진행중");
-    const completedRes = await learningApi.getLearningList(memberId, "완료");
+  // 캘린더
+  calendar,
+  year,
+  month,
+  prevMonth,
+  nextMonth,
+  isToday,
 
-    ongoingPlans.value = ongoingRes.data.map(item => ({
-      id: item.learningId,
-      title: item.title,
-      period: "4주 플랜",
-      progress: 0
-    }));
-
-    completedPlans.value = completedRes.data.map(item => ({
-      id: item.learningId,
-      title: item.title,
-      period: "4주 플랜",
-      completedDate: item.updatedAt?.substring(0, 10) || "미확인"
-    }));
-
-  } catch (e) {
-    console.error("학습 리스트 로드 실패:", e);
-  }
-}
-
-onMounted(() => {
-  loadLearningList();
-});
-
-// ===============================
-//            🔥 탭
-// ===============================
-const currentTab = ref(route.query.tab || "ongoing");
-
-function setTab(tabName) {
-  currentTab.value = tabName;
-  router.replace({ query: { tab: tabName } });
-}
-
-// ===============================
-//       🔥 페이지네이션
-// ===============================
-const ongoingPage = ref(1);
-const completedPage = ref(1);
-const itemsPerPage = 3;
-
-const totalOngoingPages = computed(() =>
-  ongoingPlans.value.length === 0 ? 0 : Math.ceil(ongoingPlans.value.length / itemsPerPage)
-);
-
-const totalCompletedPages = computed(() =>
-  completedPlans.value.length === 0 ? 0 : Math.ceil(completedPlans.value.length / itemsPerPage)
-);
-
-const pagedOngoingPlans = computed(() => {
-  const start = (ongoingPage.value - 1) * itemsPerPage;
-  return ongoingPlans.value.slice(start, start + itemsPerPage);
-});
-
-const pagedCompletedPlans = computed(() => {
-  const start = (completedPage.value - 1) * itemsPerPage;
-  return completedPlans.value.slice(start, start + itemsPerPage);
-});
-
-function nextPage(type) {
-  if (type === "ongoing" && ongoingPage.value < totalOngoingPages.value)
-    ongoingPage.value++;
-  if (type === "completed" && completedPage.value < totalCompletedPages.value)
-    completedPage.value++;
-}
-
-function prevPage(type) {
-  if (type === "ongoing" && ongoingPage.value > 1) ongoingPage.value--;
-  if (type === "completed" && completedPage.value > 1) completedPage.value--;
-}
-
-// ===============================
-//      🔥 달력 로직
-// ===============================
-const today = new Date();
-const year = ref(today.getFullYear());
-const month = ref(today.getMonth());
-const calendar = ref([]);
-
-function generateCalendar() {
-  const firstDay = new Date(year.value, month.value, 1).getDay();
-  const daysInMonth = new Date(year.value, month.value + 1, 0).getDate();
-
-  let temp = [];
-  let week = Array(7).fill(0);
-  let day = 1;
-
-  for (let i = firstDay; i < 7; i++) week[i] = day++;
-  temp.push(week);
-
-  while (day <= daysInMonth) {
-    week = Array(7).fill(0);
-    for (let i = 0; i < 7 && day <= daysInMonth; i++) week[i] = day++;
-    temp.push(week);
-  }
-  calendar.value = temp;
-}
-
-function isToday(d) {
-  return (
-    d === today.getDate() &&
-    month.value === today.getMonth() &&
-    year.value === today.getFullYear()
-  );
-}
-
-function prevMonth() {
-  if (month.value === 0) {
-    month.value = 11;
-    year.value--;
-  } else {
-    month.value--;
-  }
-  generateCalendar();
-}
-
-function nextMonth() {
-  if (month.value === 11) {
-    month.value = 0;
-    year.value++;
-  } else {
-    month.value++;
-  }
-  generateCalendar();
-}
-
-generateCalendar();
-
-// ===============================
-//  🔥 통계 / AI 코멘트 (임시)
-// ===============================
-const stats = { ongoing: 2, completed: 1 };
-
-const aiComment = {
-  main: "SQL 학습 플랜을 잘 진행 중이에요! 이번 주 목표는 Spring Security를 공부해봐요.",
-  tip: "하루 30분만 더 투자하면 목표 자격증 합격 확률이 높아져요!"
-};
-
-function goToReport(plan) {
-  router.push(`/learning/report?learningId=${plan.id}`);
-}
-
+  // 통계
+  stats,
+  goToReport
+} = useLearningCoach(memberId);
 </script>
 
-<style scoped>
-/* --- 기존 CSS 유지 (생략 없음) --- */
-body {
-  background-color: #F1F2F3;
-  color: #111111;
-}
 
-.card-clean {
-  border-radius: 16px;
-  border: 1px solid #EAEBEC;
-  background-color: #FFFFFF;
-}
 
-.sub-card {
-  border-radius: 12px;
-  border: 1px solid #EAEBEC;
-  background-color: #F8FAF9;
-}
 
-.btn-green {
-  display: inline-flex;
-  align-items: center;
-  height: 37px;
-  background-color: #71EBBE;
-  border: 1px solid #71EBBE;
-  color: #111111;
-  border-radius: 6px;
-  font-size: 13.5px;
-  font-weight: 500;
-}
 
-.btn-green:hover {
-  background-color: #A2F1D6;
-  border-color: #A2F1D6;
-}
-
-.btn-outline-green {
-  display: inline-flex;
-  align-items: center;
-  border: 1px solid #71EBBE;
-  color: #111111;
-  border-radius: 8px;
-  height: 37px;
-  border-radius: 6px;
-  font-size: 13.5px;
-  font-weight: 500;
-}
-
-.btn-outline-green:hover {
-  background-color: #71EBBE;
-  color: #111111;
-}
-
-.shadow-sm {
-  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.05) !important;
-}
-
-.nav-tabs .nav-link {
-  color: #111111;
-  border: none;
-  font-weight: 500;
-}
-
-.nav-tabs .nav-link.active {
-  border-bottom: 3px solid #71EBBE;
-  color: #111111;
-}
-
-.clickable {
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.clickable:hover {
-  background-color: #E9FAF5;
-}
-
-.page-btn {
-  border: none;
-  background: transparent;
-  font-size: 22.4px;
-  color: #444444;
-  cursor: pointer;
-  padding: 0px 8px;
-  transition: color 0.2s;
-}
-
-.page-btn:hover:not(:disabled) {
-  color: #00C896;
-}
-
-.page-btn:disabled {
-  color: #CCCCCC;
-  cursor: default;
-}
-
-.title {
-  font-weight: 700;
-  font-size: 28px;
-}
-
-.subtitle {
-  color: #6C757D;
-  font-size: 16px;
-  margin-bottom: 0px;
-}
-
-.ongoing-container {
-  min-height: 660px;
-}
-
-.ongoing-container-finish {
-  min-height: 520px;
-}
-
-.calendar-today {
-  background-color: #DDF3EB;
-  border-radius: 6px;
-  font-weight: 700;
-  color: #111111;
-}
-
-.stats-bar {
-  padding: 8px 12px;
-  border: 1px solid #EAEBEC;
-  border-radius: 10px;
-  background-color: #FFFFFF;
-}
-</style>
+<style scoped src="@/assets/css/learningCoach.css"></style>

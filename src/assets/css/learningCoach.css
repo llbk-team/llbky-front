@@ -1,0 +1,160 @@
+/* 전체 페이지 톤 */
+body {
+  background-color: #F4F6F8;
+  color: #111111;
+}
+
+/* 페이지 제목 */
+.title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #111111;
+}
+
+/* 부제 */
+.subtitle {
+  font-size: 16px;
+  color: #555;
+}
+
+/* 기본 카드 */
+.card-clean {
+  border-radius: 14px;
+  background-color: #FFFFFF;
+  border: 1px solid #EAEBEC;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+/* ============================= */
+/*   "내 학습 이어하기" sub-card */
+/* ============================= */
+.sub-card {
+  background-color: #eafdfa;
+  border-radius: 12px;
+  border: 1.5px solid #32c0ad;
+  padding: 16px;
+  transition: 0.25s ease;
+}
+
+/* hover 시 은은 민트 강조 */
+.sub-card:hover {
+  background-color: #99e4d4;
+  /* 연한 민트 배경 */
+}
+
+/* 제목 - 직무 인사이트와 동일한 딥그린 톤 */
+.sub-card h6,
+.sub-card .fw-semibold {
+  color: #0F3D33;
+  /* 딥그린 */
+  font-weight: 600;
+}
+
+/* 설명 텍스트 - 직무 인사이트의 흑청 느낌 그레이그린 */
+.sub-card .text-secondary,
+.sub-card p,
+.sub-card small {
+  color: #4B5E57;
+  /* 차분한 그린+그레이 */
+}
+
+
+
+/* 버튼 - 초록 민트 */
+.btn-green {
+  display: inline-flex;
+  align-items: center;
+  height: 37px;
+  background-color: #71EBBE;
+  border: 1px solid #71EBBE;
+  color: #111111;
+  border-radius: 6px;
+  font-size: 13.5px;
+  font-weight: 500;
+  transition: 0.2s;
+}
+
+.btn-green:hover {
+  background-color: #8FF5CF;
+  border-color: #8FF5CF;
+}
+
+/* 버튼 - 아웃라인 민트 */
+.btn-outline-green {
+  display: inline-flex;
+  align-items: center;
+  height: 37px;
+  padding: 0 14px;
+  border: 1px solid #71EBBE;
+  border-radius: 6px;
+  background-color: #ffffff;
+  color: #111111;
+  font-size: 13.5px;
+  font-weight: 500;
+  transition: 0.2s;
+}
+
+/* hover */
+.btn-outline-green:hover {
+  background-color: #000000;
+  color: #ffffff;
+  border: 1px solid #000000;
+}
+
+/* 탭 스타일 */
+.nav-tabs .nav-link {
+  border: none;
+  color: #555;
+  background: transparent;
+  transition: 0.2s;
+}
+
+.nav-tabs .nav-link.active {
+  color: #111111;
+  font-weight: 600;
+  border-bottom: 3px solid #71EBBE;
+}
+
+/* 클릭 가능한 영역 */
+.clickable {
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.clickable:hover {
+  background-color: #EAFBF5;
+}
+
+/* 페이지네이션 버튼 */
+.page-btn {
+  border: none;
+  background: transparent;
+  font-size: 22px;
+  color: #777;
+  padding: 0 8px;
+  cursor: pointer;
+}
+
+.page-btn:hover:not(:disabled) {
+  color: #00C896;
+}
+
+.page-btn:disabled {
+  color: #CCC;
+}
+
+/* 캘린더 */
+.calendar-today {
+  background-color: #DFF7EF;
+  color: #111;
+  font-weight: 700;
+  border-radius: 6px;
+}
+
+/* 학습 현황 박스 */
+.stats-bar {
+  background-color: #FFFFFF;
+  border-radius: 12px;
+  border: 1px solid #E2E6EA;
+  padding: 10px 14px;
+}
