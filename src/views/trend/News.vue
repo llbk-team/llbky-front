@@ -253,7 +253,17 @@ const mapNewsData = (newsItems) => {
 /*------------------------------
    다음 페이지 로드 (무한 스크롤)
 -------------------------------*/
+const isSearchMode = ref(false);  // 추가
+
+
 const loadMoreNews = async() =>{
+
+
+   if (isSearchMode.value) {
+    console.log('검색 모드 - 무한 스크롤 비활성화');
+    return;
+  }
+
   if(!hasMore.value|| isLoadingMore.value|| loading.value){
    
     return;
@@ -362,6 +372,8 @@ const searchNews = async () => {
       
       if (newsItems.length > 0) {
         newsList.value = mapNewsData(newsItems);
+        isSearchMode.value = true;   // ← 검색 모드 활성화
+        hasMore.value = false; 
         keyword.value = ''
        
       } else {
