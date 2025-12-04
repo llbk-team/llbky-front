@@ -2,86 +2,79 @@
 
 import { ref, computed, onMounted } from "vue";
 import learningApi from "@/apis/learningApi";
-import WeekDetailModal from "@/components/modal/LearningWeekDetailModal.vue";
 
-function useLearningStart() {
+function useLearningStart(learningId) {
 
   /*-------------------------------------
     공통 상태 정의
   -------------------------------------*/
-  const weeklyHours = ref(25);
-  const currentWeek = ref(2); 
-  const overallProgress = ref(45);  // 진행률
-
-  const weeklyProgress = ref([
-    {
-      label: "1주차",
-      topic: "Java 기초",
-      progress: 100,
-      details: [
-        "1일차: Java 개발 환경 설정 및 Hello World 출력",
-        "2일차: 변수, 자료형, 연산자 실습",
-        "3일차: 조건문과 반복문 학습",
-        "4일차: 배열과 메서드 이해",
-        "5일차: 클래스와 객체 개념 정리",
-        "6일차: 간단한 콘솔 미니프로젝트 제작",
-        "7일차: 주간 복습 및 퀴즈",
-      ],
-    },
-    {
-      label: "2주차",
-      topic: "Spring Security",
-      progress: 60,
-      details: [
-        "1일차: 스프링 시큐리티 구조와 필터 이해",
-        "2일차: AuthenticationManager 학습",
-        "3일차: JWT 발급 및 검증 로직 구현",
-        "4일차: OAuth2 로그인 구조 실습",
-        "5일차: AccessDeniedHandler 설정",
-        "6일차: 커스텀 로그인 페이지 구현",
-        "7일차: 예외 처리 및 테스트",
-      ],
-    },
-    {
-      label: "3주차",
-      topic: "JPA & Database",
-      progress: 0,
-      details: [
-        "1일차: JPA 환경 설정 및 기본 CRUD",
-        "2일차: Entity 매핑 실습",
-        "3일차: 연관관계 매핑 (1:N, N:M)",
-        "4일차: JPQL 쿼리 작성",
-        "5일차: 영속성 컨텍스트 이해",
-        "6일차: 트랜잭션 및 롤백 실습",
-        "7일차: 데이터베이스 최적화 복습",
-      ],
-    },
-    {
-      label: "4주차",
-      topic: "REST API 설계",
-      progress: 0,
-      details: [
-        "1일차: RESTful 설계 원칙 학습",
-        "2일차: Controller 및 Service 설계",
-        "3일차: 요청/응답 구조 정의",
-        "4일차: 예외 처리(Exception Handling)",
-        "5일차: Swagger API 문서화",
-        "6일차: 배포 환경 테스트",
-        "7일차: 프로젝트 리팩토링 및 점검",
-      ],
-    },
-  ]); // 주차별 학습 진행
+  const goal = ref("여기는 학습 목표 들어갈 자리입니다 예를 들면 취업 준비");  // 학습 목표
+  const isLoading = ref(false);
 
   /*-------------------------------------------------------
     현재 주차 + 일차 목록
   -------------------------------------------------------*/
+  const weeklyProgress = ref([]); // 주차별 학습 진행
+
+  const loadWeeks = async () => {
+    const { data } = await learningApi.getWeekListByLearningId(learningId);
+
+    weeklyProgress.value = data.map(w => ({
+      weekId: w.weekId,
+      weekNumber: w.weekNumber,
+      label: `${w.weekNumber}주차`,
+      topic: w.title,
+      progress: w.status === "완료" ? 100 : (w.status === "진행 중" ? 50 : 0),
+      status: w.status,
+      summary: w.learningWeekSummary
+    }));
+  };
+
   const weeklyItems = ref([]);
 
   const loadWeeklyItems = async (weekId) => {
     const { data } = await learningApi.getLearningDayByWeek(weekId);
     weeklyItems.value = data;
   }
+  
+  /*-------------------------------------------------------
+    진행률 계산
+  -------------------------------------------------------*/
+  const totalWeeks = computed(() => weeklyProgress.value.length); // 전체 주 수 계산
+  
+  // 완료된 주 수
+  const completedWeeks = computed(() => {
+    return weeklyProgress.value.reduce((acc, w) => {
+      if (w.status === "완료") return acc + 1;
+      if (w.status === "진행 중") return acc + 0.5;
+      return acc;
+    }, 0);
+  });
 
+  // 현재 진행 중인 주차
+  const currentWeek = computed(() => {
+    // 진행 중 상태
+    const ongoing = weeklyProgress.value.find(w => w.status === "진행 중");
+    if (ongoing) return ongoing.weekNumber;
+
+    // 진행 중 없음 -> 다음 예정 주차 찾기
+    const nextPlanned = weeklyProgress.value.find(w => w.status === "예정");
+    if (nextPlanned) return nextPlanned.weekNumber;
+
+    // 모두 완료 -> 마지막 주차 번호
+    return (weeklyProgress.value.length > 0) ? (weeklyProgress.value[weeklyProgress.value.length - 1].weekNumber) : 1;
+  }); 
+
+  // 전체 진행률
+  const overallProgress = computed(() => {
+    if (totalWeeks.value === 0) return 0;
+    return Math.round((completedWeeks.value / totalWeeks.value) * 100);
+  });
+
+
+  /*-------------------------------------------------------
+    페이징
+  -------------------------------------------------------*/
   const currentPage = ref(1); // 현재 페이지
   const itemsPerPage = 4; // 첫 페이지에 1~4일차, 두 번째 페이지에 5~7일차
 
@@ -108,10 +101,28 @@ function useLearningStart() {
     주차 상세 모달 관련 상태/기능
   -------------------------------------------------------*/
   const showWeekModal = ref(false);
-  const selectedWeek = ref(null);
+  const selectedWeek = ref({
+    label: "",
+    topic: "",
+    days: []
+  });
   
-  const openWeekModal = (week) => {
-    selectedWeek.value = week;
+  const openWeekModal = async (week) => {
+    
+    const { data: days } = await learningApi.getLearningDayByWeek(week.weekId);
+
+    selectedWeek.value = {
+      ...week,
+      days: days.map(d => ({
+        dayId: d.dayId,
+        label: `${d.dayNumber}일차`,
+        title: d.title,
+        desc: d.content,
+        memo: d.learningDaySummary,
+        open: false
+      }))
+    };
+
     showWeekModal.value = true;
   }
   
@@ -159,6 +170,8 @@ function useLearningStart() {
     }
 
     try {
+      isLoading.value = true;
+
       const dayId = selectedItem.value.dayId; // 일일 학습 ID
       const learningDaySummary = memoContent.value; // 정리 내용
 
@@ -172,6 +185,8 @@ function useLearningStart() {
         fixedMemo.value = data.learningDaySummary;
         selectedItem.value.status = data.status;  // 상태 업데이트
         memoContent.value = "";  // 입력창 초기화
+
+        await loadWeeks(learningId);  // 업데이트된 주차/진행률 다시 불러오기
         
       } else {
         fixedMemo.value = "";
@@ -181,6 +196,9 @@ function useLearningStart() {
 
     } catch (err) {
       console.error("메모 검증 실패:", err);
+
+    } finally {
+      isLoading.value = false;
     }
   };
 
@@ -206,20 +224,36 @@ function useLearningStart() {
   // 파싱된 메모
   const parsedMemo = computed(() => parseMarkDown(fixedMemo.value));
 
-  onMounted(() => {
-    loadWeeklyItems(27);
-    // loadWeeklyItems(currentWeek.value);
+  onMounted(async () => {
+
+    // 주차 정보 불러오기
+    await loadWeeks(learningId);
+
+    // 계산
+    const cw = currentWeek.value;
+
+    // 현재 주차 찾기
+    const currentWeekObj = weeklyProgress.value.find(w => w.weekNumber === cw);
+    
+    // 해당 주차의 일별 학습 정보 불러오기
+    if (currentWeekObj) {
+      await loadWeeklyItems(currentWeekObj.weekId);
+    }
+
   });
 
   return {
     // 기본 정보
-    weeklyHours,
+    goal,
+    totalWeeks,
+    completedWeeks,
     currentWeek,
     overallProgress,
 
     // 진행률 & 내용
     weeklyProgress,
     weeklyItems,
+    loadWeeks,
     loadWeeklyItems,
     currentPage,
     itemsPerPage,
@@ -229,6 +263,7 @@ function useLearningStart() {
     prevPage,
 
     // 주차 상세 모달
+    selectedWeek,
     showWeekModal,
     openWeekModal,
     closeWeekModal,

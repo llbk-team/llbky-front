@@ -3,7 +3,7 @@
     <div class="d-flex justify-content-between align-items-end mb-1">
       <div>
         <div class="title">백엔드 개발자 학습 코칭</div>
-        <div class="subtitle">취업 준비 · 주 {{ weeklyHours }}시간</div>
+        <div class="subtitle">{{goal}}</div>
       </div>
       <div class="fs-5">{{ overallProgress }}% 전체 진행률</div>
     </div>
@@ -94,27 +94,38 @@
               ⚠️ 학습 기록이 거부되었습니다. 내용을 다시 확인해주세요.
             </div>
 
-            <!-- 검증 성공 + 새로운 메모 저장됐을 때 -->
-            <div v-if="fixedMemo">
-              <div class="ai-memo-box bg-light rounded border mt-4">
-                <div class="ai-memo-content" v-html="parsedMemo"></div>
-              </div>
-            </div>
+            <div class="ai-memo-box bg-light rounded border mt-4">
 
-            <!-- 입력 모드일 때 -->
-            <div v-else>
-              <textarea v-model="memoContent" rows="14" class="form-control mb-3 mt-4" placeholder="예: Session vs JWT 차이점 정리..."></textarea>
-  
-              <div class="d-flex justify-content-between align-items-center">
-                <small class="text-muted">{{ memoContent.length }}/500자</small>
-                <div>
-                  <button class="btn btn-outline-secondary me-2" @click="cancelMemo">취소</button>
-                  <button class="btn btn-mint" @click="submitMemo">⚡ AI 검증 받기</button>
-                </div>
+              <!-- 1) 로딩 중 -->
+              <div v-if="isLoading" class="loading-spinner">
+                  <div class="spinner-border text-mint"></div>
+                  <p class="mt-2 small">AI가 내용을 검토하고 있어요...</p>
               </div>
-            </div>
 
+              <!-- 2) AI 결과(fixedMemo)가 있으면 출력 -->
+              <div v-else-if="fixedMemo" class="ai-memo-content" v-html="parsedMemo"></div>
+
+              <!-- 3) 결과가 없으면 입력 모드 -->
+              <div v-else>
+                  <textarea
+                    v-model="memoContent"
+                    rows="14"
+                    class="form-control mb-3 mt-4"
+                    placeholder="예: Session vs JWT 차이점 정리..."
+                  ></textarea>
+
+                  <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted">{{ memoContent.length }}/500자</small>
+                    <div>
+                      <button class="btn btn-outline-secondary me-2" @click="cancelMemo">취소</button>
+                      <button class="btn btn-mint" @click="submitMemo">⚡ AI 검증 받기</button>
+                    </div>
+                  </div>
+              </div>
+
+            </div>
           </div>
+          
           <div v-else class="text-center text-muted py-5 rounded-6">
             <p>왼쪽에서 학습 항목을 선택하면<br />여기에 정리 노트를 작성할 수 있습니다 ✍️</p>
           </div>
@@ -123,7 +134,11 @@
     </div>
   </div>
 
-  <WeekDetailModal v-if="showWeekModal" :week="selectedWeek" @close="closeWeekModal" />
+  <WeekDetailModal 
+    v-if="showWeekModal && selectedWeek && selectedWeek.days && selectedWeek.days.length"
+    :week="selectedWeek"
+    @close="closeWeekModal"
+  />
 
 </template>
 
@@ -137,7 +152,9 @@ const learningId = Number(route.query.learningId);
 
 const {
     // 기본 정보
-    weeklyHours,
+    goal,
+    totalWeeks,
+    completedWeeks,
     currentWeek,
     overallProgress,
 
@@ -154,6 +171,7 @@ const {
     prevPage,
 
     // 주차 상세 모달
+    selectedWeek,
     showWeekModal,
     openWeekModal,
     closeWeekModal,
