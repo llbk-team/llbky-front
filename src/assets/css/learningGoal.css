@@ -1,0 +1,261 @@
+* {
+  font-family: 'Pretendard', 'Inter', sans-serif;
+}
+
+.main-wrapper {
+  max-width: 1150px;
+}
+
+/* 제목 */
+.title {
+  font-weight: 700;
+  font-size: 28px;
+}
+
+.subtitle {
+  color: #6C757D;
+  font-size: 16px;
+  margin-bottom: 16px;
+}
+
+/* 카드 */
+.card-clean {
+  border-radius: 14px;
+  border: 1px solid #EAEBEC;
+  background-color: #FFFFFF;
+}
+
+/* 직무 태그 */
+.job-tag {
+  background: #111;
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+}
+
+/* 주당 공부 박스 */
+.study-box {
+  text-align: center;
+}
+
+.study-time-selector {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 18px;
+  margin-top: 8px;
+}
+
+.btn-circle {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #F3F4F6;
+  border: 1px solid #DDD;
+  font-size: 20px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-circle:hover {
+  background: #E5E7EB;
+}
+
+.study-hour-text {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+/* 체크박스 */
+.checkbox-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+  border: 1px solid #EAEBEC;
+  border-radius: 6px;
+  margin-bottom: 6px;
+  cursor: pointer;
+}
+
+.checkbox-item:hover {
+  background: #F6F6F6;
+}
+
+.checkbox-item input {
+  margin-right: 10px;
+}
+
+/* info 박스 */
+.info-box-mint {
+  padding: 6px 14px;
+  background: #f0fcf7;
+  border: 1px solid #71EBBE;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.green-info-light {
+  background: #f0fcf7;
+  border: 1px solid #71EBBE;
+  padding: 12px;
+  border-radius: 6px;
+}
+
+/* 스크롤 박스 */
+.skill-scroll-box {
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+/* 관심 기술 */
+.added-skills-list {
+  list-style: none;
+  padding: 0;
+}
+
+.added-skills-list li {
+  background: #F9FAFB;
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+}
+
+/* 플랜 버튼 */
+.btn-primary {
+  background: #111827;
+  height: 37px;
+  font-size: 14px;
+}
+
+.btn-primary:hover {
+  background: #374151;
+}
+
+/* 모달 */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.resume-modal {
+  background: #fff;
+  width: 90%;
+  max-width: 650px;
+  padding: 30px;
+  border-radius: 10px;
+  max-height: 80vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  background: none;
+  border: none;
+  font-size: 26px;
+  cursor: pointer;
+}
+
+/* 탭 */
+.doc-tab-btn {
+  height: 37px;
+  border-radius: 6px;
+  padding: 6px 16px;
+  background: #f1f1f1;
+  border: 1px solid #ddd;
+  cursor: pointer;
+  margin-right: 6px;
+}
+
+.doc-tab-btn.active {
+  background: #DDF3EB;
+  border-color: #71EBBE;
+}
+
+/* 리스트 */
+.resume-list {
+  list-style: none;
+  padding: 0;
+}
+
+.resume-item-new {
+  background: #F9FAFB;
+  border: 1px solid #EEE;
+  padding: 14px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+}
+
+.add-skill-box {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.skill-input {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid #D1D5DB;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.add-button {
+  background-color: #A2F1D6;
+  border: none;
+  padding: 0 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.add-button:hover {
+  background-color: #71EBBE;
+}
+
+/* --------------------------
+      전체 화면 로딩 스피너
+--------------------------- */
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(3px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+/* 원형 스피너 */
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 5px solid #e5e7eb;
+  border-top-color: #10b981;
+  /* 초록 포인트 */
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-text {
+  margin-top: 14px;
+  font-size: 15px;
+  font-weight: 500;
+  color: #111827;
+}

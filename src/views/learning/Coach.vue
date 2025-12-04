@@ -176,8 +176,4 @@ const {
 } = useLearningCoach(memberId);
 </script>
 
-
-
-
-
 <style scoped src="@/assets/css/learningCoach.css"></style>

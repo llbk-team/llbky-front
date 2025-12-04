@@ -17,13 +17,16 @@ async function searchRelatedNews(summaryId, limit = 3) {
 /**
  * 네이버 뉴스 검색
  */
-async function searchNews(keywords, memberId) {
+async function searchNews(keywords, memberId,limit=15) {
+
+   const keywordArray = Array.isArray(keywords) ? keywords : [keywords];
+  
    const response = await axios.get(`/trend/news/search`,{
       params:{
-      keywords: keywords,  
+      keywords: keywordArray, 
           memberId: memberId,
           period: 'month',
-          limit: 20
+          limit: limit
       }
     });
 
@@ -45,13 +48,30 @@ async function getNewsDetail(summaryId) {
 }
 
 
-async function feedNews(memberId,limit=15){
-   return axios.get(`/trend/news/feed`,{
-    params:{
-      memberId: memberId,
-      limit:limit
-    }
-   });
+// ✅ 피드 뉴스 조회 (무한 스크롤 지원)
+async function feedNews(
+  memberId, 
+  limit = 15, 
+  period = 'week',  // ✅ 추가
+  lastPublishedAt = null, 
+  lastSummaryId = null
+) {
+  const params = {
+    memberId,
+    limit,
+    period  // ✅ 추가
+  };
+  
+  if (lastPublishedAt) {
+    params.lastPublishedAt = lastPublishedAt;  
+  }
+  if (lastSummaryId) {
+    params.lastSummaryId = lastSummaryId;
+  }
+  
+  
+  
+  return axios.get('/trend/news/feed', { params });
 }
 
 export default {
