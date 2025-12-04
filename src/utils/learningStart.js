@@ -1,6 +1,6 @@
 // 학습 진행 페이지 컴포넌트용 js 파일
 
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, watch } from "vue";
 import learningApi from "@/apis/learningApi";
 
 function useLearningStart(learningId) {
@@ -52,12 +52,12 @@ function useLearningStart(learningId) {
     const { data } = await learningApi.getLearningDayByWeek(weekId);
     weeklyItems.value = data;
   }
-  
+
   /*-------------------------------------------------------
     진행률 계산
   -------------------------------------------------------*/
   const totalWeeks = computed(() => weeklyProgress.value.length); // 전체 주 수 계산
-  
+
   // 완료된 주 수
   // const completedWeeks = computed(() => {
   //   return weeklyProgress.value.reduce((acc, w) => {
@@ -79,7 +79,7 @@ function useLearningStart(learningId) {
 
     // 모두 완료 -> 마지막 주차 번호
     return (weeklyProgress.value.length > 0) ? (weeklyProgress.value[weeklyProgress.value.length - 1].weekNumber) : 1;
-  }); 
+  });
 
   const overallProgress = computed(() => {
     // 전체 Day
@@ -108,7 +108,7 @@ function useLearningStart(learningId) {
     if (!weeklyItems.value) return [];
 
     const start = (currentPage.value - 1) * itemsPerPage;
-    
+
     return weeklyItems.value.slice(start, start + itemsPerPage);
   });
 
@@ -128,9 +128,9 @@ function useLearningStart(learningId) {
     topic: "",
     days: []
   });
-  
+
   const openWeekModal = async (week) => {
-    
+
     const { data: days } = await learningApi.getLearningDayByWeek(week.weekId);
 
     selectedWeek.value = {
@@ -147,12 +147,12 @@ function useLearningStart(learningId) {
 
     showWeekModal.value = true;
   }
-  
+
   const closeWeekModal = () => {
     showWeekModal.value = false;
   }
-  
-  
+
+
   /*-------------------------------------------------------
     일차 선택 + 학습 메모 입력
   -------------------------------------------------------*/
@@ -210,12 +210,12 @@ function useLearningStart(learningId) {
         memoContent.value = "";  // 입력창 초기화
 
         await loadWeeks(learningId);  // 업데이트된 주차/진행률 다시 불러오기
-        
+
       } else {
-        memoContent.value = data.learningDaySummary; 
+        memoContent.value = data.learningDaySummary;
         await loadWeeks(learningId);
       }
-   
+
 
     } catch (err) {
       console.error("메모 검증 실패:", err);
@@ -257,13 +257,68 @@ function useLearningStart(learningId) {
 
     // 현재 주차 찾기
     const currentWeekObj = weeklyProgress.value.find(w => w.weekNumber === cw);
-    
+
     // 해당 주차의 일별 학습 정보 불러오기
     if (currentWeekObj) {
       await loadWeeklyItems(currentWeekObj.weekId);
     }
 
   });
+
+
+  // ---------------------------
+  // 폭죽 하나 생성
+  // ---------------------------
+  function spawnFirework(x, y) {
+    const fw = document.createElement("dotlottie-player");
+    fw.classList.add("firework");
+
+    fw.setAttribute(
+      "src",
+      "https://lottie.host/824cb754-a11a-4458-bba0-1f5129c3ed76/NuLW5jGi8g.lottie"
+    );
+    fw.setAttribute("background", "transparent");
+    fw.setAttribute("speed", "1");
+    fw.setAttribute("loop", "false");
+    fw.setAttribute("autoplay", "true");
+
+    fw.style.top = `${y}px`;
+    fw.style.left = `${x}px`;
+
+    document.body.appendChild(fw);
+
+    setTimeout(() => fw.remove(), 1800);
+  }
+
+  // ---------------------------
+  // 여러 개 폭죽 동시에 팡팡
+  // ---------------------------
+  function burstFireworks() {
+    const centerX = window.innerWidth / 2;
+    const centerY = window.innerHeight / 2;
+
+    for (let i = 0; i < 6; i++) {
+      setTimeout(() => {
+        const offX = centerX + (Math.random() * 300 - 150);
+        const offY = centerY + (Math.random() * 300 - 150);
+        spawnFirework(offX, offY);
+      }, i * 200);
+    }
+  }
+
+  const fired = ref(false);
+
+  watch(
+    () => overallProgress.value,
+    (val) => {
+      if (val === 100 && !fired.value) {
+        fired.value = true;
+        burstFireworks();
+      }
+    }
+  );
+
+
 
   return {
     // 기본 정보
@@ -300,6 +355,9 @@ function useLearningStart(learningId) {
     selectItem,
     cancelMemo,
     submitMemo,
+
+    spawnFirework,
+    burstFireworks
   };
 }
 
