@@ -3,7 +3,7 @@
     <div class="d-flex justify-content-between align-items-end mb-1">
       <div>
         <div class="title">백엔드 개발자 학습 코칭</div>
-        <div class="subtitle">{{goal}}</div>
+        <div class="subtitle">{{ goal }}</div>
       </div>
       <div class="fs-5">{{ overallProgress }}% 전체 진행률</div>
     </div>
@@ -98,8 +98,8 @@
 
               <!-- 1) 로딩 중 -->
               <div v-if="isLoading" class="loading-spinner">
-                  <div class="spinner-border text-mint"></div>
-                  <p class="mt-2 small">AI가 내용을 검토하고 있어요...</p>
+                <div class="spinner-border text-mint"></div>
+                <p class="mt-2 small">AI가 내용을 검토하고 있어요...</p>
               </div>
 
               <!-- 2) AI 결과(fixedMemo)가 있으면 출력 -->
@@ -107,20 +107,15 @@
 
               <!-- 3) 결과가 없으면 입력 모드 -->
               <div v-else>
-                  <textarea
-                    v-model="memoContent"
-                    rows="14"
-                    class="form-control mb-3 mt-4"
-                    placeholder="예: Session vs JWT 차이점 정리..."
-                  ></textarea>
+                <textarea v-model="memoContent" rows="14" class="form-control mb-3 mt-4" placeholder="예: Session vs JWT 차이점 정리..."></textarea>
 
-                  <div class="d-flex justify-content-between align-items-center">
-                    <small class="text-muted">{{ memoContent.length }}/500자</small>
-                    <div>
-                      <button class="btn btn-outline-secondary me-2" @click="cancelMemo">취소</button>
-                      <button class="btn btn-mint" @click="submitMemo">⚡ AI 검증 받기</button>
-                    </div>
+                <div class="d-flex justify-content-between align-items-center">
+                  <small class="text-muted">{{ memoContent.length }}/500자</small>
+                  <div>
+                    <button class="btn btn-outline-secondary me-2" @click="cancelMemo">취소</button>
+                    <button class="btn btn-mint" @click="submitMemo">⚡ AI 검증 받기</button>
                   </div>
+                </div>
               </div>
 
             </div>
@@ -134,11 +129,15 @@
     </div>
   </div>
 
-  <WeekDetailModal 
-    v-if="showWeekModal && selectedWeek && selectedWeek.days && selectedWeek.days.length"
-    :week="selectedWeek"
-    @close="closeWeekModal"
-  />
+  <div v-if="showCongrats" class="congrats-popup">
+    <div class="congrats-box">
+      🎉 학습 목표 달성을 축하합니다! 🎉<br>
+      당신은 끝까지 해냈어요! 🔥
+    </div>
+  </div>
+
+
+  <WeekDetailModal v-if="showWeekModal && selectedWeek && selectedWeek.days && selectedWeek.days.length" :week="selectedWeek" @close="closeWeekModal" />
 
 </template>
 
@@ -151,40 +150,40 @@ const route = useRoute();
 const learningId = Number(route.query.learningId);
 
 const {
-    // 기본 정보
-    goal,
-    isLoading,
-    totalWeeks,
-    currentWeek,
-    overallProgress,
+  // 기본 정보
+  goal,
+  isLoading,
+  totalWeeks,
+  currentWeek,
+  overallProgress,
 
-    // 진행률 & 내용
-    weeklyProgress,
-    weeklyItems,
-    loadWeeks,
-    loadWeeklyItems,
-    currentPage,
-    itemsPerPage,
-    totalPages,
-    paginatedItems,
-    nextPage,
-    prevPage,
+  // 진행률 & 내용
+  weeklyProgress,
+  weeklyItems,
+  loadWeeks,
+  loadWeeklyItems,
+  currentPage,
+  itemsPerPage,
+  totalPages,
+  paginatedItems,
+  nextPage,
+  prevPage,
 
-    // 주차 상세 모달
-    selectedWeek,
-    showWeekModal,
-    openWeekModal,
-    closeWeekModal,
+  // 주차 상세 모달
+  selectedWeek,
+  showWeekModal,
+  openWeekModal,
+  closeWeekModal,
 
-    // 메모 작성
-    selectedItem,
-    memoContent,
-    fixedMemo,
-    parseMarkDown,
-    parsedMemo,
-    selectItem,
-    cancelMemo,
-    submitMemo,
+  // 메모 작성
+  selectedItem,
+  memoContent,
+  fixedMemo,
+  parseMarkDown,
+  parsedMemo,
+  selectItem,
+  cancelMemo,
+  submitMemo,
 
 } = learningStart.useLearningStart(learningId);
 

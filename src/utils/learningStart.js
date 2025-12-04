@@ -266,9 +266,11 @@ function useLearningStart(learningId) {
   });
 
 
-  // ---------------------------
-  // 폭죽 하나 생성
-  // ---------------------------
+  /*-------------------------------------------------------
+    폭죽 효과
+  -------------------------------------------------------*/
+  const showCongrats = ref(false);
+
   function spawnFirework(x, y) {
     const fw = document.createElement("dotlottie-player");
     fw.classList.add("firework");
@@ -290,9 +292,6 @@ function useLearningStart(learningId) {
     setTimeout(() => fw.remove(), 1800);
   }
 
-  // ---------------------------
-  // 여러 개 폭죽 동시에 팡팡
-  // ---------------------------
   function burstFireworks() {
     const centerX = window.innerWidth / 2;
     const centerY = window.innerHeight / 2;
@@ -313,7 +312,16 @@ function useLearningStart(learningId) {
     (val) => {
       if (val === 100 && !fired.value) {
         fired.value = true;
+
+        // 🔥 폭죽 팡팡
         burstFireworks();
+
+        // 🎉 축하 메시지 표시
+        showCongrats.value = true;
+
+        setTimeout(() => {
+          showCongrats.value = false;
+        }, 3000);
       }
     }
   );
@@ -356,8 +364,10 @@ function useLearningStart(learningId) {
     cancelMemo,
     submitMemo,
 
+    showCongrats,
     spawnFirework,
-    burstFireworks
+    burstFireworks,
+    
   };
 }
 
