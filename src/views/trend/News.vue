@@ -205,38 +205,44 @@ const visibleNews = computed(() => filteredNews.value);
    API 응답을 화면용 데이터로 변환
 ------------------------------ */
 const mapNewsData = (newsItems) => {
-  console.log('🔄 mapNewsData - Input:', newsItems);
+ 
   
   if (!Array.isArray(newsItems)) {
-   console.log('⚠️ mapNewsData - Invalid input');
+ 
     return [];
   }
-  
-try {
-    const mapped = newsItems.map((n) => ({
-      id: n.id || n.summaryId,
-      title: n.title || "제목 없음",
-      summary_short: n.summaryText || n.summary_short || "",
-      keywords: Array.isArray(n.keywords) 
-        ? n.keywords.map(k => {
-            if (typeof k === 'string') return k;
-            if (typeof k === 'object') return k.keyword || k.name || k.value || JSON.stringify(k);
-            return String(k);
-          })
-        : [],
-      trust: n.trustScore ?? n.trust ?? 0,
-      sentiment: n.sentiment || "neutral",
-      sentimentLabel: 
-        n.sentiment === 'positive' ? '긍정적' : 
-        n.sentiment === 'negative' ? '부정적' : '중립적',
-      bias_detected: n.biasDetected ?? n.bias_detected ?? false,
-      bias_type: n.biasType || n.bias_type || "",
-      date: n.publishedAt || n.date || "",
-      source: n.sourceName || n.source || "",
-      source_url: n.sourceUrl || n.source_url || "",
-    }));
+    try {
+    const mapped = newsItems.map((n) => {
     
-    console.log('✅ mapNewsData 완료 - 출력:', mapped.length, '건');
+      
+      const result = {
+        id: n.summaryId || n.summary_id || n.id,
+        title: n.title || "제목 없음",
+        summary_short: n.summaryText || n.summary_text || n.summary_short || "",
+        keywords: Array.isArray(n.keywords) 
+          ? n.keywords.map(k => {
+              if (typeof k === 'string') return k;
+              if (typeof k === 'object') return k.keyword || k.name || k.value || JSON.stringify(k);
+              return String(k);
+            })
+          : [],
+        trust: n.trustScore ?? n.trust_score ?? n.trust ?? 0,
+        sentiment: n.sentiment || "neutral",
+        sentimentLabel: 
+          n.sentiment === 'positive' ? '긍정적' : 
+          n.sentiment === 'negative' ? '부정적' : '중립적',
+        bias_detected: n.biasDetected ?? n.bias_detected ?? false,
+        bias_type: n.biasType || n.bias_type || "",
+        date: n.publishedAt || n.published_at || n.date || "",
+        source: n.sourceName || n.source_name || n.source || "",
+        source_url: n.sourceUrl || n.source_url || "",
+      };
+      
+    
+      return result;
+    });
+    
+  
     return mapped;
     
   } catch (error) {
@@ -249,19 +255,19 @@ try {
 -------------------------------*/
 const loadMoreNews = async() =>{
   if(!hasMore.value|| isLoadingMore.value|| loading.value){
-    console.log("로딩 중단",{ hasMore: hasMore.value, isLoadingMore: isLoadingMore.value, loading: loading.value });
+   
     return;
   }
 
   const lastItem = newsList.value[newsList.value.length-1];
   if(!lastItem){
-    console.log('마지막 항목 없음');
+    
     return;
   }
   const lastPublishedAt = lastItem.date;
   const lastSummaryId = lastItem.id; 
 
-   console.log('📥 다음 페이지 로드:', { lastPublishedAt, lastSummaryId });
+ 
 
   isLoadingMore.value = true;
   try {
@@ -272,8 +278,7 @@ const loadMoreNews = async() =>{
       lastPublishedAt,
       lastSummaryId
     );
-    console.log('=== loadMore 응답 ===');
-    console.log('response.data.data:', response.data.data);
+  
 
     if(response.data.status ==='success' && response.data.data){
       const newsItems = Array.isArray(response.data.data) ? response.data.data : [];
@@ -281,16 +286,16 @@ const loadMoreNews = async() =>{
       if(newsItems.length>0){
         const mapped = mapNewsData(newsItems);
         newsList.value=[...newsList.value, ...mapped];
-        console.log('✅ 추가 로드 완료:', mapped.length, '건 / 전체:', newsList.value.length, '건');
+ 
 
         if(newsItems.length<15){
           hasMore.value=false;
-          console.log('마지막 페이지 도달');
+          
         }
 
       }else{
         hasMore.value=false;
-        console.log("더이상 뉴스 없음");
+        
       }
     }
 
@@ -340,9 +345,6 @@ const searchNews = async () => {
   
   const term = keyword.value.trim();
   
-
-
-  
   // 최근 검색어 저장
   const saved = JSON.parse(localStorage.getItem("search_keywords") || "[]");
   const updated = [term, ...saved.filter((k) => k !== term)].slice(0, 5);
@@ -352,36 +354,22 @@ const searchNews = async () => {
   loading.value = true;
   apiError.value = null;
   
-   // ✅ 디버깅 로그 켜기
-  console.log('🔍 searchNews - 검색어:', term);
     try {
     const response = await newsApi.searchNews([term], MEMBER_ID);
-    
-    // ✅ 응답 전체 확인
-    console.log('=== searchNews 응답 ===');
-    console.log('response:', response);
-    console.log('response.data:', response.data);
-    console.log('response.data.status:', response.data.status);
-    console.log('response.data.data:', response.data.data);
-    console.log('response.data.data 배열?', Array.isArray(response.data.data));
-    console.log('========================');
     
     if (response.data.status === 'success' && response.data.data) {
       const newsItems = Array.isArray(response.data.data) ? response.data.data : [];
       
-      console.log('newsItems 길이:', newsItems.length);
-      
       if (newsItems.length > 0) {
         newsList.value = mapNewsData(newsItems);
+        keyword.value = ''
        
       } else {
-        console.log('⚠️ newsItems가 비어있음');
-        apiError.value = '검색 결과가 없습니다.';
+                apiError.value = '검색 결과가 없습니다.';
       }
     } else {
-      console.log('❌ status 체크 실패');
-      console.log('response.data.status:', response.data.status);
-      console.log('response.data.data:', response.data.data);
+     
+    
       apiError.value = response.data.message || '검색에 실패했습니다.';
     }
 
@@ -416,7 +404,7 @@ const clearAll = () => {
 ------------------------------ */
 const loadInitialNews = async () => {
   if (newsList.value.length > 0) {
-    // console.log('⏭️ 이미 뉴스가 있으므로 스킵');
+   
     return;
   }
 
@@ -430,19 +418,14 @@ const loadInitialNews = async () => {
       15,
       filters.value.period
     );
-    console.log('=== feedNews 응답 전체 ===');
-    console.log('response:', response);
-    console.log('response.data:', response.data);
-    console.log('response.data.status:', response.data.status); 
-    console.log('response.data.data:', response.data.data);
-    console.log('===========================');
+   
     
     if (response.data.status === 'success' && response.data.data) {
       const newsItems = Array.isArray(response.data.data) ? response.data.data : [];
           
       if (newsItems.length > 0) {
         newsList.value = mapNewsData(newsItems);
-        console.log('✅ 피드 뉴스 로드 완료:', newsList.value.length, '건');
+     
 
         //15개 미만이면 더이상 없음
         if(newsItems.length<15){
@@ -450,14 +433,12 @@ const loadInitialNews = async () => {
         }
 
       } else {
-        console.log('⚠️ newsItems가 비어있음');
+        
         apiError.value = '회원님의 직군에 맞는 뉴스가 아직 없습니다.';
          hasMore.value = false;
       }
     } else {
-      console.log('❌ status가 success가 아니거나 data가 없음');
-      console.log('response.data.status:', response.data.status);
-      console.log('response.data.data:', response.data.data);
+      
       apiError.value = response.data.message || '뉴스 피드를 불러오는데 실패했습니다.';
       hasMore.value = false;
     }
@@ -477,7 +458,7 @@ onMounted(async () => {
     localStorage.getItem("search_keywords") || "[]"
   );
   await loadInitialNews();
-  console.log('✅ onMounted 완료 - newsList:', newsList.value.length, '건');
+ 
   //스크롤 이벤트 등록
   window.addEventListener('scroll', handleScroll);
 });
@@ -507,7 +488,7 @@ const formatSummary = (summary) => {
 
 // ✅ 필터 변경 시 호출 (API 재호출 없이 클라이언트 필터링만)
 const applyFilter = (newFilters) => {
-  console.log('🔧 필터 변경:', newFilters);
+
   filters.value = newFilters;
   // filteredNews computed가 자동으로 재계산됨
 };
