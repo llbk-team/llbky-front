@@ -41,6 +41,15 @@ function getLearningList(memberId, status) {
 }
 
 /**
+ * 학습 상세 조회
+ */
+function getLearningWeekDetail(learningId) {
+  return axios.get("/learning/detail", {
+    params: { learningId }
+  });
+}
+
+/**
  * 학습 ID 기준 주차 학습 전체 조회
  */
 function getWeekListByLearningId(learningId) {
