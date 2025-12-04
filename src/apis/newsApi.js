@@ -23,7 +23,7 @@ async function searchNews(keywords, memberId,limit=15) {
   
    const response = await axios.get(`/trend/news/search`,{
       params:{
-      keywords: keywords,  
+      keywords: keywordArray, 
           memberId: memberId,
           period: 'month',
           limit: limit
@@ -69,7 +69,7 @@ async function feedNews(
     params.lastSummaryId = lastSummaryId;
   }
   
-  console.log('📡 feedNews 요청:', params);
+  
   
   return axios.get('/trend/news/feed', { params });
 }
