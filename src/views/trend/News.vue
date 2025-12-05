@@ -18,7 +18,7 @@
         </button>
       </div>
 
-      <!-- 🔹 최근 검색어 표시 -->
+      <!-- 최근 검색어 표시 -->
       <div class="recent-keywords" v-if="recentKeywords.length">
         <div class="recent-header">
           <span class="label">최근 검색:</span>
@@ -39,7 +39,7 @@
       </div>
     </section>
 
-    <!-- ✅ 필터바 -->
+    <!-- 필터바 -->
     <FilterBar @filter-change="applyFilter" />
 
     <!-- 뉴스 카드 리스트 -->
@@ -64,7 +64,7 @@
           검색 결과가 없습니다.
         </div>
         
-        <div v-for="(item, i) in visibleNews" :key="i" class="news-card" @click="openDetail(item)">
+        <div v-for="(item, i) in visibleNews" :key="item.id || i" class="news-card" @click="openDetail(item)">
           <!-- 상단 태그 -->
           <div class="tag-row">
             <span class="tag category">채용 시장</span>
@@ -84,7 +84,6 @@
             <span v-for="(k, j) in item.keywords" :key="j">#{{ k }}</span>
           </div>
 
-
           <!-- 신뢰도 + 출처 -->
           <div class="card-footer">
             <div class="trust">
@@ -101,780 +100,84 @@
         </div>
       </div>
 
-      <!-- ✅ 추가 로딩 (무한 스크롤) -->
+      <!-- 추가 로딩 (무한 스크롤) -->
       <div v-if="isLoadingMore" class="loading-more">
         <div class="spinner"></div>
         <p>추가 뉴스를 불러오는 중...</p>
       </div>
 
-      <!-- ✅ 마지막 페이지 -->
+      <!-- 마지막 페이지 -->
       <div v-if="!hasMore && visibleNews.length > 0" class="no-more">
         <p>모든 뉴스를 불러왔습니다.</p>
       </div>
-
-
-
-      
     </section>
 
-    <!-- 상세보기 -->
-    <NewsDetailModal v-if="selectedNews" :news="selectedNews" @close="selectedNews = null" />
+    <!-- 상세보기 모달 -->
+    <NewsDetailModal 
+      v-if="selectedNews" 
+      :news="selectedNews" 
+      @close="closeDetail" 
+    />
   </div>
 </template>
+
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from "vue";
+import { onMounted, onUnmounted } from "vue";
 import FilterBar from "@/components/bar/FilterBar.vue";
 import NewsDetailModal from "@/components/modal/NewsDetailModal.vue";
-import newsApi from "@/apis/newsApi";
+import { news } from "@/utils/news";
 
-const keyword = ref("");
-const recentKeywords = ref([]);
-const selectedNews = ref(null);
-const filters = ref({
-  period: "week",
-  sentiment: "",
-  trustMin: 70,
-});
-
-const loading = ref(false);
-const apiError = ref(null);
-const newsList = ref([]);
-
-const hasMore = ref(true);           // 더 불러올 데이터가 있는지
-const isLoadingMore = ref(false);    // 추가 로딩 중인지
-
-
-const MEMBER_ID = 1;
-
-/* ------------------------------
-   날짜 필터링 유틸리티
------------------------------- */
-const calculateStartDate = (period) => {
-  const today = new Date();
+// 뉴스 컴포저블 사용
+const {
+  // 상태
+  keyword,
+  recentKeywords,
+  selectedNews,
+  filters,
+  loading,
+  apiError,
+  newsList,
+  hasMore,
+  isLoadingMore,
+  isSearchMode,
+  MEMBER_ID,
   
-  switch (period) {
-    case "today":
-      today.setHours(0, 0, 0, 0);
-      return today;
-    case "week":
-      return new Date(today.setDate(today.getDate() - 7));
-    case "month":
-      return new Date(today.setMonth(today.getMonth() - 1));
-    default:
-      return new Date(0); // 전체
-  }
-};
-
-/* ------------------------------
-   필터 및 검색
------------------------------- */
-const filteredNews = computed(() => {
-  let filtered = newsList.value;
+  // 계산된 속성
+  filteredNews,
+  visibleNews,
   
-  // ✅ 1. 날짜 필터링 (period)
-  const startDate = calculateStartDate(filters.value.period);
-  filtered = filtered.filter(n => {
-    const newsDate = new Date(n.date || n.publishedAt);
-    return newsDate >= startDate;
-  });
+  // 유틸리티 함수
+  formatSummary,
   
-  // ✅ 2. 감정 필터링
-  if (filters.value.sentiment) {
-    filtered = filtered.filter(n => n.sentiment === filters.value.sentiment);
-  }
+  // 검색어 관리
+  clickKeyword,
+  deleteKeyword,
+  clearAll,
   
-  // ✅ 3. 신뢰도 필터링
-  filtered = filtered.filter(n => n.trust >= filters.value.trustMin);
+  // 뉴스 검색 및 로드
+  searchNews,
   
-  // ✅ 4. 키워드 검색
-  if (keyword.value) {
-    filtered = filtered.filter(n =>
-      n.title.includes(keyword.value) ||
-      n.summary_short.includes(keyword.value) ||
-      n.keywords.some(k => k.includes(keyword.value))
-    );
-  }
+  // 필터 관리
+  applyFilter,
   
-  return filtered;
-});
-
-//무한 스크롤
-const visibleNews = computed(() => filteredNews.value);
-
-/* ------------------------------
-   API 응답을 화면용 데이터로 변환
------------------------------- */
-const mapNewsData = (newsItems) => {
- 
+  // 모달 관리
+  openDetail,
+  closeDetail,
   
-  if (!Array.isArray(newsItems)) {
- 
-    return [];
-  }
-    try {
-    const mapped = newsItems.map((n) => {
-    
-      
-      const result = {
-        id: n.summaryId || n.summary_id || n.id,
-        title: n.title || "제목 없음",
-        summary_short: n.summaryText || n.summary_text || n.summary_short || "",
-        keywords: Array.isArray(n.keywords) 
-          ? n.keywords.map(k => {
-              if (typeof k === 'string') return k;
-              if (typeof k === 'object') return k.keyword || k.name || k.value || JSON.stringify(k);
-              return String(k);
-            })
-          : [],
-        trust: n.trustScore ?? n.trust_score ?? n.trust ?? 0,
-        sentiment: n.sentiment || "neutral",
-        sentimentLabel: 
-          n.sentiment === 'positive' ? '긍정적' : 
-          n.sentiment === 'negative' ? '부정적' : '중립적',
-        bias_detected: n.biasDetected ?? n.bias_detected ?? false,
-        bias_type: n.biasType || n.bias_type || "",
-        date: n.publishedAt || n.published_at || n.date || "",
-        source: n.sourceName || n.source_name || n.source || "",
-        source_url: n.sourceUrl || n.source_url || "",
-      };
-      
-    
-      return result;
-    });
-    
-  
-    return mapped;
-    
-  } catch (error) {
-    console.error('❌ mapNewsData 에러:', error);
-    return [];
-  }
-};
-/*------------------------------
-   다음 페이지 로드 (무한 스크롤)
--------------------------------*/
-const isSearchMode = ref(false);  // 추가
+  // 생명주기
+  initializeNews,
+  cleanupNews,
+} = news();
 
-
-const loadMoreNews = async() =>{
-
-
-   if (isSearchMode.value) {
-    console.log('검색 모드 - 무한 스크롤 비활성화');
-    return;
-  }
-
-  if(!hasMore.value|| isLoadingMore.value|| loading.value){
-   
-    return;
-  }
-
-  const lastItem = newsList.value[newsList.value.length-1];
-  if(!lastItem){
-    
-    return;
-  }
-  const lastPublishedAt = lastItem.date;
-  const lastSummaryId = lastItem.id; 
-
- 
-
-  isLoadingMore.value = true;
-  try {
-    const response = await newsApi.feedNews(
-      MEMBER_ID,
-      15,
-      filters.value.period,
-      lastPublishedAt,
-      lastSummaryId
-    );
-  
-
-    if(response.data.status ==='success' && response.data.data){
-      const newsItems = Array.isArray(response.data.data) ? response.data.data : [];
-
-      if(newsItems.length>0){
-        const mapped = mapNewsData(newsItems);
-        newsList.value=[...newsList.value, ...mapped];
- 
-
-        if(newsItems.length<15){
-          hasMore.value=false;
-          
-        }
-
-      }else{
-        hasMore.value=false;
-        
-      }
-    }
-
-  } catch (error) {
-    console.error('❌ 추가 로드 실패:', error);
-    apiError.value = '추가 뉴스를 불러오는 데 실패했습니다.';
-  }finally{
-      isLoadingMore.value = false;
-  }
-}
-
-
-
-/*------------------------------
-   스크롤 이벤트 핸들러
--------------------------------*/
-let scrollTimeout = null; //스크롤 이벤트는 1초에 수십 번 발생하므로 디바운싱 추가:
-
-const handleScroll=()=>{
-
-   if(!hasMore.value || isLoadingMore.value || loading.value){
-    return;
-  }
-  
-  if(scrollTimeout) {
-    clearTimeout(scrollTimeout);
-  }
-   scrollTimeout = setTimeout(() => {
-    const scrollTop = window.scrollY;
-    const windowHeight = window.innerHeight;
-    const documentHeight = document.documentElement.scrollHeight;
-
-    if(scrollTop + windowHeight >= documentHeight-300){
-      loadMoreNews();
-    }
-  }, 100);
-}
-
-/* ------------------------------
-   검색
------------------------------- */
-const searchNews = async () => {
-  if (!keyword.value.trim()) {
-    alert('검색어를 입력해주세요.');
-    return;
-  }
-  
-  const term = keyword.value.trim();
-  
-  // 최근 검색어 저장
-  const saved = JSON.parse(localStorage.getItem("search_keywords") || "[]");
-  const updated = [term, ...saved.filter((k) => k !== term)].slice(0, 5);
-  localStorage.setItem("search_keywords", JSON.stringify(updated));
-  recentKeywords.value = updated;
-  
-  loading.value = true;
-  apiError.value = null;
-  
-    try {
-    const response = await newsApi.searchNews([term], MEMBER_ID);
-    
-    if (response.data.status === 'success' && response.data.data) {
-      const newsItems = Array.isArray(response.data.data) ? response.data.data : [];
-      
-      if (newsItems.length > 0) {
-        newsList.value = mapNewsData(newsItems);
-        isSearchMode.value = true;   // ← 검색 모드 활성화
-        hasMore.value = false; 
-        keyword.value = ''
-       
-      } else {
-                apiError.value = '검색 결과가 없습니다.';
-      }
-    } else {
-     
-    
-      apiError.value = response.data.message || '검색에 실패했습니다.';
-    }
-
-  } catch (error) {
-    console.error('❌ 뉴스 검색 실패:', error);
-    console.error('에러 응답:', error.response?.data);
-    apiError.value = error.response?.data?.message || '뉴스 검색에 실패했습니다.';
-  } finally {
-    loading.value = false;
-  }
-};
-
-
-const clickKeyword = (k) => {
-  keyword.value = k;
-  searchNews();
-};
-
-const deleteKeyword = (k) => {
-  const updated = recentKeywords.value.filter((item) => item !== k);
-  recentKeywords.value = updated;
-  localStorage.setItem("search_keywords", JSON.stringify(updated));
-};
-
-const clearAll = () => {
-  recentKeywords.value = [];
-  localStorage.removeItem("search_keywords");
-};
-
-/* ------------------------------
-   초기 데이터 로드
------------------------------- */
-const loadInitialNews = async () => {
-  if (newsList.value.length > 0) {
-   
-    return;
-  }
-
-  loading.value = true;
-  apiError.value = null;
-  hasMore.value = true;
-
-  try {
-    const response = await newsApi.feedNews(
-      MEMBER_ID, 
-      15,
-      filters.value.period
-    );
-   
-    
-    if (response.data.status === 'success' && response.data.data) {
-      const newsItems = Array.isArray(response.data.data) ? response.data.data : [];
-          
-      if (newsItems.length > 0) {
-        newsList.value = mapNewsData(newsItems);
-     
-
-        //15개 미만이면 더이상 없음
-        if(newsItems.length<15){
-          hasMore.value=false;
-        }
-
-      } else {
-        
-        apiError.value = '회원님의 직군에 맞는 뉴스가 아직 없습니다.';
-         hasMore.value = false;
-      }
-    } else {
-      
-      apiError.value = response.data.message || '뉴스 피드를 불러오는데 실패했습니다.';
-      hasMore.value = false;
-    }
-    
-  } catch (error) {
-    console.error('❌ 피드 로드 실패:', error);
-    apiError.value = error.response?.data?.message || '뉴스를 불러오는 데 실패했습니다.';
-    hasMore.value = false;  
-  } finally {
-    loading.value = false;
-  }
-};
-
+// 컴포넌트 마운트 시 초기화
 onMounted(async () => {
-
-  recentKeywords.value = JSON.parse(
-    localStorage.getItem("search_keywords") || "[]"
-  );
-  await loadInitialNews();
- 
-  //스크롤 이벤트 등록
-  window.addEventListener('scroll', handleScroll);
+  await initializeNews();
 });
 
-onUnmounted(()=>{
-  window.removeEventListener('scroll',handleScroll);
-})
-
-
-
-/* ------------------------------
-   유틸리티 함수
------------------------------- */
-const formatSummary = (summary) => {
-  if (!summary) return "";
-  
-  const lines = summary.trim().split("\n").filter(line => line.trim());
-  
-  if (lines.length === 0) return "";
-  
-  return (
-    "<ul>" +
-    lines.map((line) => `<li>${line.trim()}</li>`).join("") +
-    "</ul>"
-  );
-};
-
-// ✅ 필터 변경 시 호출 (API 재호출 없이 클라이언트 필터링만)
-const applyFilter = (newFilters) => {
-
-  filters.value = newFilters;
-  // filteredNews computed가 자동으로 재계산됨
-};
-
-const openDetail = (item) => {
-  selectedNews.value = item;
-};
+// 컴포넌트 언마운트 시 정리
+onUnmounted(() => {
+  cleanupNews();
+});
 </script>
 
-<style scoped>
-.trend-news {
-  background: #fff;
-  color: #111;
-  font-family: "NexonLv1Gothic", sans-serif;
-}
-
-/* Hero */
-.hero {
-  background: #000;
-  color: #fff;
-  text-align: center;
-  padding: 70px 20px;
-  width: 100vw;
-  margin-left: calc(50% - 50vw);
-}
-
-.hero h2 {
-  font-size: 28px;
-  font-weight: 700;
-  margin-bottom: 28px;
-  letter-spacing: -0.3px;
-}
-
-.search-bar {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-}
-
-.search-bar input {
-  width: 440px;
-  padding: 12px 18px;
-  height: 37px;
-  border-radius: 30px;
-  border: none;
-  outline: none;
-  font-size: 14px;
-}
-
-.search-bar button {
-  background: #71ebbe;
-  border: none;
-  color: #000;
-  height: 37px;
-  font-weight: 600;
-  font-size: 13.5px;
-  padding: 10px 22px;
-  border-radius: 30px;
-  cursor: pointer;
-}
-
-/* 최근 검색어 */
-.recent-keywords {
-  margin-top: 18px;
-  text-align: center;
-}
-
-.recent-header {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-}
-
-.clear-all {
-  background: none;
-  border: none;
-  color: #ccc;
-  font-size: 12px;
-  cursor: pointer;
-}
-
-.clear-all:hover {
-  color: #fff;
-}
-
-.recent-keywords .tags {
-  display: inline-flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 6px;
-}
-
-.recent-keywords .tag {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  background: #f3f3f3;
-  border-radius: 30px;
-  padding: 4px 10px;
-  font-size: 12px;
-  color: #333;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.recent-keywords .tag:hover {
-  background: #ddf3eb;
-  color: #00c896;
-}
-
-.recent-keywords .tag i {
-  font-size: 14px;
-  color: #aaa;
-  cursor: pointer;
-}
-
-.recent-keywords .tag i:hover {
-  color: #ff6666;
-}
-
-/* 뉴스 섹션 */
-.news-section {
-  padding: 40px 80px 100px;
-}
-
-.news-section h3 {
-  font-size: 28px;
-  font-weight: 700;
-  margin-bottom: 6px;
-}
-
-.news-section .desc {
-  font-size: 16px;
-  color: #6c757d;
-}
-
-.news-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 28px;
-}
-
-.news-card {
-  background: #ffffff;
-  border-radius: 16px;
-  padding: 24px;
-  border: 1px solid #e5e5e5;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
-  transition: 0.2s;
-  cursor: pointer;
-}
-
-.news-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
-  border-color: #d0d0d0;
-}
-
-/* 카드 내부 */
-.tag-row {
-  display: flex;
-  gap: 6px;
-}
-
-.tag {
-  font-size: 11px;
-  font-weight: 600;
-  border-radius: 10px;
-  padding: 3px 8px;
-}
-
-.tag.category {
-  background: #eafff5;
-  color: #00a877;
-}
-
-.tag.positive {
-  background: #eafff5;
-  color: #00c896;
-}
-
-.tag.neutral {
-  background: #f5f5f5;
-  color: #555;
-}
-
-.tag.negative {
-  background: #ffecec;
-  color: #e85b5b;
-}
-
-.title {
-  font-size: 15px;
-  font-weight: 700;
-  color: #111;
-  margin: 8px 0 12px;
-}
-
-.summary-box {
-  background: #f9fdfb;
-  border: 1px solid #e4f7ee;
-  border-radius: 10px;
-  padding: 14px 16px;
-  font-size: 13px;
-  color: #333;
-  line-height: 1.6;
-  margin-bottom: 12px;
-}
-
-.summary-box ul {
-  margin: 0;
-  padding-left: 18px;
-}
-
-.summary-box li {
-  list-style-type: disc;
-  margin-bottom: 4px;
-}
-
-.keywords {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-bottom: 8px;
-}
-
-.keywords span {
-  background: #f3f3f3;
-  border-radius: 8px;
-  padding: 3px 8px;
-  font-size: 12px;
-  color: #444;
-}
-
-.bias {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 8px;
-}
-
-
-
-.bias-status {
-  font-size: 12px;
-  font-weight: 600;
-  border-radius: 8px;
-  padding: 3px 8px;
-}
-
-.biasYes {
-  background: #ffecec;
-  color: #e85b5b;
-}
-
-.biasNo {
-  background: #f3f3f3;
-  color: #555;
-}
-
-.trust {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.trust .label {
-  font-size: 12px;
-  color: #777;
-}
-
-.trust .bar {
-  flex: 1;
-  height: 6px;
-  background: #eee;
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-.trust .fill {
-  height: 100%;
-  background: #71ebbe;
-}
-
-.trust .score {
-  font-weight: 700;
-  font-size: 12px;
-}
-
-.source {
-  font-size: 11.5px;
-  color: #888;
-  text-align: right;
-}
-
-.delete-icon {
-  font-size: 12px;
-  cursor: pointer;
-  opacity: 0.6;
-  transition: 0.2s;
-}
-
-.delete-icon:hover {
-  opacity: 1;
-  color: #ff5b5b;
-}
-
-.error-message {
-  background-color: #fee;
-  color: #c33;
-  padding: 12px 20px;
-  border-radius: 8px;
-  margin: 16px 0;
-  text-align: center;
-}
-
-.loading-state {
-  text-align: center;
-  padding: 60px 20px;
-  color: #666;
-  font-size: 18px;
-}
-
-/* ✅ 무한 스크롤 로딩 */
-.loading-more {
-  text-align: center;
-  padding: 40px 20px;
-  color: #666;
-  font-size: 16px;
-}
-
-/* ✅ Spinner 애니메이션 */
-.spinner {
-  width: 32px;
-  height: 32px;
-  border: 3px solid #f3f3f3;
-  border-top: 3px solid #71ebbe;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin: 0 auto 12px;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-.no-more {
-  text-align: center;
-  padding: 40px 20px;
-  color: #999;
-  font-size: 14px;
-  border-top: 1px solid #eee;
-  margin-top: 20px;
-}
-
-
-.no-results {
-  text-align: center;
-  padding: 60px 20px;
-  color: #999;
-  font-size: 16px;
-  grid-column: 1 / -1;
-}
-
-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-input:disabled {
-  background-color: #f5f5f5;
-  cursor: not-allowed;
-}
-
-</style>
+<style src="@/assets/css/news.css" scoped></style>
