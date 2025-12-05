@@ -15,7 +15,9 @@
       <div class="login">
         <!-- 로그인 상태일 때 -->
         <template v-if="isLoggedIn">
-          <span class="welcome">{{ userInfo?.name }}님</span>
+          <span class="welcome">{{ userInfo?.member_name || userInfo?.loginId }}님
+          </span>
+
           <button class="logout-btn" @click="logout">로그아웃</button>
         </template>
 
@@ -267,5 +269,4 @@ const isActive = (path) => route.path.startsWith(path);
   margin-right: 8px;
   color: #555;
 }
-
 </style>
