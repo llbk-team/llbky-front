@@ -645,4 +645,4 @@ onMounted(() => {
 
 </script>
 
-<style src="@/assets/css/resumeCoach.css"></style>
+<style scoped src="@/assets/css/resumeCoach.css"></style>
