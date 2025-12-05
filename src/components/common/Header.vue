@@ -6,21 +6,29 @@
         <h1 class="logo" @click="goHome">Career Coach</h1>
 
         <nav class="main-nav">
-          <span v-for="menu in mainMenus" :key="menu.name" class="nav-item"
-            :class="{ active: activeMenu === menu.name }" @click="selectMenu(menu.name)">
+          <span v-for="menu in mainMenus" :key="menu.name" class="nav-item" :class="{ active: activeMenu === menu.name }" @click="selectMenu(menu.name)">
             {{ menu.label }}
           </span>
         </nav>
       </div>
 
       <div class="login">
-        <router-link to="/login" :class="{ active: isActive('/login') }">로그인</router-link>
+        <!-- 로그인 상태일 때 -->
+        <template v-if="isLoggedIn">
+          <span class="welcome">{{ userInfo?.name }}님</span>
+          <button class="logout-btn" @click="logout">로그아웃</button>
+        </template>
+
+        <!-- 로그아웃 상태일 때 -->
+        <template v-else>
+          <router-link to="/login" :class="{ active: isActive('/login') }">로그인</router-link>
+        </template>
       </div>
+
     </div>
 
     <div v-if="subMenus[activeMenu]" class="sub-menu">
-      <router-link v-for="(sub, idx) in subMenus[activeMenu]" :key="idx" :to="sub.path" class="sub-item"
-        :class="{ active: isActive(sub.path) }">
+      <router-link v-for="(sub, idx) in subMenus[activeMenu]" :key="idx" :to="sub.path" class="sub-item" :class="{ active: isActive(sub.path) }">
         {{ sub.label }}
       </router-link>
     </div>
@@ -30,9 +38,12 @@
 <script setup>
 import { ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import { computed } from "vue";
+import { useStore } from "vuex";
 
 const router = useRouter();
 const route = useRoute();
+const store = useStore();
 
 /* -------------------------
   현재 라우트 기반 메뉴 감지
@@ -73,7 +84,7 @@ const subMenus = {
   resume: [
     { label: "서류", path: "/resume/list" },
     { label: "서류작성", path: "/resume/write" },
-   
+
 
   ],
   interview: [
@@ -90,6 +101,21 @@ const subMenus = {
     { label: "직무 인사이트", path: "/trend/insight" },
   ],
 };
+/* -------------------------
+  로그인
+-------------------------- */
+// 로그인 여부
+const isLoggedIn = computed(() => store.getters["user/isLoggedIn"]);
+
+// 유저 정보
+const userInfo = computed(() => store.getters["user/userInfo"]);
+
+// 로그아웃 실행
+const logout = () => {
+  store.dispatch("user/logout");
+  router.push("/"); // 홈으로 이동
+};
+
 
 /* -------------------------
   메뉴 클릭 시 이동
@@ -222,4 +248,24 @@ const isActive = (path) => route.path.startsWith(path);
 .sub-item:hover {
   color: #71EBBE;
 }
+
+.logout-btn {
+  background: none;
+  border: none;
+  color: #000;
+  font-size: 13px;
+  cursor: pointer;
+  margin-left: 10px;
+}
+
+.logout-btn:hover {
+  color: #71EBBE;
+}
+
+.welcome {
+  font-size: 13px;
+  margin-right: 8px;
+  color: #555;
+}
+
 </style>

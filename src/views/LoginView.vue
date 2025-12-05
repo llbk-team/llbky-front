@@ -36,12 +36,14 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
+import { useStore } from "vuex";
 import memberApi from "@/apis/memberApi";
 
 const router = useRouter();
 const username = ref("");
 const password = ref("");
 const showPassword = ref(false);
+const store = useStore();
 
 const handleLogin = async () => {
   try {
@@ -52,12 +54,11 @@ const handleLogin = async () => {
 
     const user = res.data;
 
-    // 로그인 성공 → 로컬스토리지 저장
-    localStorage.setItem("user", JSON.stringify(user));
+    // 전역 로그인 상태 저장
+    store.dispatch("user/login", user);
 
     alert("로그인 성공!");
 
-    // 원하는 페이지로 이동
     router.push("/");
   } catch (err) {
     alert(err.response?.data || "로그인 실패");
