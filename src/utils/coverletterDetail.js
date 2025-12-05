@@ -1,12 +1,16 @@
 // 자소서 상세 페이지 컴포넌트용 js 파일
 import { ref, reactive, onUnmounted, nextTick } from "vue";
 import { useRoute } from "vue-router";
+import { useStore } from "vuex";
 import * as bootstrap from "bootstrap";
 import coverletterApi from "@/apis/coverletterApi";
 
 // 자소서 상세
 function useCoverletterDetail() {
     const route = useRoute();
+    const store = useStore();
+
+    const memberId = store.getters["user/userInfo"]?.memberId;
 
     // 자소서 내용=================================================
     const introFields = reactive({
@@ -116,7 +120,6 @@ function useCoverletterDetail() {
 
         try {
             const coverletterId = parseInt(route.query.id);
-            const memberId = 1;
 
             // api 호출
             await coverletterApi.applyWritingStyles(
@@ -156,8 +159,9 @@ function useCoverletterDetail() {
             introFields["직무역량"] = data.jobCapability || "";
             introFields["입사 후 포부"] = data.futurePlan || "";
 
+            const userInfo = store.getters["user/userInfo"];
             // 작성자 이름
-            memberName.value = data.memberName || "사용자";
+            memberName.value = userInfo?.memberName || "사용자";
             
             // 문자열(JSON string)이라 파싱 필요함
             let parsed = data.coverFeedback;
@@ -199,10 +203,9 @@ function useCoverletterDetail() {
 
         try {
             const coverletterId = parseInt(route.query.id);
-            const memberId = 1;
 
             const payload = {
-                memberId: 1,
+                memberId: memberId,
                 coverletterId: coverletterId,
                 supportMotive: introFields["지원동기"],
                 growthExperience: introFields["성장경험"],
