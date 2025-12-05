@@ -64,12 +64,12 @@ const mainMenus = [
   하위 메뉴
 -------------------------- */
 const subMenus = {
-  my: [
-    { label: "마이 페이지", path: "/my/page" },
-    // { label: "내 정보수정", path: "/my/edit" },
-    { label: "통합 리포트", path: "/my/report" },
-    { label: "리포트 보관함", path: "/my/save" },
-  ],
+  // my: [
+  //   { label: "마이 페이지", path: "/my/page" },
+  //   { label: "내 정보수정", path: "/my/edit" },
+  //   { label: "통합 리포트", path: "/my/report" },
+  //   { label: "리포트 보관함", path: "/my/save" },
+  // ],
   resume: [
     { label: "서류", path: "/resume/list" },
     { label: "서류작성", path: "/resume/write" },
@@ -98,7 +98,7 @@ const selectMenu = (menuName) => {
   activeMenu.value = menuName;
 
   const defaultPaths = {
-    my: "/my/page",
+    my: "/my/edit",
     resume: "/resume/list",
     interview: "/interview/report",
     learning: "/learning/coach",
