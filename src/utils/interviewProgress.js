@@ -235,9 +235,15 @@ function useInterviewProgress(sessionId) {
 
     try {
       const formData = new FormData();
+      
       formData.append("questionId", questionId);
-      if (mode.value === "audio") formData.append("audio", blob, "audio.webm");
-      else formData.append("video", blob, "original_video.webm");
+      formData.append("sessionId", sessionId);
+      
+      if (mode.value === "audio") {
+        formData.append("audio", blob, "audio.webm");
+      } else {
+        formData.append("video", blob, "original_video.webm");
+      }
 
       let answerId;
 

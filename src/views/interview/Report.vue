@@ -197,8 +197,19 @@
 
 <script setup>
 import interviewList from '@/utils/interviewList';
+import { useStore } from "vuex";
+import { computed } from "vue";
 
-const memberId = 1;
+const store = useStore();
+
+// 로그인된 사용자 정보
+const userInfo = computed(() => store.getters["user/userInfo"]) ;
+const memberId = computed(() => {
+  if (userInfo.value) {
+    return userInfo.value.memberId;
+  }
+  return undefined;
+});
 
 const {
   tab,
@@ -213,7 +224,7 @@ const {
   histories,
   openAnswerModal,
   goToReport
-} = interviewList.useInterviewList(memberId);
+} = interviewList.useInterviewList(memberId.value);
 </script>
 
 <style scoped src="@/assets/css/interviewList.css"></style>

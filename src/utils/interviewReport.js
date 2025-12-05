@@ -3,7 +3,7 @@
 import { ref, computed , onMounted} from "vue";
 import interviewApi from "@/apis/interviewApi";
 
-function useInterviewReport(rawSessionId, memberId) {
+function useInterviewReport(rawSessionId, memberId, memberName, memberJobRole) {
 
     /*-------------------------------------
         상태 정의
@@ -13,6 +13,11 @@ function useInterviewReport(rawSessionId, memberId) {
     const loading = ref(true);
     const error = ref(null);
     
+    // 사용자 정보
+    const userName = ref(memberName || "사용자");
+    const jobRole = ref("");    // 희망 직무
+    jobRole.value = memberJobRole;
+        
     const sessionInfo = ref(null);  // 면접 정보
     const qaList = ref([]);  // 질문 + 답변 목록
     const finalFeedback = ref(null);    // 종합 피드백
@@ -64,8 +69,6 @@ function useInterviewReport(rawSessionId, memberId) {
     
     const audioRef = ref(null);
     const isPlaying = ref(false);
-    
-    const jobRole = ref("");    // 희망 직무
 
     
     /*-------------------------------------
@@ -200,6 +203,7 @@ function useInterviewReport(rawSessionId, memberId) {
 
     return {
         loading,
+        userName,
         languageScore,
         nonLanguageScore,
         totalScore,

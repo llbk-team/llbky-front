@@ -5,7 +5,7 @@
       <section class="col-lg-5 bg-black text-white rounded-4 p-4 shadow-sm">
         <!-- 제목 -->
         <div class="mb-4">
-          <h3 class="fw-bold mb-0">김병현님의</h3>
+          <h3 class="fw-bold mb-0">{{ userName }}님의</h3>
           <h1 class="text-mint">AI 면접 리포트</h1>
         </div>
 
@@ -172,13 +172,27 @@
 <script setup>
 import interviewReport from '@/utils/interviewReport';
 import { useRoute } from 'vue-router';
+import { useStore } from "vuex";
+import { computed } from "vue";
 
 const route = useRoute();
 
-const memberId = 1;
+const store = useStore();
+
+// 로그인된 사용자 정보
+const userInfo = computed(() => store.getters["user/userInfo"]) ;
+const memberId = computed(() => {
+  if (userInfo.value) {
+    return userInfo.value.memberId;
+  }
+  return undefined;
+});
+const memberName = computed(() => userInfo.value?.memberName);
+const memberJobRole = computed(() => userInfo.value?.jobRole);
 
 const {
   loading,
+  userName,
   languageScore,
   nonLanguageScore,
   totalScore,
@@ -202,7 +216,7 @@ const {
   audioRef,
   isPlaying,
   togglePlay
-} = interviewReport.useInterviewReport(route.query.sessionId, memberId);
+} = interviewReport.useInterviewReport(route.query.sessionId, memberId.value, memberName.value, memberJobRole.value);
 </script>
 
 <style scoped src="@/assets/css/interviewReport.css"></style>

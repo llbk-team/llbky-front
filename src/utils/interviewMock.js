@@ -4,8 +4,9 @@ import router from "@/router";
 import interviewApi from "@/apis/interviewApi";
 import jobInsightApi from "@/apis/jobInsightApi";
 
-function useInterviewMock() {
+function useInterviewMock(memberId) {
   // --- 상태값 ---
+  memberId = Number(memberId);
   const type = ref("comprehensive");
 
   const companyQuery = ref("");
@@ -107,7 +108,7 @@ function useInterviewMock() {
 
     try {
       const formData = new FormData();
-      formData.append("memberId", 1);
+      formData.append("memberId", memberId);
       formData.append(
         "type",
         type.value === "comprehensive" ? "종합" : "직무"
@@ -134,7 +135,7 @@ function useInterviewMock() {
   const saveSession = async () => {
     try {
       const formData = new FormData();
-      formData.append("memberId", 1);
+      formData.append("memberId", memberId);
       formData.append(
         "type",
         type.value === "comprehensive" ? "종합" : "직무"
@@ -171,7 +172,7 @@ function useInterviewMock() {
   // 저장한 키워드 불러오기
   async function loadSavedKeywords() {
     try {
-      const res = await jobInsightApi.getSavedKeywords(1);
+      const res = await jobInsightApi.getSavedKeywords(memberId);
       keywordList.value = res.data.map(k => k.keyword);
     } catch (e) {
       console.error("키워드 로딩 실패:", e);

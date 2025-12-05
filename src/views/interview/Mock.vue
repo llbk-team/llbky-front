@@ -151,6 +151,12 @@
 
 <script setup>
 import interviewMock from "@/utils/interviewMock";
+import { useStore } from "vuex";
+import { computed } from "vue";
+
+const store = useStore();
+const userInfo = computed(() => store.getters["user/userInfo"]);
+const memberId = computed(() => userInfo.value?.memberId);
 
 const { useInterviewMock } = interviewMock;
 
@@ -180,7 +186,7 @@ const {
   addQuestion,
   generateQuestions,
   saveSession,
-} = useInterviewMock();
+} = useInterviewMock(memberId.value);
 
 </script>
 
