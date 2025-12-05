@@ -9,7 +9,8 @@ export function useResumeMain() {
     const router = useRouter();
 
     // 사용자 정보
-    const userName = ref("김병현");
+    const user = JSON.parse(localStorage.getItem("user"));
+    const userName = ref(user?.member_name || "사용자");
 
     // 이력서
     const resumeList = ref([]);
