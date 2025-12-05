@@ -169,6 +169,11 @@ function useLearningStart(learningId) {
 
     const { data } = await learningApi.getLearningDayByDayId(item.dayId);
 
+    selectedItem.value = {
+      ...item,
+      desc: data.content  
+    };
+
     // DB에 summary가 있으면 읽기 모드
     if (data.learningDaySummary && !data.learningDaySummary.startsWith("[학습 기록 거부 안내]")) {
       fixedMemo.value = data.learningDaySummary;

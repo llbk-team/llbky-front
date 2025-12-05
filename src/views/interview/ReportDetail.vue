@@ -205,4 +205,4 @@ const {
 } = interviewReport.useInterviewReport(route.query.sessionId, memberId);
 </script>
 
-<style src="@/assets/css/interviewReport.css"></style>
+<style scoped src="@/assets/css/interviewReport.css"></style>
