@@ -129,12 +129,16 @@
     </div>
   </div>
 
-  <div v-if="showCongrats" class="congrats-popup">
-    <div class="congrats-box">
-      🎉 학습 목표 달성을 축하합니다! 🎉<br>
-      당신은 끝까지 해냈어요! 🔥
+  <div v-if="showCongrats" class="congrats-modal-overlay">
+    <div class="congrats-modal">
+      <h3>🎉 학습 목표 달성을 축하합니다! 🎉</h3>
+      <p>당신은 끝까지 해냈어요! 정말 대단해요🔥</p>
+      <button class="btn btn-mint mt-3" @click="goToCoach">
+        학습 코치로 돌아가기 →
+      </button>
     </div>
   </div>
+
 
 
   <WeekDetailModal v-if="showWeekModal && selectedWeek && selectedWeek.days && selectedWeek.days.length" :week="selectedWeek" @close="closeWeekModal" />
@@ -187,8 +191,7 @@ const {
   submitMemo,
 
   showCongrats,
-  spawnFirework,
-  burstFireworks,
+  goToCoach
 
 } = learningStart.useLearningStart(learningId);
 
