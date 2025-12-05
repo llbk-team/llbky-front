@@ -1,6 +1,7 @@
 // 뉴스 트렌드 페이지 컴포넌트용 Composition API
 import { ref, computed } from "vue";
 import newsApi from "@/apis/newsApi";
+import { useStore } from "vuex";
 
 // 뉴스 트렌드 페이지 컴포저블
 function news() {
@@ -21,8 +22,10 @@ function news() {
     const isLoadingMore = ref(false);    // 추가 로딩 중인지
     const isSearchMode = ref(false);     // 검색 모드 여부
 
-    // ⚠️ FIXME: 하드코딩된 MEMBER_ID - 실제 로그인 시스템에서 가져와야 함
-    const MEMBER_ID = ref(1);
+
+    const store= useStore();
+    // ⚠️ FIXME: 하드코딩된 memberId - 실제 로그인 시스템에서 가져와야 함
+    const memberId = computed(()=>(store.state.user.user?.memberId || null));
 
     // 무한 스크롤용 타임아웃
     let scrollTimeout = null;
@@ -226,7 +229,7 @@ function news() {
         apiError.value = null;
         
         try {
-            const response = await newsApi.searchNews([term], MEMBER_ID.value);
+            const response = await newsApi.searchNews([term], memberId.value);
             
             if (response.data.status === 'success' && response.data.data) {
                 const newsItems = Array.isArray(response.data.data) ? response.data.data : [];
@@ -278,7 +281,7 @@ function news() {
 
         try {
             const response = await newsApi.feedNews(
-                MEMBER_ID.value, 
+                memberId.value, 
                 15,
                 filters.value.period
             );
@@ -339,7 +342,7 @@ function news() {
         
         try {
             const response = await newsApi.feedNews(
-                MEMBER_ID.value,
+                memberId.value,
                 15,
                 filters.value.period,
                 lastPublishedAt,
@@ -465,7 +468,7 @@ function news() {
         hasMore,
         isLoadingMore,
         isSearchMode,
-        MEMBER_ID,
+        memberId,
         
         // 계산된 속성
         filteredNews,
