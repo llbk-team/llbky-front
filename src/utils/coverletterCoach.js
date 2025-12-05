@@ -1,9 +1,13 @@
 // 자소서 작성 페이지 컴포넌트용 AI 코칭 js 파일
 import { ref, reactive, computed } from "vue";
+import { useStore } from "vuex";
 import coverletterApi from "@/apis/coverletterApi";
 
 function useCoverLetterCoach(introFields, selectedKeywords) {
 
+  const store = useStore();
+  const memberId = store.getters["user/userInfo"]?.memberId;
+  
   // 오른쪽 AI 패널 ON/OFF
   const showAICoaching = ref(true);
   const toggleAICoaching = () => {
@@ -56,7 +60,7 @@ function useCoverLetterCoach(introFields, selectedKeywords) {
 
     try {
       const { data } = await coverletterApi.coach({
-        memberId: 1,
+        memberId: memberId,
         section: mapped,
         content: content,
         keywords: selectedKeywords?.value || [] // 키워드 추가

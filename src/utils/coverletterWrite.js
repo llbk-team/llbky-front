@@ -1,11 +1,15 @@
 // 자소서 작성 페이지 컴포넌트용 js 파일
 import coverletterApi from "@/apis/coverletterApi";
 import { onMounted, reactive, ref } from "vue";
+import { useStore } from "vuex";
 import router from "@/router";
 import jobInsightApi from "@/apis/jobInsightApi";
 
 // 자소서 작성
 function useCoverletterWrite() {
+
+    const store = useStore();
+    const memberId = store.getters["user/userInfo"]?.memberId;
 
     // 제목
     const coverTitle = ref("");
@@ -53,9 +57,6 @@ function useCoverletterWrite() {
                 coverFeedback: null,
             }
     
-            // 사용자 ID 지정
-            const memberId = 1;
-    
             // api 호출
             const res = await coverletterApi.saveCoverLetter(coverLetter, memberId);
             console.log("저장 완료: ", res.data);
@@ -73,7 +74,7 @@ function useCoverletterWrite() {
 
     const loadKeywords = async () => {
         try{
-            const res = await jobInsightApi.getSavedKeywords(1);
+            const res = await jobInsightApi.getSavedKeywords(memberId);
             savedKeywords.value = res.data.map(k => k.keyword);
         } catch(e){
             console.error("저장 키워드 로딩 실패", e);
