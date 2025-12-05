@@ -63,12 +63,16 @@ function learningRoadmap() {
   async function saveRoadmap() {
     try {
       const payload = {
-        memberId: 1,
+        memberId: 1, // 멤버 Id 수정해주세요~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         title: roadmapData.value.title,
         weeks: roadmapData.value.weeks
       };
 
-      await learningApi.saveRoadmap(payload);
+      const res = await learningApi.saveRoadmap(payload);
+      // 저장이 끝난 뒤, 백엔드에서 최신 로드맵 다시 조회
+      const full = await learningApi.getLearningDetail(res.data.learningId);
+      store.dispatch("learning/saveRoadmap", full.data);
+      roadmapData.value = full.data;
       showSaveModal.value = true;
     } catch (e) {
       alert("로드맵 저장 중 오류 발생");
@@ -90,9 +94,14 @@ function learningRoadmap() {
       isRefining.value = true;
 
       const payload = {
-        memberId: 1,
-        currentRoadmap: roadmapData.value,
-        userFeedback: aiInput.value
+      originalRoadmapJson: JSON.stringify(roadmapData.value),
+      userFeedback: aiInput.value,
+
+      // 생성 시 사용했던 정보들 (store에서 가져옴)
+      jobRole: store.getters["learning/getJobRole"],
+      purposes: store.getters["learning/getPurposes"],
+      skills: store.getters["learning/getSkills"],
+      studyHours: store.getters["learning/getStudyHours"]
       };
 
       const res = await learningApi.refineRoadmap(payload);

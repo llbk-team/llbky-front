@@ -1,13 +1,18 @@
 // 학습 진행 페이지 컴포넌트용 js 파일
 
 import { ref, computed, onMounted, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import learningApi from "@/apis/learningApi";
 
-function useLearningStart(learningId) {
+function useLearningStart() {
 
   /*-------------------------------------
     공통 상태 정의
   -------------------------------------*/
+  const route = useRoute();
+  const router = useRouter();
+  const learningId = route.query.learningId;
+
   const isLoading = ref(false); // AI 응답 로딩 스피너용
   const learningTitle = ref("");  // 학습 타이틀
   const loadLearningInfo = async () => {
@@ -171,7 +176,7 @@ function useLearningStart(learningId) {
 
     selectedItem.value = {
       ...item,
-      desc: data.content  
+      desc: data.content
     };
 
     // DB에 summary가 있으면 읽기 모드
@@ -279,10 +284,13 @@ function useLearningStart(learningId) {
 
 
   /*-------------------------------------------------------
-    폭죽 효과
-  -------------------------------------------------------*/
+     폭죽 효과 
+ -------------------------------------------------------*/
   const showCongrats = ref(false);
+  const fired = ref(false);
+  let fireworkInterval = null;
 
+  // 하나의 폭죽 생성
   function spawnFirework(x, y) {
     const fw = document.createElement("dotlottie-player");
     fw.classList.add("firework");
@@ -296,49 +304,61 @@ function useLearningStart(learningId) {
     fw.setAttribute("loop", "false");
     fw.setAttribute("autoplay", "true");
 
-    fw.style.top = `${y}px`;
-    fw.style.left = `${x}px`;
+    const size = 300; // 폭죽 크기
+    fw.style.width = size + "px";
+    fw.style.height = size + "px";
+
+    fw.style.position = "fixed";
+    fw.style.pointerEvents = "none";
+    fw.style.zIndex = "99999";
+
+    // 중앙 기준으로 위치 조정 (폭죽 크기의 절반 빼주기)
+    fw.style.top = `${y - size / 2}px`;
+    fw.style.left = `${x - size / 2}px`;
 
     document.body.appendChild(fw);
 
     setTimeout(() => fw.remove(), 1800);
   }
 
+  // 여러 폭죽을 한 번에 터뜨리기
   function burstFireworks() {
-    const centerX = window.innerWidth / 2;
-    const centerY = window.innerHeight / 2;
+    const screenWidth = window.innerWidth;
+    const screenHeight = window.innerHeight;
 
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 8; i++) {
       setTimeout(() => {
-        const offX = centerX + (Math.random() * 300 - 150);
-        const offY = centerY + (Math.random() * 300 - 150);
+        const offX = Math.random() * screenWidth;
+        const offY = Math.random() * screenHeight;
         spawnFirework(offX, offY);
       }, i * 200);
     }
   }
 
-  const fired = ref(false);
 
+  // 학습코치로 이동 + 폭죽 중단
+  function goToCoach() {
+    if (fireworkInterval) clearInterval(fireworkInterval);
+    router.push("/learning/coach");
+  }
+
+  // 전체 진행률 100% 달성 시 실행
   watch(
     () => overallProgress.value,
     (val) => {
       if (val === 100 && !fired.value) {
         fired.value = true;
 
-        // 🔥 폭죽 팡팡
-        burstFireworks();
-
-        // 🎉 축하 메시지 표시
+        // 모달 표시
         showCongrats.value = true;
 
-        setTimeout(() => {
-          showCongrats.value = false;
-        }, 3000);
+        // 폭죽 무한 반복 시작
+        fireworkInterval = setInterval(() => {
+          burstFireworks();
+        }, 1500);
       }
     }
   );
-
-
 
   return {
     // 기본 정보
@@ -378,9 +398,7 @@ function useLearningStart(learningId) {
     submitMemo,
 
     showCongrats,
-    spawnFirework,
-    burstFireworks,
-    
+    goToCoach
   };
 }
 

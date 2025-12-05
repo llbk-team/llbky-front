@@ -102,14 +102,14 @@
         <h4 class="fw-bold mb-3">플랜이 저장되었습니다!</h4>
 
         <div class="alert alert-mint-light mb-4">
-          🎯 <strong>'백엔드 개발자 – 취업 준비 + 자기계발'</strong><br />
-          4주 학습 로드맵이 내 학습함에 추가되었습니다.
+          🎯 <strong>'{{ roadmapData.title }} - {{ purposeLabels.join(" + ") }}'</strong><br />
+          학습 로드맵이 내 학습함에 추가되었습니다.
         </div>
 
         <p class="fw-semibold mb-3">👉 다음 단계로 이동할까요?</p>
 
         <div class="d-flex justify-content-center gap-3 mb-4">
-          <router-link :to="`/learning/start`" class="btn btn-dark" @click="startLearning">▶ 학습 시작하기</router-link>
+          <router-link :to="`/learning/start?learningId=${roadmapData.learningId}`" class="btn btn-dark" @click="startLearning">▶ 학습 시작하기</router-link>
           <router-link :to="`/learning/coach`" class="btn btn-mint" @click="goToMyLearning">📁 내 학습함</router-link>
         </div>
         <div class="ai-tip">💬 <strong>AI 팁:</strong> 이제 주차별 학습을 진행하면,<br />진행률과 피드백을 자동으로 기록해드릴게요!!!!!!!!!!!!!!!</div>

@@ -174,4 +174,4 @@ const {
 onMounted(loadPortfolio);
 </script>
 
-<style src="@/assets/css/portfolioCoach.css"></style>
+<style scoped src="@/assets/css/portfolioCoach.css"></style>
