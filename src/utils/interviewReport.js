@@ -19,7 +19,24 @@ function useInterviewReport(rawSessionId, memberId) {
 
     const languageScore = computed(() => finalFeedback.value?.languageScore || 0);  // 언어점수
     const nonLanguageScore = computed(() => finalFeedback.value?.nonLanguageScore || 0);    //비언어점수
-    const totalScore = computed(() => finalFeedback.value?.totalScore || 0);
+    const totalScore = computed(() => {
+        if (!qaList.value.length) return 0;
+
+        let scores = qaList.value.map(q => {
+            const lang = q.answerFeedback?.languageScore ?? 0;
+            const non = q.answerFeedback?.nonLanguageScore ?? 0;
+
+            // 영상 없음 → 언어 점수만 종합 점수로 반영
+            if (q.answerFeedback?.toneExpressionAnalysis?.includes("영상 정보가 없어")) {
+                return lang;
+            }
+
+            return Math.round((lang + non) / 2);
+        });
+
+        const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
+        return Math.round(avg);
+    });
 
     const singleLanguageScore = computed(() => {
         return selectedQuestion.value?.answerFeedback?.languageScore ?? 0;
@@ -30,7 +47,15 @@ function useInterviewReport(rawSessionId, memberId) {
     });
 
     const singleTotalScore = computed(() => {
-        return selectedQuestion.value?.answerFeedback?.totalScore ?? 0;
+        const lang = selectedQuestion.value?.answerFeedback?.languageScore ?? 0;
+        const non = selectedQuestion.value?.answerFeedback?.nonLanguageScore ?? 0;
+
+        // 비언어 분석 없음 → 언어 점수 그대로 사용
+        if (selectedQuestion.value?.answerFeedback?.toneExpressionAnalysis?.includes("영상 정보가 없어")) {
+            return lang;
+        }
+
+        return Math.round((lang + non) / 2);
     });
 
     

@@ -30,47 +30,41 @@ function useInterviewList(memberId) {
     
     async function loadHistories() {
         const res = await interviewApi.getInterviewList(memberId);
-        
-        histories.value = res.data.map((s) => {
+        const list = [];
 
-            // 1, 날짜
-            let date = "";
-            if (s.createdAt !== null && s.createdAt !== undefined) {
-                date = s.createdAt.slice(0, 10);
+        for (const s of res.data) {
+
+            const date = s.createdAt ? s.createdAt.slice(0, 10) : "";
+
+            const detailRes = await interviewApi.getInterviewDetail(s.sessionId);
+            const qaList = detailRes.data.qaList || [];
+
+            const perScores = qaList.map(q => {
+                const lang = q.answerFeedback?.languageScore ?? 0;
+                const non = q.answerFeedback?.nonLanguageScore ?? 0;
+
+                if (q.answerFeedback?.toneExpressionAnalysis?.includes("영상 정보가 없어")) {
+                    return lang;
+                }
+                return Math.round((lang + non) / 2);
+            });
+
+            let total = 0;
+            if (perScores.length > 0) {
+                total = Math.round(perScores.reduce((a, b) => a + b, 0) / perScores.length);
             }
 
-            // 2. reportFeedback은 JSON 문자열 -> 객체로 변환
-            let feedbackObj = {};
-            try {
-                feedbackObj = s.reportFeedback ? JSON.parse(s.reportFeedback) : {};
-            } catch (e) {
-                console.error("reportFeedback JSON 파싱 실패:", e);
-            }
-
-            // 3. 점수 계산
-            const language = feedbackObj.languageScore ?? 0;
-            const nonLanguage = feedbackObj.nonLanguageScore ?? 0;
-
-            let avgScore = 0;
-            if (language != 0 || nonLanguage !== 0) {
-                avgScore = Math.round((language + nonLanguage) / 2);
-            }
-
-            // 4. 화면에 보일 텍스트들
-            const scoreSummary = avgScore > 0 ? `종합 점수 ${avgScore}점` : "점수 없음";
-
-            const feedbackText = feedbackObj.overallSummary || feedbackObj.keyCoachingPoint || "피드백 없음";
-            
-            return {
+            list.push({
                 sessionId: s.sessionId,
-                date: date,
-                scoreSummary: scoreSummary,
-                feedback: feedbackText,
-                progress: avgScore || 0
-            };
-        });
+                date,
+                scoreSummary: total > 0 ? `종합 점수 ${total}점` : "점수 없음",
+                feedback: detailRes.data.finalFeedback?.overallSummary || "피드백 없음",
+                progress: total
+            });
+        }
+
+        histories.value = list;
     }
-    
     
     /*-------------------------------------
     2) 사용자 질문 목록 불러오기
