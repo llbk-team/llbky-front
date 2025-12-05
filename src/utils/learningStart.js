@@ -1,13 +1,17 @@
 // 학습 진행 페이지 컴포넌트용 js 파일
 
 import { ref, computed, onMounted, watch } from "vue";
+import { useRoute } from "vue-router";
 import learningApi from "@/apis/learningApi";
 
-function useLearningStart(learningId) {
+function useLearningStart() {
 
   /*-------------------------------------
     공통 상태 정의
   -------------------------------------*/
+  const route = useRoute();
+  const learningId = route.query.learningId;
+  
   const isLoading = ref(false); // AI 응답 로딩 스피너용
   const learningTitle = ref("");  // 학습 타이틀
   const loadLearningInfo = async () => {

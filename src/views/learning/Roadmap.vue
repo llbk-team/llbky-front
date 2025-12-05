@@ -102,8 +102,8 @@
         <h4 class="fw-bold mb-3">플랜이 저장되었습니다!</h4>
 
         <div class="alert alert-mint-light mb-4">
-          🎯 <strong>'백엔드 개발자 – 취업 준비 + 자기계발'</strong><br />
-          4주 학습 로드맵이 내 학습함에 추가되었습니다.
+          🎯 <strong>'{{ roadmapData.title }} - {{ purposeLabels.join(" + ") }}'</strong><br />
+          학습 로드맵이 내 학습함에 추가되었습니다.
         </div>
 
         <p class="fw-semibold mb-3">👉 다음 단계로 이동할까요?</p>

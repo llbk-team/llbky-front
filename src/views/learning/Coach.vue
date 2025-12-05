@@ -65,7 +65,7 @@
         <!-- ======================== -->
         <!--      완료됨 탭           -->
         <!-- ======================== -->
-        <div v-else class="card shadow-sm p-4 mb-3 card-clean ongoing-container-finish">
+        <div v-else class="card shadow-sm p-4 mb-3 card-clean ongoing-container">
 
           <div class="d-flex justify-content-between align-items-center mb-3">
             <h5 class="fw-bold mb-0">완료된 학습 플랜</h5>
@@ -85,15 +85,26 @@
 
           <!-- 완료된 학습 있을 때 -->
           <div v-else>
-            <div v-for="(plan, i) in pagedCompletedPlans" :key="i" class="card mb-3 sub-card" @click="goToReport(plan)">
+            <div v-for="(plan, i) in pagedCompletedPlans" :key="i" class="card mb-3 sub-card">
               <div class="card-body">
+
+                <!-- 제목 -->
                 <h6 class="fw-semibold">{{ plan.title }}</h6>
+
+                <!-- 기간 -->
                 <p class="text-secondary small mb-1">{{ plan.period }}</p>
-                <p class="text-secondary small">완료일: {{ plan.completedDate }}</p>
+
+                <!-- 100% 프로그레스 바 -->
+                <div class="progress mb-2" style="height: 6px;">
+                  <div class="progress-bar" role="progressbar" :style="{ width: '100%', backgroundColor: '#71EBBE' }"></div>
+                </div>
+                <p class="text-secondary small mb-2">진행률 100%</p>
+                <router-link :to="`/learning/report?learningId=${plan.id}`" class="btn btn-outline-green">복습하기 →</router-link>
               </div>
             </div>
           </div>
         </div>
+
       </div>
 
       <!-- ======================== -->
