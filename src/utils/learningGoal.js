@@ -1,4 +1,6 @@
-import { ref, onMounted } from "vue";
+// utils/learningGoal.js
+
+import { ref, onMounted, computed } from "vue";
 import learningApi from "@/apis/learningApi";
 import jobInsightApi from "@/apis/jobInsightApi";
 import { useRouter } from "vue-router";
@@ -8,14 +10,18 @@ function useLearningGoal() {
   const router = useRouter();
   const store = useStore();
 
+  // 기본 상태
   const isLoading = ref(false);
-  const keywordList = ref([]);
+  const keywordList = ref([]);          
   const newInterestSkill = ref("");
   const recommendedSkills = ref([]);
 
-  const user = store.getters["user/userInfo"];
-  const memberId = user?.memberId;
+  // 로그인 정보
+  const userInfo = computed(() => store.getters["user/userInfo"] || {});
+  const memberId = computed(() => userInfo.value?.memberId ?? null);
+  const myJobRole = computed(() => userInfo.value?.jobRole || "직무 정보 없음");
 
+  // 폼 데이터
   const formData = ref({
     careerGoals: [],
     learningGoals: [],
@@ -58,23 +64,33 @@ function useLearningGoal() {
     }
   ];
 
-  // 부족 역량 API
+  // 부족 역량 로드
   async function loadRecommendedSkills() {
     try {
-      const { data } = await learningApi.recommendSkills(1);
-      recommendedSkills.value = data.skills || [];
+      const { data } = await learningApi.recommendSkills(memberId.value);
+
+      recommendedSkills.value = Array.isArray(data?.skills)
+        ? data.skills.filter(v => typeof v === "string" && v.trim() !== "")
+        : [];
     } catch (err) {
       console.error("추천 기술 로딩 실패:", err);
+      recommendedSkills.value = [];
     }
   }
 
-  // 관심 기술 API
+  // 관심 키워드 로드
   async function loadSavedKeywords() {
     try {
-      const { data } = await jobInsightApi.getSavedKeywords(1);
-      keywordList.value = data.map((k) => k.keyword);
+      const { data } = await jobInsightApi.getSavedKeywords(memberId.value);
+
+      keywordList.value = Array.isArray(data)
+        ? data
+            .map(k => k?.keyword)
+            .filter(v => typeof v === "string" && v.trim() !== "")
+        : [];
     } catch (err) {
       console.error("키워드 로딩 실패:", err);
+      keywordList.value = [];
     }
   }
 
@@ -92,7 +108,7 @@ function useLearningGoal() {
     newInterestSkill.value = "";
   }
 
-  // 시간 증가 감소
+  // 공부 가능 시간 조절
   function increaseHour() {
     if (formData.value.studyHours < 15) formData.value.studyHours++;
   }
@@ -107,7 +123,7 @@ function useLearningGoal() {
       ...formData.value.learningGoals,
       ...formData.value.projectGoals
     ];
-    
+
     store.dispatch("learning/savePurposes", purposes);
 
     if (purposes.length === 0) {
@@ -118,16 +134,16 @@ function useLearningGoal() {
     isLoading.value = true;
 
     const fd = new FormData();
-    fd.append("memberId", memberId);
+    fd.append("memberId", memberId.value);
     fd.append("studyHours", formData.value.studyHours);
 
-    purposes.forEach((p) => fd.append("purposes", p));
+    purposes.forEach(p => fd.append("purposes", p));
 
     const skills = [
       ...formData.value.lackingSkills,
       ...formData.value.interestedSkills
     ];
-    skills.forEach((s) => fd.append("skills", s));
+    skills.forEach(s => fd.append("skills", s));
 
     try {
       const res = await learningApi.createRoadmap(fd);
@@ -140,7 +156,6 @@ function useLearningGoal() {
     }
   }
 
-  // 초기 로딩
   onMounted(() => {
     loadRecommendedSkills();
     loadSavedKeywords();
@@ -153,6 +168,7 @@ function useLearningGoal() {
     recommendedSkills,
     formData,
     goalSections,
+    myJobRole,
 
     addInterestSkill,
     increaseHour,
