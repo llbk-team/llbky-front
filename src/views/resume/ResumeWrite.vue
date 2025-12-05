@@ -464,4 +464,4 @@ const {
 } = resumeWrite.useResumeWrite();
 </script>
 
-<style src="@/assets/css/resumeWrite.css"></style>
+<style scoped src="@/assets/css/resumeWrite.css"></style>

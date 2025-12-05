@@ -136,4 +136,4 @@ const {
 </script>
 
 
-<style src="@/assets/css/jobInsightAnalysis.css"></style>
+<style scoped src="@/assets/css/jobInsightAnalysis.css"></style>

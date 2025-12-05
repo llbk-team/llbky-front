@@ -171,4 +171,4 @@ const {
 </script>
 
 
-<style src="@/assets/css/resumeMain.css"></style>
+<style scoped src="@/assets/css/resumeMain.css"></style>

@@ -92,4 +92,4 @@ const {
 
 </script>
 
-<style src="@/assets/css/trendAnalysis.css"></style>
+<style scoped src="@/assets/css/trendAnalysis.css"></style>
