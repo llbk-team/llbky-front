@@ -22,7 +22,6 @@
               <div class="resume-header">
                 <div class="resume-header-left">
                   <h2>📄 이력서 상세</h2>
-                  <p class="resume-title">{{ resume.title || "제목 없음" }}</p>
                 </div>
                 <span class="badge bg-mint">{{ formatLabel }}</span>
               </div>
