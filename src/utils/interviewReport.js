@@ -16,8 +16,23 @@ function useInterviewReport(rawSessionId, memberId) {
     const sessionInfo = ref(null);  // 면접 정보
     const qaList = ref([]);  // 질문 + 답변 목록
     const finalFeedback = ref(null);    // 종합 피드백
+
     const languageScore = computed(() => finalFeedback.value?.languageScore || 0);  // 언어점수
     const nonLanguageScore = computed(() => finalFeedback.value?.nonLanguageScore || 0);    //비언어점수
+    const totalScore = computed(() => finalFeedback.value?.totalScore || 0);
+
+    const singleLanguageScore = computed(() => {
+        return selectedQuestion.value?.answerFeedback?.languageScore ?? 0;
+    });
+
+    const singleNonLanguageScore = computed(() => {
+        return selectedQuestion.value?.answerFeedback?.nonLanguageScore ?? 0;
+    });
+
+    const singleTotalScore = computed(() => {
+        return selectedQuestion.value?.answerFeedback?.totalScore ?? 0;
+    });
+
     
     const selectedQuestion = ref(null); // 선택된 질문
     const mode = ref("all");    // all / single 모드
@@ -125,56 +140,6 @@ function useInterviewReport(rawSessionId, memberId) {
     onMounted(async () => {
         await loadReport();
     });
-
-    /*-------------------------------------
-        종합 평균 점수 = (언어 + 비언어) / 2
-    -------------------------------------*/
-    const avgScore = computed(() => {
-        if (!finalFeedback.value) return 0;
-
-        const lang = finalFeedback.value.languageScore || 0;
-        const non = finalFeedback.value.nonLanguageScore || 0;
-
-        return Math.round((lang + non) / 2);
-    });
-
-    /*-------------------------------------
-        답변별 언어 점수
-    -------------------------------------*/
-    const singleLanguageScore = computed(() => {
-        
-        if (!selectedQuestion.value) return 0;
-        if (!selectedQuestion.value.answerFeedback) return 0;
-        if (selectedQuestion.value.answerFeedback.languageScore == null) return 0;
-        
-        return selectedQuestion.value.answerFeedback.languageScore;
-    });
-    
-    /*-------------------------------------
-        답변별 비언어 점수
-    -------------------------------------*/
-    const singleNonLanguageScore = computed(() => {
-        if(!selectedQuestion.value) return 0;
-        if(!selectedQuestion.value.answerFeedback) return 0;
-        if(selectedQuestion.value.answerFeedback.nonLanguageScore == null) return 0;
-        
-        return selectedQuestion.value.answerFeedback.nonLanguageScore;
-    });
-    
-    /*-------------------------------------
-    답변별 평균 점수
-    -------------------------------------*/
-    const singleAvgScore = computed(() => {
-        if(!selectedQuestion.value) return 0;
-        if(!selectedQuestion.value.answerFeedback) return 0;
-
-        const lang = selectedQuestion.value.answerFeedback.languageScore;
-        const non = selectedQuestion.value.answerFeedback.nonLanguageScore;
-
-        if (lang == null || non == null) return 0;
-
-        return Math.round((lang + non) / 2);
-    });
     
     /*-------------------------------------
         피드백 카드 필터링
@@ -212,10 +177,10 @@ function useInterviewReport(rawSessionId, memberId) {
         loading,
         languageScore,
         nonLanguageScore,
-        avgScore,
+        totalScore,
         singleLanguageScore,
         singleNonLanguageScore,
-        singleAvgScore,
+        singleTotalScore,
         error,
         sessionInfo,
         qaList,

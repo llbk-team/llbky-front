@@ -122,7 +122,7 @@
           <h4 class="fw-bold mb-2 text-dark">{{ mode === 'single' ? '개별 평가' : '종합 평가' }}</h4>
           <div class="score-row">
             <div class="score-top">
-              <h4 class="fw-bold text-dark mb-0">{{ mode === 'single' ? singleAvgScore : avgScore }}/100점</h4>
+              <h4 class="fw-bold text-dark mb-0">{{ mode === 'single' ? singleTotalScore : totalScore }}/100점</h4>
             </div>
 
             <div class="progress mb-1" style="height: 8px;">
@@ -179,12 +179,12 @@ const memberId = 1;
 
 const {
   loading,
-  avgScore,
   languageScore,
   nonLanguageScore,
+  totalScore,
   singleLanguageScore,
   singleNonLanguageScore,
-  singleAvgScore,
+  singleTotalScore,
   error,
   sessionInfo,
   qaList,
