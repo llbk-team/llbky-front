@@ -16,7 +16,7 @@
       <div class="login">
         <!-- 로그인 상태일 때 -->
         <template v-if="isLoggedIn">
-          <span class="welcome">{{ userInfo?.member_name || userInfo?.loginId }}님
+          <span class="welcome">{{ userInfo?.memberName || userInfo?.loginId }}님
           </span>
 
           <button class="logout-btn" @click="logout">로그아웃</button>

@@ -10,7 +10,7 @@ export function useResumeMain() {
 
     // 사용자 정보
     const user = JSON.parse(localStorage.getItem("user"));
-    const userName = ref(user?.member_name || "사용자");
+    const userName = ref(user?.memberName || "사용자");
 
     // 이력서
     const resumeList = ref([]);
