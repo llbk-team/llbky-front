@@ -2,25 +2,28 @@
 import portfolioGuideApi from "@/apis/portfolioGuideApi";
 import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
+import { useStore } from "vuex";
 
 // 포트폴리오 작성 도우미
 function portfolioStepbystep() {
     const router = useRouter();
-
+    const store = useStore();
     // 전체 진행률 및 현재 단계
     const overallProgress = ref(0);
     const currentStep = ref(1);
 
     // 사용자 정보 (하드코딩 - DB 데이터)
-    const memberId = ref(1);  // DB의 memberId
-    const guideId = ref(2);   // DB의 guideId
-    const userName = ref('사용자1');  // DB의 memberName
-    const userEmail = ref('user@test.com');  // DB의 email
+    const memberId = ref(null);  // DB의 memberId
+    const guideId = ref(null);   // DB의 guideId
+    const userName = ref('');  // DB의 memberName
+    const userEmail = ref('');  // DB의 email
 
     // 직군/직무 정보 (DB에서 가져온 값으로 하드코딩)
     const jobGroup = ref('개발');  // DB의 jobGroup
     const jobRole = ref('백엔드');  // DB의 jobRole
 
+    const isLoggedIn = computed(() => store.getters['user/isLoggedIn']);
+    const currentUser = computed(() => store.getters['user/userInfo']);
     // 포트폴리오 단계 (DB에서 가져올 데이터)
     const portfolioSteps = ref([]);
 
@@ -92,6 +95,12 @@ function portfolioStepbystep() {
     // AI 피드백 요청
     const submitItemContent = async (index) => {
         try {
+             if (!memberId.value) {
+                console.warn('❌ 사용자 정보가 없습니다. 다시 로그인해주세요.');
+                router.push('/login');
+                return;
+            }
+
             const currentItem = portfolioSteps.value[openStepIndex.value].items[index];
 
             // 입력값 검증
@@ -108,14 +117,13 @@ function portfolioStepbystep() {
 
             // 🔥 수정: 하드코딩된 값들을 명시적으로 포함
             const requestData = {
-                userInput: currentContent.value,
+               userInput: currentContent.value,
                 inputFieldType: currentItem.title,
-                // 하드코딩된 사용자 정보 포함
-                memberId:1,
-                jobGroup: jobGroup.value,      // '개발'
-                jobRole: jobRole.value,        // '백엔드'
-                careerYears: 2,                // 하드코딩 (또는 ref로 관리)
-                currentStep: currentStep.value // 현재 단계
+                memberId: memberId.value,          // 🔥 실제 로그인된 사용자 ID
+                jobGroup: jobGroup.value,          
+                jobRole: jobRole.value,            
+                careerYears: 2,                    
+                currentStep: currentStep.value  
             };
 
             console.log('🚀 AI 피드백 요청 (하드코딩 포함):', requestData);
@@ -127,7 +135,7 @@ function portfolioStepbystep() {
             if (response.data) {
                 const feedback = response.data;
                 
-                // 피드백 표시
+                // 피드백 표시g
                 showItemFeedback.value[index] = true;
 
                 // AI 코치 패널에 표시할 상세 피드백 (전체 객체)
@@ -160,6 +168,14 @@ function portfolioStepbystep() {
             }
 
             alert(errorMessage);
+             if (error.response?.status === 401) {
+                errorMessage = '인증이 만료되었습니다. 다시 로그인해주세요.';
+                store.dispatch('user/logout'); // 로그아웃 처리
+                router.push('/login');
+                return;
+            }
+
+
         } finally {
             // 로딩 종료 (성공/실패 모두)
             aiLoading.value = false;
@@ -557,10 +573,46 @@ function portfolioStepbystep() {
         return text;
     };
 
+const setUserInfoFromStore = () => {
+        console.log('🔍 Vuex store에서 사용자 정보 확인 중...');
+        
+        if (!isLoggedIn.value || !currentUser.value) {
+            console.warn('❌ 로그인되지 않은 상태입니다.');
+            router.push('/login');
+            return false;
+        }
+
+        const user = currentUser.value;
+        
+        // 🔥 핵심: store에서 실제 사용자 정보 가져오기
+        memberId.value = user.memberId || user.id || user.member_id;
+        userName.value = user.name || user.username || user.member_name || '';
+        userEmail.value = user.email || user.member_email || '';
+        
+        // 직군/직무 정보도 있다면 설정
+        if (user.jobGroup || user.job_group) {
+            jobGroup.value = user.jobGroup || user.job_group;
+        }
+        if (user.jobRole || user.job_role) {
+            jobRole.value = user.jobRole || user.job_role;
+        }
+
+        console.log('✅ 사용자 정보 설정 완료:', {
+            memberId: memberId.value,
+            userName: userName.value,
+            userEmail: userEmail.value
+        });
+
+        return true;
+    };
 
 
     // 초기화 함수
     const initializePortfolio = async () => {
+
+        if (!setUserInfoFromStore()) {
+            return; // 로그인되지 않았으면 중단
+        }
         openStepIndex.value = 0;
 
         // 표준 데이터 로드
@@ -600,6 +652,9 @@ function portfolioStepbystep() {
         jobRole,
         
         // 함수
+        setUserInfoFromStore,
+        isLoggedIn,
+        currentUser,
         toggleStep,
         toggleItem,
         cancelItemInput,
