@@ -4,7 +4,7 @@
     <!-- 헤더 -->
     <div class="insight-header">
       <div class="title-section">
-        <h2>AI 추천 인사이트</h2>
+        <h2>AI 직무 인사이트</h2>
         <p>
           AI가 최신 뉴스·트렌드·저장 키워드를 종합 분석해,
           희망 직무를 중심으로 연관 직무와 기술 흐름을 제안합니다.
@@ -47,7 +47,7 @@
 
     <!-- 🤖 AI 추천 인사이트 -->
     <div class="recommend-section">
-      <h3>🤖 AI 추천 인사이트</h3>
+      <h3>🤖 AI 직무 인사이트</h3>
 
       <p class="sub-desc">
         최근 뉴스·트렌드 분석과 저장된 키워드를 바탕으로
