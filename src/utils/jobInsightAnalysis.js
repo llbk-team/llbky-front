@@ -2,8 +2,13 @@
 
 import { ref, onMounted } from "vue";
 import jobInsightApi from "@/apis/jobInsightApi";
+import { useStore } from "vuex";
 
-function useJobInsight(memberId) {
+function useJobInsight() {
+
+    // 로그인 사용자 정보 가져오기
+    const store = useStore();
+    const memberId = store.getters["user/userInfo"]?.memberId;
 
     /*-------------------------------------
         상태 정의

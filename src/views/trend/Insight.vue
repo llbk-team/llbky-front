@@ -120,7 +120,6 @@
 <script setup>
 import jobInsight from "@/utils/jobInsightAnalysis";
 
-const memberId = 1;
 
 const {
   loading,
@@ -132,7 +131,7 @@ const {
   jobs,
   isSaved,
   toggleKeyword
-} = jobInsight.useJobInsight(memberId);
+} = jobInsight.useJobInsight();
 </script>
 
 

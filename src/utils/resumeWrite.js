@@ -3,11 +3,14 @@ import jobInsightApi from "@/apis/jobInsightApi";
 import resumeApi from "@/apis/resumeApi";
 import { onMounted, reactive, ref } from "vue";
 import { useRouter } from "vue-router";
+import { useStore } from "vuex";
 
 function useResumeWrite() {
     const router = useRouter();
+    const store = useStore();
+    const memberId = store.getters["user/userInfo"]?.memberId;
 
-    /* 🔥 섹션 오픈 상태 */
+    /* 섹션 오픈 상태 */
     const sections = reactive({
         basic: true,
         education: false,
@@ -16,17 +19,17 @@ function useResumeWrite() {
         activities: false,
         certificates: false,
     });
-    
+
     // 저장된 키워드
     const savedKeywords = ref([]);
     const selectedKeywords = ref([]);
 
-    /* 🔥 AI 관련 */
+    /* AI 관련 */
     const aiFeedback = ref([]);
     const aiLoading = ref(false);
     const saveLoading = ref(false);
 
-    /* 🔥 이력서 데이터 */
+    /* 이력서 데이터 */
     const resumeData = reactive({
         title: "",
         name: "",
@@ -56,12 +59,12 @@ function useResumeWrite() {
         certificates: [{ name: "", date: "", issuer: "" }],
     });
 
-    /* 🔥 섹션 토글 */
+    /* 섹션 토글 */
     const toggleSection = (key) => {
         sections[key] = !sections[key];
     };
 
-    /* 🔥 입력 변경 */
+    /* 입력 변경 */
     const onInputChange = (field, value) => {
         resumeData[field] = value;
     };
@@ -136,7 +139,7 @@ function useResumeWrite() {
             resumeData.certificates.splice(i, 1);
     };
 
-    /* 🔥 섹션 라벨 */
+    /* 섹션 라벨 */
     const getSectionLabel = (section) => {
         return (
             {
@@ -148,15 +151,15 @@ function useResumeWrite() {
         );
     };
 
-    /* 🔥 AI 피드백 요청 */
+    /* AI 피드백 요청 */
     const getSectionFeedback = async (section, index) => {
         try {
             let content =
                 section === "career"
                     ? resumeData.careers[index].responsibilities
                     : section === "activity"
-                    ? resumeData.activities[index].description
-                    : "";
+                        ? resumeData.activities[index].description
+                        : "";
 
             if (!content.trim()) {
                 alert("내용을 입력해야 AI 피드백을 받을 수 있습니다.");
@@ -166,7 +169,7 @@ function useResumeWrite() {
             aiLoading.value = true;
 
             const payload = {
-                memberId: 1,
+                memberId: memberId,
                 section,
                 content,
                 keywords: selectedKeywords?.value || [] // 키워드 추가
@@ -193,15 +196,15 @@ function useResumeWrite() {
 
     // 키워드 불러오기 함수
     const loadSavedKeywords = async () => {
-    try {
-        const res = await jobInsightApi.getSavedKeywords(1);
-        savedKeywords.value = res.data.map(k => k.keyword);
-    } catch (e) {
-        console.error("키워드 로딩 실패:", e);
-    }
-};
+        try {
+            const res = await jobInsightApi.getSavedKeywords(memberId);
+            savedKeywords.value = res.data.map(k => k.keyword);
+        } catch (e) {
+            console.error("키워드 로딩 실패:", e);
+        }
+    };
 
-    /* 🔥 개선문 적용 */
+    /* 개선문 적용 */
     const applyImprovedToResume = (item) => {
         if (item.section === "career") {
             resumeData.careers[item.index].responsibilities = item.improvedText;
@@ -212,13 +215,13 @@ function useResumeWrite() {
         alert("AI 수정본을 적용했습니다!");
     };
 
-    /* 🔥 저장 */
+    /* 저장 */
     const submitResume = async () => {
         try {
             saveLoading.value = true;
 
             const payload = {
-                memberId: 1,
+                memberId: memberId,
                 title: resumeData.title,
                 careerInfo: JSON.stringify(resumeData.careers),
                 educationInfo: JSON.stringify(resumeData.educations),

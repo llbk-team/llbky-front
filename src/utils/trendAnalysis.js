@@ -4,9 +4,12 @@ import { ref, onMounted, nextTick } from "vue";
 import Chart from "chart.js/auto";
 import WordCloud from "wordcloud";
 import trendApi from "@/apis/trendApi";
+import { useStore } from "vuex";
 
-export function useTrendAnalysis(memberId = 1) {
-
+export function useTrendAnalysis() {
+  const store = useStore();
+  const memberId = store.getters["user/userInfo"]?.memberId;
+  
   // ==============================
   //  상태 값
   // ==============================
@@ -32,7 +35,7 @@ export function useTrendAnalysis(memberId = 1) {
     const s = insightJson.summarycard;
     summaryCards.value = [
       { label: "주목 키워드", value: s.majorKeyword },
-      { label: "전체 평균 관심도", value: s.avgInterest},
+      { label: "전체 평균 관심도", value: s.avgInterest },
       { label: "분석 키워드 수", value: s.keywordCount + "개" }
     ];
 

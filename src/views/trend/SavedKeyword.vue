@@ -87,7 +87,6 @@
 <script setup>
 import userSavedKeyword from '@/utils/savedKeyword';
 
-const memberId = 1;
 
 const {
    keywords,
@@ -102,7 +101,7 @@ const {
   deleteKeyword,
   clearAll,
   loadKeywords
-} = userSavedKeyword(memberId);
+} = userSavedKeyword();
 
 </script>
 

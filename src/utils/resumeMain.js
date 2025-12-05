@@ -4,12 +4,15 @@ import { useRouter } from "vue-router";
 import resumeApi from "@/apis/resumeApi";
 import portfolioApi from "@/apis/portfolioApi";
 import coverletterApi from "@/apis/coverletterApi";
+import { useStore } from "vuex";
 
 export function useResumeMain() {
     const router = useRouter();
+    const store = useStore();
 
-    // 사용자 정보
-    const user = JSON.parse(localStorage.getItem("user"));
+    // 로그인한 사용자 정보
+    const user = store.getters["user/userInfo"];
+    const memberId = user?.memberId;
     const userName = ref(user?.memberName || "사용자");
 
     // 이력서
@@ -29,7 +32,7 @@ export function useResumeMain() {
 
     const fetchResumeList = async () => {
         try {
-            const res = await resumeApi.list(1);
+            const res = await resumeApi.list(memberId);
             resumeList.value = res.data.map((item) => ({
                 id: item.resumeId,
                 title: item.title,
@@ -50,7 +53,7 @@ export function useResumeMain() {
 
     const fetchCoverletterList = async () => {
         try {
-            const res = await coverletterApi.getCoverLetterList(1);
+            const res = await coverletterApi.getCoverLetterList(memberId);
             coverLetterList.value = res.data.map((item) => ({
                 id: item.coverletterId,
                 title: item.title,
@@ -70,7 +73,7 @@ export function useResumeMain() {
 
     const fetchPortfolioList = async () => {
         try {
-            const res = await portfolioApi.getPortfolioList(1);
+            const res = await portfolioApi.getPortfolioList(memberId);
             portfolioList.value = res.data.map(item => ({
                 portfolioId: item.portfolioId ?? item.portfolio_id,
                 title: item.title,
@@ -144,7 +147,7 @@ export function useResumeMain() {
     const deleteCoverLetter = async () => {
         for (const id of selectedCovers.value) {
             try {
-                await coverletterApi.deleteCoverLetter(1, id);
+                await coverletterApi.deleteCoverLetter(memberId, id);
             } catch (err) {
                 console.error("자소서 삭제 실패:", err);
             }

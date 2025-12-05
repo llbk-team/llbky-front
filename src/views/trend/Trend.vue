@@ -88,7 +88,7 @@ const {
   wordCloudData,
   marketInsight,
   saveLoading
-} = useTrendAnalysis(1);
+} = useTrendAnalysis();
 
 </script>
 
