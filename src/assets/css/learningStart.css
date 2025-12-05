@@ -227,7 +227,7 @@
   width: 240px;
   height: 240px;
   pointer-events: none;
-  transform: translate(-50%, -50%) scale(2.2);;
+  transform: translate(-50%, -50%) scale(3);
   z-index: 9999;
 }
 
@@ -249,7 +249,7 @@
   color: white;
   padding: 22px 40px;
   border-radius: 12px;
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 700;
   text-align: center;
   animation: fadeInOut 3s forwards;

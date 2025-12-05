@@ -80,4 +80,4 @@ const {
 
 
 
-<style src="@/assets/css/portfolioWrite.css"></style>
+<style scoped src="@/assets/css/portfolioWrite.css"></style>
