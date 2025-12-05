@@ -223,11 +223,23 @@ function useLearningStart() {
         selectedItem.value.status = data.status;  // 상태 업데이트
         memoContent.value = "";  // 입력창 초기화
 
-        await loadWeeks(learningId);  // 업데이트된 주차/진행률 다시 불러오기
+        await loadWeeks();
+        const cw = currentWeek.value;
+        const currentWeekObj = weeklyProgress.value.find(w => w.weekNumber === cw);
+        if (currentWeekObj) {
+          await loadWeeklyItems(currentWeekObj.weekId);
+        }
 
       } else {
         memoContent.value = data.learningDaySummary;
-        await loadWeeks(learningId);
+        await loadWeeks();
+
+        const cw = currentWeek.value;
+        const currentWeekObj = weeklyProgress.value.find(w => w.weekNumber === cw);
+        if (currentWeekObj) {
+          await loadWeeklyItems(currentWeekObj.weekId);
+        }
+        return;
       }
 
 
