@@ -6,28 +6,16 @@
       <form @submit.prevent="handleLogin">
         <div class="input-group">
           <label for="username">아이디</label>
-          <input
-            id="username"
-            v-model="username"
-            type="text"
-            placeholder="아이디를 입력하세요"
-          />
+          <input id="username" v-model="username" type="text" placeholder="아이디를 입력하세요" />
         </div>
 
         <div class="input-group">
           <label for="password">비밀번호</label>
           <div class="password-box">
-            <input
-              id="password"
-              v-model="password"
-              :type="showPassword ? 'text' : 'password'"
-              placeholder="비밀번호를 입력하세요"
-            />
-            <i
-              :class="showPassword ? 'ri-eye-off-line' : 'ri-eye-line'"
-              class="toggle-icon"
-              @click="showPassword = !showPassword"
-            ></i>
+            <input id="password" v-model="password" :type="showPassword ? 'text' : 'password'"
+              placeholder="비밀번호를 입력하세요" />
+            <i :class="showPassword ? 'ri-eye-off-line' : 'ri-eye-line'" class="toggle-icon"
+              @click="showPassword = !showPassword"></i>
           </div>
         </div>
 
@@ -48,14 +36,32 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
+import memberApi from "@/apis/memberApi";
 
 const router = useRouter();
 const username = ref("");
 const password = ref("");
 const showPassword = ref(false);
 
-const handleLogin = () => {
-  alert(`로그인 시도: ${username.value}`);
+const handleLogin = async () => {
+  try {
+    const res = await memberApi.login({
+      loginId: username.value,
+      password: password.value,
+    });
+
+    const user = res.data;
+
+    // 로그인 성공 → 로컬스토리지 저장
+    localStorage.setItem("user", JSON.stringify(user));
+
+    alert("로그인 성공!");
+
+    // 원하는 페이지로 이동
+    router.push("/");
+  } catch (err) {
+    alert(err.response?.data || "로그인 실패");
+  }
 };
 
 const goSignup = () => {
@@ -120,7 +126,8 @@ input:focus {
 
 .password-box input {
   width: 100%;
-  padding-right: 38px; /* 아이콘 공간 확보 */
+  padding-right: 38px;
+  /* 아이콘 공간 확보 */
 }
 
 .toggle-icon {

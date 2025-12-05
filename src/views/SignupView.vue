@@ -19,16 +19,9 @@
           <div class="input-group">
             <label>비밀번호</label>
             <div class="password-box">
-              <input
-                v-model="password"
-                :type="showPassword ? 'text' : 'password'"
-                placeholder="비밀번호를 입력하세요"
-              />
-              <i
-                :class="showPassword ? 'ri-eye-off-line' : 'ri-eye-line'"
-                class="toggle-icon"
-                @click="showPassword = !showPassword"
-              ></i>
+              <input v-model="password" :type="showPassword ? 'text' : 'password'" placeholder="비밀번호를 입력하세요" />
+              <i :class="showPassword ? 'ri-eye-off-line' : 'ri-eye-line'" class="toggle-icon"
+                @click="showPassword = !showPassword"></i>
             </div>
           </div>
 
@@ -51,11 +44,8 @@
               <div class="step" :class="{ active: progressStep >= 1 }">1</div>
               <span class="step-label">직군/직무</span>
               <div class="progress-bar">
-                <div
-                  class="progress-fill"
-                  :class="{ active: progressStep > 0 }"
-                  :style="{ width: progressStep === 1 ? '50%' : progressStep === 2 ? '100%' : '0%' }"
-                ></div>
+                <div class="progress-fill" :class="{ active: progressStep > 0 }"
+                  :style="{ width: progressStep === 1 ? '50%' : progressStep === 2 ? '100%' : '0%' }"></div>
               </div>
               <div class="step" :class="{ active: progressStep === 2 }">2</div>
               <span class="step-label">경력/스킬</span>
@@ -66,12 +56,8 @@
           <div class="section job-section">
             <h4>직군 선택</h4>
             <div class="grid-5">
-              <button
-                v-for="(job, idx) in jobFields"
-                :key="idx"
-                :class="['grid-item', { selected: selectedJob === job }]"
-                @click.prevent="selectJob(job)"
-              >
+              <button v-for="(job, idx) in jobFields" :key="idx"
+                :class="['grid-item', { selected: selectedJob === job }]" @click.prevent="selectJob(job)">
                 {{ job }}
               </button>
             </div>
@@ -81,13 +67,9 @@
           <div class="section role-section">
             <h4>직무</h4>
             <div class="dropdown" ref="dropdownRef">
-              <button
-                class="btn dropdown-toggle w-100 text-start"
-                :class="{'btn-secondary': !selectedJob, 'btn-light': selectedJob}"
-                type="button"
-                :disabled="!selectedJob"
-                @click="toggleDropdown"
-              >
+              <button class="btn dropdown-toggle w-100 text-start"
+                :class="{ 'btn-secondary': !selectedJob, 'btn-light': selectedJob }" type="button"
+                :disabled="!selectedJob" @click="toggleDropdown">
                 {{ jobRole || '직군을 먼저 선택해주세요' }}
               </button>
               <ul class="dropdown-menu w-100" :class="{ show: isDropdownOpen }">
@@ -103,12 +85,8 @@
           <div class="section career-section">
             <h4>경력</h4>
             <div class="grid-5">
-              <button
-                v-for="(exp, idx) in experiences"
-                :key="idx"
-                :class="['grid-item', { selected: selectedExp === exp }]"
-                @click.prevent="selectExp(exp)"
-              >
+              <button v-for="(exp, idx) in experiences" :key="idx"
+                :class="['grid-item', { selected: selectedExp === exp }]" @click.prevent="selectExp(exp)">
                 {{ exp }}
               </button>
             </div>
@@ -128,6 +106,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
+import memberApi from "@/apis/memberApi";   // ✅ 회원가입 API import
 
 const router = useRouter();
 
@@ -291,24 +270,19 @@ const selectJob = (job) => {
   isDropdownOpen.value = false;
   if (!progressStep.value) progressStep.value = 1;
   updateProgress();
-  console.log('직군 선택:', job, '직무 옵션:', roleOptions.value.length);
 };
 
 const toggleDropdown = (event) => {
-  event.stopPropagation();  // 이벤트 버블링 중단
-  console.log('toggleDropdown 실행 전:', isDropdownOpen.value);
+  event.stopPropagation();
   if (selectedJob.value) {
     isDropdownOpen.value = !isDropdownOpen.value;
-    console.log('toggleDropdown 실행 후:', isDropdownOpen.value);
-  } else {
-    console.log('직군이 선택되지 않아 드롭다운 열 수 없음');
   }
 };
+
 const selectRole = (role) => {
   jobRole.value = role;
   isDropdownOpen.value = false;
   updateProgress();
-  console.log('직무 선택:', role);
 };
 
 const selectExp = (exp) => {
@@ -319,6 +293,13 @@ const selectExp = (exp) => {
 const updateProgress = () => {
   if (selectedJob.value && jobRole.value) progressStep.value = 1;
   if (selectedExp.value) progressStep.value = 2;
+};
+
+// 경력 문자열 → 숫자 변환
+const convertCareer = (exp) => {
+  if (exp === "신입") return 0;
+  if (exp.includes("년")) return parseInt(exp);
+  return 0;
 };
 
 const isFormComplete = computed(
@@ -332,25 +313,41 @@ const isFormComplete = computed(
     selectedExp.value
 );
 
-const handleSignup = () => {
-  if (isFormComplete.value) {
+// =========================
+// 🚀 회원가입 API 호출
+// =========================
+const handleSignup = async () => {
+  if (!isFormComplete.value) return;
+
+  try {
+    await memberApi.register({
+      name: name.value,
+      loginId: username.value,
+      password: password.value,
+      email: email.value,
+      jobGroup: selectedJob.value,
+      jobRole: jobRole.value,
+      careerYears: convertCareer(selectedExp.value),
+    });
+
     alert("회원가입이 완료되었습니다!");
     router.push("/login");
+
+  } catch (err) {
+    alert(err.response?.data || "회원가입 실패");
   }
 };
 
-// 드롭다운 외부 클릭 시 닫기
+// 드롭다운 외부 클릭 처리
 const handleClickOutside = (event) => {
   const dropdownContainer = event.target.closest('.dropdown-container');
   if (!dropdownContainer && isDropdownOpen.value) {
     isDropdownOpen.value = false;
-    console.log('외부 클릭으로 드롭다운 닫힘');
   }
 };
 
 onMounted(() => {
   document.addEventListener('click', handleClickOutside);
-  console.log('컴포넌트 마운트됨');
 });
 
 onUnmounted(() => {
@@ -359,7 +356,6 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-
 .dropdown {
   position: relative;
 }
