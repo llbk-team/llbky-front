@@ -87,9 +87,21 @@ const features = [
 ];
 
 const stats = [
-  { icon: "ri-file-list-line", number: "1,234", label: "누적 코칭 완료" },
-  { icon: "ri-emotion-happy-line", number: "94%", label: "사용자 만족도" },
-  { icon: "ri-trophy-line", number: "234", label: "취업 성공" },
+  {
+    icon: "ri-magic-line",
+    number: "더 쉬운 준비",
+    label: "복잡한 취업 준비를 단순하게"
+  },
+  {
+    icon: "ri-heart-2-line",
+    number: "더 나은 표현",
+    label: "당신의 강점을 돋보이게 만듭니다"
+  },
+  {
+    icon: "ri-skip-forward-line",
+    number: "더 빠른 성장",
+    label: "시간 대비 최고의 효율 경험"
+  }
 ];
 
 const steps = [
@@ -223,7 +235,7 @@ const steps = [
   margin-bottom: 10px;
 }
 .stat h4 {
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-weight: 700;
   margin-bottom: 5px;
 }
