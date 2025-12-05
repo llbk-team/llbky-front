@@ -39,6 +39,8 @@ function learningRoadmap() {
     purposes.value.map(p => PURPOSE_LABELS[p] || p)
   );
 
+  const user = store.getters["user/userInfo"];
+  const memberId = user?.memberId;
 
   // store에서 로드맵 받기
   watch(
@@ -63,7 +65,7 @@ function learningRoadmap() {
   async function saveRoadmap() {
     try {
       const payload = {
-        memberId: 1, // 멤버 Id 수정해주세요~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        memberId: memberId,
         title: roadmapData.value.title,
         weeks: roadmapData.value.weeks
       };

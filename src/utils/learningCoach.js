@@ -2,12 +2,17 @@
 
 import { ref, computed, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
+import { useStore } from "vuex";
 import learningApi from "@/apis/learningApi";
 
-export function useLearningCoach(memberId = 1) {
+export function useLearningCoach() {
 
   const router = useRouter();
   const route = useRoute();
+   const store = useStore();
+
+  const user = store.getters["user/userInfo"];
+  const memberId = user?.memberId;
 
   // ===============================
   //        학습 리스트 로드

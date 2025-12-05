@@ -1,25 +1,29 @@
 // 포트폴리오 작성 도우미 페이지 컴포넌트용 js 파일
 import portfolioGuideApi from "@/apis/portfolioGuideApi";
 import { ref, computed } from "vue";
-import { useRouter } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
+import { useStore } from "vuex";
 
 // 포트폴리오 작성 도우미
 function portfolioStepbystep() {
     const router = useRouter();
+    const route = useRoute();
+    const store = useStore();
+
+    const guideId = ref(route.query.guideId || null);
 
     // 전체 진행률 및 현재 단계
     const overallProgress = ref(0);
     const currentStep = ref(1);
 
-    // 사용자 정보 (하드코딩 - DB 데이터)
-    const memberId = ref(1);  // DB의 memberId
-    const guideId = ref(2);   // DB의 guideId
-    const userName = ref('사용자1');  // DB의 memberName
-    const userEmail = ref('user@test.com');  // DB의 email
+    // 사용자 정보
+    const user = store.getters["user/userInfo"];
 
-    // 직군/직무 정보 (DB에서 가져온 값으로 하드코딩)
-    const jobGroup = ref('개발');  // DB의 jobGroup
-    const jobRole = ref('백엔드');  // DB의 jobRole
+    const memberId = ref(user.memberId);
+    const userName = ref(user.memberName);
+    const userEmail = ref(user.memberEmail);
+    const jobGroup = ref(user.jobGroup);
+    const jobRole = ref(user.jobRole);
 
     // 포트폴리오 단계 (DB에서 가져올 데이터)
     const portfolioSteps = ref([]);
@@ -106,19 +110,18 @@ function portfolioStepbystep() {
             // 원본 내용 저장 (나중에 복원을 위해)
             originalContent.value = currentContent.value;
 
-            // 🔥 수정: 하드코딩된 값들을 명시적으로 포함
+            // 수정
             const requestData = {
                 userInput: currentContent.value,
                 inputFieldType: currentItem.title,
-                // 하드코딩된 사용자 정보 포함
-                memberId:1,
-                jobGroup: jobGroup.value,      // '개발'
-                jobRole: jobRole.value,        // '백엔드'
-                careerYears: 2,                // 하드코딩 (또는 ref로 관리)
-                currentStep: currentStep.value // 현재 단계
+                memberId: memberId.value,
+                jobGroup: jobGroup.value,
+                jobRole: jobRole.value,
+                careerYears: user.careerYears || 0,
+                currentStep: currentStep.value
             };
 
-            console.log('🚀 AI 피드백 요청 (하드코딩 포함):', requestData);
+            console.log('🚀 AI 피드백 요청:', requestData);
 
             // 실시간 코칭 API 호출 (POST /portfolio-guide/coaching)
             const response = await portfolioGuideApi.getRealtimeCoaching(requestData);

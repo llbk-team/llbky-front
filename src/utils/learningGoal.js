@@ -13,6 +13,9 @@ function useLearningGoal() {
   const newInterestSkill = ref("");
   const recommendedSkills = ref([]);
 
+  const user = store.getters["user/userInfo"];
+  const memberId = user?.memberId;
+
   const formData = ref({
     careerGoals: [],
     learningGoals: [],
@@ -115,7 +118,7 @@ function useLearningGoal() {
     isLoading.value = true;
 
     const fd = new FormData();
-    fd.append("memberId", 1);
+    fd.append("memberId", memberId);
     fd.append("studyHours", formData.value.studyHours);
 
     purposes.forEach((p) => fd.append("purposes", p));

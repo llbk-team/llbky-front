@@ -2,9 +2,14 @@
 import { ref } from "vue";
 import portfolioApi from "@/apis/portfolioApi";
 import { useRouter } from "vue-router";
+import { useStore } from "vuex";
 
 export function usePortfolioWrite() {
   const router = useRouter();
+  const store = useStore();
+
+  const user = store.getters["user/userInfo"];
+  const memberId = user?.memberId;
 
   // 상태값
   const uploadedFile = ref(null);
@@ -40,7 +45,7 @@ export function usePortfolioWrite() {
     loadingUpload.value = true;
 
     const formData = new FormData();
-    formData.append("memberId", 1);
+    formData.append("memberId", memberId);
     formData.append("title", portfolioTitle.value);
     formData.append("pdfFile", uploadedFile.value);
 
