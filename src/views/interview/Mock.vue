@@ -184,4 +184,4 @@ const {
 
 </script>
 
-<style src="@/assets/css/interviewMock.css"></style>
+<style scoped src="@/assets/css/interviewMock.css"></style>

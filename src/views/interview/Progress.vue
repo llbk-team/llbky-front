@@ -294,4 +294,4 @@ onMounted(() => {
 });
 </script>
 
-<style src="@/assets/css/interviewProgress.css"></style>
+<style scoped src="@/assets/css/interviewProgress.css"></style>

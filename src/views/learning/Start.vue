@@ -194,4 +194,4 @@ const {
 
 </script>
 
-<style src="@/assets/css/learningStart.css"></style>
+<style scoped src="@/assets/css/learningStart.css"></style>

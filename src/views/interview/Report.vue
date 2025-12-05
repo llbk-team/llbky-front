@@ -216,4 +216,4 @@ const {
 } = interviewList.useInterviewList(memberId);
 </script>
 
-<style src="@/assets/css/interviewList.css"></style>
+<style scoped src="@/assets/css/interviewList.css"></style>

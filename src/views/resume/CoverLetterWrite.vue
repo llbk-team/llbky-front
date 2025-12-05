@@ -179,4 +179,4 @@ const {
 } = coverletterCoach.useCoverLetterCoach(introFields, selectedKeywords);
 </script>
 
-<style src="@/assets/css/coverletterWrite.css"></style>
+<style scoped src="@/assets/css/coverletterWrite.css"></style>
