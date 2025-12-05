@@ -89,6 +89,7 @@
           <div v-if="selectedItem">
             <h6 class="fw-bold mb-3">📝 {{ selectedItem.title }} 학습 노트</h6>
             <p class="text-muted small mb-2">학습한 내용을 자유롭게 작성하세요. AI가 내용을 검토해드립니다.</p>
+            <p class="small text-muted mb-2">{{ selectedItem.desc }}</p>
             <div v-if="memoContent.startsWith('[학습 기록 거부 안내]')" class="alert alert-warning small">
               ⚠️ 학습 기록이 거부되었습니다. 내용을 다시 확인해주세요.
             </div>

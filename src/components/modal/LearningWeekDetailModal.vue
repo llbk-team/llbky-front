@@ -22,8 +22,6 @@
 
             <!-- ✅ 펼침 영역 -->
             <div v-show="day.open" class="fade-section mt-2">
-              <p class="small text-muted mb-2">{{ day.desc }}</p>
-
               <div v-if="day.memo" class="note-box p-3 rounded-3 border bg-light">
                 <h6 class="fw-semibold small mb-2">📝 정리 노트</h6>
                 <p class="small mb-0" style="white-space: pre-line;">{{ day.memo }}</p>
