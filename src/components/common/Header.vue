@@ -5,11 +5,12 @@
         <!-- 로고 클릭 시 홈 이동 + 메뉴 비활성화 -->
         <h1 class="logo" @click="goHome">Career Coach</h1>
 
-        <nav class="main-nav">
+        <nav class="main-nav" v-if="isLoggedIn">
           <span v-for="menu in mainMenus" :key="menu.name" class="nav-item" :class="{ active: activeMenu === menu.name }" @click="selectMenu(menu.name)">
             {{ menu.label }}
           </span>
         </nav>
+
       </div>
 
       <div class="login">
