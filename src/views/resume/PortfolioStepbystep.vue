@@ -284,7 +284,7 @@
 <script setup>
 import { onMounted } from "vue";
 import { portfolioStepbystep } from "@/utils/portfolioStepbystep";
-import "@/assets/css/PortfolioStepbystep.css";
+
 
 const {
   // 상태
@@ -323,3 +323,5 @@ onMounted(() => {
   initializePortfolio();
 });
 </script>
+
+<style scoped src="@/assets/css/PortfolioStepbystep.css"></style>
