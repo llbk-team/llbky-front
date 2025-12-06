@@ -12,7 +12,10 @@
           이력서 작성부터 면접 준비, 학습 트렌드 분석까지<br />
           당신만을 위한 맞춤 커리어 코칭으로 목표를 실현하세요.
         </p>
-        <button class="btn-main" @click="router.push('/login')">시작하기</button>
+        <button v-if="!isLoggedIn" class="btn-main" @click="router.push('/login')">
+          시작하기
+        </button>
+
       </div>
     </section>
 
@@ -58,8 +61,10 @@
       <p>AI 커리어 코칭의 완성형과 함께 당신의 꿈을 실현해보세요</p>
 
       <div class="btn-group">
-        <button class="btn-main" @click="router.push('/login')">시작하기</button>
-         <button class="btn-sub" @click="scrollToFeatures">더 알아보기</button>
+        <button v-if="!isLoggedIn" class="btn-main" @click="router.push('/login')">
+          시작하기
+        </button>
+        <button class="btn-sub" @click="scrollToFeatures">더 알아보기</button>
       </div>
 
       <p class="footer">© 2025 Career Coach | Let AI guide your next career move.</p>
@@ -69,8 +74,14 @@
 
 <script setup>
 import { useRouter } from 'vue-router';
+import { useStore } from 'vuex';
+import { computed } from 'vue';
 
 const router = useRouter();
+const store = useStore();
+
+// 로그인 여부
+const isLoggedIn = computed(() => store.getters["user/userInfo"]);
 
 const scrollToFeatures = () => {
   const el = document.getElementById('features')
@@ -132,31 +143,37 @@ const steps = [
   text-align: center;
   padding: 140px 20px 160px;
 }
+
 .hero-inner {
   max-width: 780px;
   margin: 0 auto;
 }
+
 .tagline {
   color: var(--green);
   font-weight: 600;
   font-size: 0.95rem;
   margin-bottom: 10px;
 }
+
 .hero h1 {
   font-size: 2.8rem;
   font-weight: 800;
   line-height: 1.3;
   margin-bottom: 20px;
 }
+
 .hero h1 span {
   color: var(--green);
 }
+
 .hero .desc {
   color: #ccc;
   font-size: 1rem;
   line-height: 1.7;
   margin-bottom: 40px;
 }
+
 .btn-main {
   background-color: var(--green);
   border: none;
@@ -167,6 +184,7 @@ const steps = [
   font-size: 1rem;
   cursor: pointer;
 }
+
 .btn-main:hover {
   background-color: var(--green-light2);
 }
@@ -177,21 +195,25 @@ const steps = [
   text-align: center;
   padding: 100px 20px;
 }
+
 .features h2 {
   font-size: 2rem;
   font-weight: 700;
   color: var(--black);
 }
+
 .subtitle {
   color: #666;
   margin: 10px 0 50px;
 }
+
 .feature-box {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   gap: 24px;
 }
+
 .feature {
   background: var(--white);
   border: 1px solid var(--gray-light2);
@@ -200,20 +222,24 @@ const steps = [
   width: 230px;
   transition: all 0.3s;
 }
+
 .feature:hover {
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.08);
 }
+
 .feature i {
   font-size: 38px;
   color: var(--green);
   margin-bottom: 14px;
   display: block;
 }
+
 .feature h3 {
   font-size: 1.1rem;
   font-weight: 600;
   margin-bottom: 10px;
 }
+
 .feature p {
   color: #666;
   font-size: 0.9rem;
@@ -229,16 +255,19 @@ const steps = [
   padding: 100px 20px;
   text-align: center;
 }
+
 .stat i {
   font-size: 48px;
   color: var(--green);
   margin-bottom: 10px;
 }
+
 .stat h4 {
   font-size: 1.5rem;
   font-weight: 700;
   margin-bottom: 5px;
 }
+
 .stat p {
   color: #555;
 }
@@ -249,10 +278,12 @@ const steps = [
   padding: 100px 20px;
   background-color: var(--gray-light1);
 }
+
 .steps h2 {
   font-size: 1.8rem;
   font-weight: 700;
 }
+
 .step-list {
   display: flex;
   flex-wrap: wrap;
@@ -260,20 +291,24 @@ const steps = [
   gap: 60px;
   margin-top: 60px;
 }
+
 .step {
   width: 220px;
 }
+
 .step .num {
   color: var(--green);
   font-size: 3rem;
   font-weight: 800;
   margin-bottom: 10px;
 }
+
 .step h3 {
   font-weight: 600;
   font-size: 1rem;
   margin-bottom: 8px;
 }
+
 .step p {
   color: #666;
   font-size: 0.9rem;
@@ -287,21 +322,25 @@ const steps = [
   text-align: center;
   padding: 120px 20px;
 }
+
 .cta h2 {
   font-size: 2rem;
   font-weight: 700;
   margin-bottom: 12px;
 }
+
 .cta p {
   color: #ccc;
   margin-bottom: 40px;
   font-size: 0.95rem;
 }
+
 .btn-group {
   display: flex;
   justify-content: center;
   gap: 20px;
 }
+
 .btn-sub {
   background: transparent;
   border: 2px solid var(--green);
@@ -312,10 +351,12 @@ const steps = [
   font-size: 1rem;
   cursor: pointer;
 }
+
 .btn-sub:hover {
   background-color: var(--green);
   color: var(--black);
 }
+
 .footer {
   color: #666;
   font-size: 0.8rem;

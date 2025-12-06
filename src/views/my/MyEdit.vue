@@ -292,7 +292,7 @@ function convertCareerToLabel(years) {
   if (years === 0) return "신입";
   if (years <= 3) return "1~3년차";
   if (years <= 5) return "3~5년차";
-  if (years <= 10) return "5~10년차";
+  if (years < 10) return "5~10년차";
   return "10년 이상";
 }
 
