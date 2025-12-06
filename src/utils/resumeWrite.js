@@ -168,14 +168,43 @@ function useResumeWrite() {
 
             aiLoading.value = true;
 
+            // 섹션별 추가 데이터 구성
+            let extraFields = {};
+
+            if (section === "career") {
+                const c = resumeData.careers[index];
+                extraFields = {
+                    company: c.company,
+                    position: c.position,
+                    startDate: c.startDate,
+                    endDate: c.endDate,
+                    isCurrent: c.isCurrent
+                };
+            }
+
+            if (section === "activity") {
+                const a = resumeData.activities[index];
+                extraFields = {
+                    activityName: a.name,
+                    organization: a.organization,
+                    startDate: a.startDate,
+                    endDate: a.endDate
+                };
+            }
+
             const payload = {
                 memberId: memberId,
                 section,
                 content,
-                keywords: selectedKeywords?.value || [] // 키워드 추가
+                keywords: selectedKeywords?.value || [],
+                ...extraFields
             };
 
             const { data } = await resumeApi.coach(payload);
+
+            aiFeedback.value = aiFeedback.value.filter(
+                (item) => !(item.section === section && item.index === index)
+            );
 
             aiFeedback.value.unshift({
                 section,
@@ -184,15 +213,15 @@ function useResumeWrite() {
                 strengths: data.strengths,
                 improvements: data.improvements,
                 improvedText: data.improvedText,
-                timestamp: Date.now(),
+                timestamp: Date.now()
             });
         } catch (err) {
             console.error("AI 피드백 오류:", err);
-            alert("AI 피드백 요청 실패");
         } finally {
             aiLoading.value = false;
         }
     };
+
 
     // 키워드 불러오기 함수
     const loadSavedKeywords = async () => {
@@ -212,7 +241,6 @@ function useResumeWrite() {
         if (item.section === "activity") {
             resumeData.activities[item.index].description = item.improvedText;
         }
-        alert("AI 수정본을 적용했습니다!");
     };
 
     /* 저장 */

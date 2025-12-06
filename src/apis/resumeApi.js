@@ -16,6 +16,7 @@ function list (memberId = 1){
   return axios.get(`/resume/list/${memberId}`);
 }
 
+// 이력서 수정
 function update(resume){
   return axios.put("/resume/update", resume);
 }
