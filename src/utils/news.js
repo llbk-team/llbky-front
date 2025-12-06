@@ -155,6 +155,11 @@ function news() {
     const visibleNews = computed(() => filteredNews.value);
 
     // ========== 최근 검색어 관리 ==========
+
+    /**
+     * 로컬스토리지에서 사용자별 키워드 가져오는 key 생성
+     */
+    const keywordStorageKey = computed(() => `search_keywords_${memberId.value}`);
     
     /**
      * 로컬스토리지에서 최근 검색어 로드
@@ -162,10 +167,10 @@ function news() {
     const loadRecentKeywords = () => {
         try {
             recentKeywords.value = JSON.parse(
-                localStorage.getItem("search_keywords") || "[]"
+            localStorage.getItem(keywordStorageKey.value) || "[]"
             );
         } catch (error) {
-            console.error('❌ 최근 검색어 로드 실패:', error);
+            console.error("❌ 최근 검색어 로드 실패:", error);
             recentKeywords.value = [];
         }
     };
@@ -175,12 +180,12 @@ function news() {
      */
     const addRecentKeyword = (term) => {
         try {
-            const saved = JSON.parse(localStorage.getItem("search_keywords") || "[]");
-            const updated = [term, ...saved.filter((k) => k !== term)].slice(0, 5);
-            localStorage.setItem("search_keywords", JSON.stringify(updated));
+            const saved = JSON.parse(localStorage.getItem(keywordStorageKey.value) || "[]");
+            const updated = [term, ...saved.filter(k => k !== term)].slice(0, 5);
+            localStorage.setItem(keywordStorageKey.value, JSON.stringify(updated));
             recentKeywords.value = updated;
         } catch (error) {
-            console.error('❌ 검색어 저장 실패:', error);
+            console.error("❌ 검색어 저장 실패:", error);
         }
     };
 
@@ -189,11 +194,11 @@ function news() {
      */
     const deleteKeyword = (k) => {
         try {
-            const updated = recentKeywords.value.filter((item) => item !== k);
+            const updated = recentKeywords.value.filter(item => item !== k);
             recentKeywords.value = updated;
-            localStorage.setItem("search_keywords", JSON.stringify(updated));
+            localStorage.setItem(keywordStorageKey.value, JSON.stringify(updated));
         } catch (error) {
-            console.error('❌ 검색어 삭제 실패:', error);
+            console.error("❌ 검색어 삭제 실패:", error);
         }
     };
 
@@ -203,9 +208,9 @@ function news() {
     const clearAll = () => {
         try {
             recentKeywords.value = [];
-            localStorage.removeItem("search_keywords");
+            localStorage.removeItem(keywordStorageKey.value);
         } catch (error) {
-            console.error('❌ 전체 검색어 삭제 실패:', error);
+            console.error("❌ 전체 검색어 삭제 실패:", error);
         }
     };
 
