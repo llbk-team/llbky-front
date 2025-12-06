@@ -11,14 +11,23 @@
   padding: 40px;
   max-width: calc(100vw - 200px - 400px);
   /* 사이드바와 AI패널 제외 */
+  display: flex;                    /* 새로 추가 */
+  flex-direction: column;           /* 새로 추가 */
+  justify-content: center;          /* 새로 추가: 세로 중앙 정렬 */
+  align-items: center;              /* 새로 추가: 가로 중앙 정렬 */
+
+
 }
 
 /* 폼 컨테이너 */
 .resume-form-container {
   background: #EAEBEC;
   border-radius: 12px;
-  padding: 30px;
-  margin-bottom: 20px;
+  padding: 50px 40px;
+  margin-left: 280px;
+  margin-bottom: 105px;              /* margin: 0 auto 삭제, 단순하게 */
+  max-width: 800px;
+  width: 100%;                      /* 새로 추가: 반응형 대응 */
   border-color: #a8a6a6;
 }
 
