@@ -61,7 +61,9 @@ function useCoverletterWrite() {
             const res = await coverletterApi.saveCoverLetter(coverLetter, memberId);
             console.log("저장 완료: ", res.data);
     
-            router.push('/resume/list');
+            const id = res.data.coverletterId;
+
+            router.push(`/resume/coverletter/detail?id=${id}`);
     
         } catch (err) {
             console.log("자소서 저장 실패:", err);
