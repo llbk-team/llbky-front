@@ -24,12 +24,18 @@ function getStandardById(standardId) {
  * 직군 + 직무로 평가 기준 조회
  * @param {String} jobGroup - 직군
  * @param {String} jobRole - 직무
+ * @param {Number} memberId - 회원 ID (선택)
  * @returns {Promise} List<PortfolioStandard>
  */
-function getStandardsByJob(jobGroup, jobRole) {
-  return axios.get("/portfolio-standard/by-job", {
-    params: { jobGroup, jobRole }
-  });
+function getStandardsByJob(jobGroup, jobRole, memberId) {
+  const params = { jobGroup, jobRole };
+  
+  // memberId가 있으면 추가 (백엔드에서 회원 정보로 직군/직무 조회)
+  if (memberId) {
+    params.memberId = memberId;
+  }
+  
+  return axios.get("/portfolio-standard/by-job", { params });
 }
 
 // 포트폴리오 가이드 코칭 API
