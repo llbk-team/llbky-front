@@ -581,6 +581,16 @@
       </section>
     </div>
   </div>
+    <!-- 수정 완료 로딩 오버레이 -->
+  <div v-if="saveLoading" class="save-loading-overlay">
+    <div class="save-loading-box">
+      <div class="spinner-container">
+        <div class="spinner"></div>
+      </div>
+      <p>수정사항을 적용하고 있습니다.</p>
+      <p class="sub">AI 분석이 자동으로 실행돼요!</p>
+    </div>
+  </div>
 </template>
 
 <script setup>
@@ -594,6 +604,7 @@ const {
   loading,
   error,
   saving,
+  saveLoading,
 
   careers,
   educations,
