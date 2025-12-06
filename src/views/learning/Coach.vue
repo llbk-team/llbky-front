@@ -154,7 +154,6 @@
 <script setup>
 import { useLearningCoach } from "@/utils/learningCoach";
 
-const memberId = 1;
 const {
   ongoingPlans,
   completedPlans,
@@ -184,7 +183,7 @@ const {
   // 통계
   stats,
   goToReport
-} = useLearningCoach(memberId);
+} = useLearningCoach();
 </script>
 
 <style scoped src="@/assets/css/learningCoach.css"></style>
