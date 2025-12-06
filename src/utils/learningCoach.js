@@ -31,7 +31,7 @@ export function useLearningCoach() {
       // 진행중 학습
       for (const item of ongoingRes.data) {
         const { data: weeks } = await learningApi.getWeekListByLearningId(item.learningId);
-        const progress = calculateProgress(weeks);
+        const progress = await calculateProgressByDays(item.learningId);
 
         ongoingPlans.value.push({
           id: item.learningId,
@@ -44,7 +44,7 @@ export function useLearningCoach() {
       // 완료된 학습
       for (const item of completedRes.data) {
         const { data: weeks } = await learningApi.getWeekListByLearningId(item.learningId);
-        const progress = calculateProgress(weeks);
+        const progress = await calculateProgressByDays(item.learningId);
 
         completedPlans.value.push({
           id: item.learningId,
@@ -60,18 +60,23 @@ export function useLearningCoach() {
     }
   }
 
-  function calculateProgress(weeks) {
-    if (!weeks || weeks.length === 0) return 0;
+  async function calculateProgressByDays(learningId) {
+    const { data: weeks } = await learningApi.getWeekListByLearningId(learningId);
 
-    let completedWeeks = 0;
+    let totalDays = 0;
+    let completedDays = 0;
 
-    weeks.forEach(w => {
-      if (w.status === "완료") completedWeeks += 1;
-      else if (w.status === "진행 중") completedWeeks += 0.5;
-    });
+    for (const w of weeks) {
+      const { data: days } = await learningApi.getLearningDayByWeek(w.weekId);
 
-    return Math.round((completedWeeks / weeks.length) * 100);
+      totalDays += days.length;
+      completedDays += days.filter(d => d.status === "완료").length;
+    }
+
+    if (totalDays === 0) return 0;
+    return Math.round((completedDays / totalDays) * 100);
   }
+
 
   // ===============================
   //        탭
