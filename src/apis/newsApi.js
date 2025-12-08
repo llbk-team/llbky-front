@@ -17,7 +17,7 @@ async function searchRelatedNews(summaryId, limit = 15) {
 /**
  * 네이버 뉴스 검색
  */
-async function searchNews(keywords, memberId,limit=15) {
+async function searchNews(keywords, memberId,limit=15,period='month') {
 
    const keywordArray = Array.isArray(keywords) ? keywords : [keywords];
   
@@ -25,7 +25,7 @@ async function searchNews(keywords, memberId,limit=15) {
       params:{
       keywords: keywordArray, 
           memberId: memberId,
-          period: 'month',
+          period: period,
           limit: limit
       }
     });
@@ -74,10 +74,19 @@ async function feedNews(
   return axios.get('/trend/news/feed', { params });
 }
 
+async function getTodayNews(memberId, limit = 15) {
+  const response = await axios.get('/trend/news/today', {
+    params: { memberId, limit }
+  });
+  return response;
+}
+
+
 export default {
   searchNews,
   analyzeNews,
   getNewsDetail,
   searchRelatedNews,
-  feedNews
+  feedNews,
+  getTodayNews  
 };

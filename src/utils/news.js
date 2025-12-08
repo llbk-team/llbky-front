@@ -23,21 +23,21 @@ function news() {
     const isSearchMode = ref(false);     // 검색 모드 여부
 
 
-    const store= useStore();
+    const store = useStore();
     // ⚠️ FIXME: 하드코딩된 memberId - 실제 로그인 시스템에서 가져와야 함
-    const memberId = computed(()=>(store.state.user.user?.memberId || null));
+    const memberId = computed(() => (store.state.user.user?.memberId || null));
 
     // 무한 스크롤용 타임아웃
     let scrollTimeout = null;
 
     // ========== 유틸리티 함수들 ==========
-    
+
     /**
      * 기간에 따른 시작 날짜 계산
      */
     const calculateStartDate = (period) => {
         const today = new Date();
-        
+
         switch (period) {
             case "today":
                 today.setHours(0, 0, 0, 0);
@@ -59,14 +59,14 @@ function news() {
             console.warn('⚠️ mapNewsData: newsItems가 배열이 아님:', newsItems);
             return [];
         }
-        
+
         try {
             const mapped = newsItems.map((n) => {
                 const result = {
                     id: n.summaryId || n.summary_id || n.id,
                     title: n.title || "제목 없음",
                     summary_short: n.summaryText || n.summary_text || n.summary_short || "",
-                    keywords: Array.isArray(n.keywords) 
+                    keywords: Array.isArray(n.keywords)
                         ? n.keywords.map(k => {
                             if (typeof k === 'string') return k;
                             if (typeof k === 'object') return k.keyword || k.name || k.value || JSON.stringify(k);
@@ -75,22 +75,22 @@ function news() {
                         : [],
                     trust: n.trustScore ?? n.trust_score ?? n.trust ?? 0,
                     sentiment: n.sentiment || "neutral",
-                    sentimentLabel: 
-                        n.sentiment === 'positive' ? '긍정적' : 
-                        n.sentiment === 'negative' ? '부정적' : '중립적',
+                    sentimentLabel:
+                        n.sentiment === 'positive' ? '긍정적' :
+                            n.sentiment === 'negative' ? '부정적' : '중립적',
                     bias_detected: n.biasDetected ?? n.bias_detected ?? false,
                     bias_type: n.biasType || n.bias_type || "",
                     date: n.publishedAt || n.published_at || n.date || "",
                     source: n.sourceName || n.source_name || n.source || "",
                     source_url: n.sourceUrl || n.source_url || "",
                 };
-                
+
                 return result;
             });
-            
+
             console.log('✅ mapNewsData 변환 완료:', mapped.length, '개 항목');
             return mapped;
-            
+
         } catch (error) {
             console.error('❌ mapNewsData 에러:', error);
             return [];
@@ -102,11 +102,11 @@ function news() {
      */
     const formatSummary = (summary) => {
         if (!summary) return "";
-        
+
         const lines = summary.trim().split("\n").filter(line => line.trim());
-        
+
         if (lines.length === 0) return "";
-        
+
         return (
             "<ul>" +
             lines.map((line) => `<li>${line.trim()}</li>`).join("") +
@@ -115,29 +115,29 @@ function news() {
     };
 
     // ========== 계산된 속성 ==========
-    
+
     /**
      * 필터링된 뉴스 목록
      */
     const filteredNews = computed(() => {
         let filtered = newsList.value;
-        
-        // 1. 날짜 필터링 (period)
-        const startDate = calculateStartDate(filters.value.period);
-        filtered = filtered.filter(n => {
-            const newsDate = new Date(n.date || n.publishedAt);
-            return newsDate >= startDate;
-        });
-        
-        // 2. 감정 필터링
+
+        // // 1. 날짜 필터링 (period)
+        // const startDate = calculateStartDate(filters.value.period);
+        // filtered = filtered.filter(n => {
+        //     const newsDate = new Date(n.date || n.publishedAt);
+        //     return newsDate >= startDate;
+        // });
+
+        // 1. 감정 필터링
         if (filters.value.sentiment) {
             filtered = filtered.filter(n => n.sentiment === filters.value.sentiment);
         }
-        
-        // 3. 신뢰도 필터링
+
+        // 2. 신뢰도 필터링
         filtered = filtered.filter(n => n.trust >= filters.value.trustMin);
-        
-        // 4. 키워드 검색
+
+        // 3. 키워드 검색
         if (keyword.value) {
             filtered = filtered.filter(n =>
                 n.title.includes(keyword.value) ||
@@ -145,7 +145,7 @@ function news() {
                 n.keywords.some(k => k.includes(keyword.value))
             );
         }
-        
+
         return filtered;
     });
 
@@ -160,14 +160,14 @@ function news() {
      * 로컬스토리지에서 사용자별 키워드 가져오는 key 생성
      */
     const keywordStorageKey = computed(() => `search_keywords_${memberId.value}`);
-    
+
     /**
      * 로컬스토리지에서 최근 검색어 로드
      */
     const loadRecentKeywords = () => {
         try {
             recentKeywords.value = JSON.parse(
-            localStorage.getItem(keywordStorageKey.value) || "[]"
+                localStorage.getItem(keywordStorageKey.value) || "[]"
             );
         } catch (error) {
             console.error("❌ 최근 검색어 로드 실패:", error);
@@ -215,7 +215,7 @@ function news() {
     };
 
     // ========== 뉴스 검색 ==========
-    
+
     /**
      * 뉴스 검색 실행
      */
@@ -224,27 +224,27 @@ function news() {
             alert('검색어를 입력해주세요.');
             return;
         }
-        
+
         const term = keyword.value.trim();
-        
+
         // 최근 검색어 저장
         addRecentKeyword(term);
-        
+
         loading.value = true;
         apiError.value = null;
-        
+
         try {
             const response = await newsApi.searchNews([term], memberId.value);
-            
+
             if (response.data.status === 'success' && response.data.data) {
                 const newsItems = Array.isArray(response.data.data) ? response.data.data : [];
-                
+
                 if (newsItems.length > 0) {
                     newsList.value = mapNewsData(newsItems);
                     isSearchMode.value = true;   // 검색 모드 활성화
-                    hasMore.value = false; 
+                    hasMore.value = false;
                     keyword.value = '';
-                   
+
                 } else {
                     apiError.value = '검색 결과가 없습니다.';
                 }
@@ -270,7 +270,7 @@ function news() {
     };
 
     // ========== 초기 데이터 로드 ==========
-    
+
     /**
      * 초기 뉴스 피드 로드
      */
@@ -285,22 +285,17 @@ function news() {
         hasMore.value = true;
 
         try {
-            const response = await newsApi.feedNews(
-                memberId.value, 
-                15,
-                filters.value.period
-            );
-           
+            // ✅ getTodayNews로 변경 (일주일치 확인 → 오늘 없으면 자동 수집)
+            const response = await newsApi.getTodayNews(memberId.value, 15);
+
             if (response.data.status === 'success' && response.data.data) {
                 const newsItems = Array.isArray(response.data.data) ? response.data.data : [];
-                      
+
                 if (newsItems.length > 0) {
                     newsList.value = mapNewsData(newsItems);
-                 
-                    // 15개 미만이면 더이상 없음
-                    if(newsItems.length < 15) {
-                        hasMore.value = false;
-                    }
+
+                    // ✅ 오늘 뉴스 기반이므로 무한스크롤은 feedNews로 전환
+                    hasMore.value = true;
 
                 } else {
                     apiError.value = '회원님의 직군에 맞는 뉴스가 아직 없습니다.';
@@ -310,18 +305,18 @@ function news() {
                 apiError.value = response.data.message || '뉴스 피드를 불러오는데 실패했습니다.';
                 hasMore.value = false;
             }
-            
+
         } catch (error) {
-            console.error('❌ 피드 로드 실패:', error);
+            console.error('❌ 오늘 뉴스 로드 실패:', error);
             apiError.value = error.response?.data?.message || '뉴스를 불러오는 데 실패했습니다.';
-            hasMore.value = false;  
+            hasMore.value = false;
         } finally {
             loading.value = false;
         }
     };
 
     // ========== 무한 스크롤 ==========
-    
+
     /**
      * 추가 뉴스 로드 (무한 스크롤)
      */
@@ -334,17 +329,17 @@ function news() {
         if (!hasMore.value || isLoadingMore.value || loading.value) {
             return;
         }
-        
+
         const lastItem = newsList.value[newsList.value.length - 1];
         if (!lastItem) {
             return;
         }
-        
+
         const lastPublishedAt = lastItem.date;
-        const lastSummaryId = lastItem.id; 
+        const lastSummaryId = lastItem.id;
 
         isLoadingMore.value = true;
-        
+
         try {
             const response = await newsApi.feedNews(
                 memberId.value,
@@ -353,14 +348,14 @@ function news() {
                 lastPublishedAt,
                 lastSummaryId
             );
-          
+
             if (response.data.status === 'success' && response.data.data) {
                 const newsItems = Array.isArray(response.data.data) ? response.data.data : [];
 
                 if (newsItems.length > 0) {
                     const mapped = mapNewsData(newsItems);
                     newsList.value = [...newsList.value, ...mapped];
-             
+
                     if (newsItems.length < 15) {
                         hasMore.value = false;
                     }
@@ -384,11 +379,11 @@ function news() {
         if (!hasMore.value || isLoadingMore.value || loading.value) {
             return;
         }
-        
+
         if (scrollTimeout) {
             clearTimeout(scrollTimeout);
         }
-        
+
         scrollTimeout = setTimeout(() => {
             const scrollTop = window.scrollY;
             const windowHeight = window.innerHeight;
@@ -401,18 +396,54 @@ function news() {
     };
 
     // ========== 필터 관리 ==========
-    
+
     /**
-     * 필터 변경 처리
+     * 필터 변경 처리-서버에서 새로 데이터 가져오기
      */
-    const applyFilter = (newFilters) => {
+    const applyFilter = async (newFilters) => {
         console.log('🔄 필터 변경:', newFilters);
+
+        const oldPeriod = filters.value.period;
         filters.value = newFilters;
+
+        // ✅ period가 바뀌면 서버에서 새로 데이터 가져오기
+        if (oldPeriod !== newFilters.period) {
+            console.log(`📅 기간 변경: ${oldPeriod} → ${newFilters.period}`);
+
+            loading.value = true;
+            apiError.value = null;
+
+            try {
+                const response = await newsApi.feedNews(
+                    memberId.value,
+                    15,
+                    newFilters.period  // ✅ 새로운 period로 서버 요청
+                );
+
+                if (response.data.status === 'success' && response.data.data) {
+                    const newsItems = Array.isArray(response.data.data) ? response.data.data : [];
+                    newsList.value = mapNewsData(newsItems); // ✅ 새 데이터로 교체
+
+                    // 무한 스크롤 상태 리셋
+                    hasMore.value = newsItems.length >= 15;
+                    isSearchMode.value = false;
+
+                    console.log(`✅ ${newFilters.period} 데이터 로드 완료: ${newsItems.length}건`);
+                }
+            } catch (error) {
+                console.error('❌ 필터 적용 실패:', error);
+                apiError.value = '데이터를 불러오는 데 실패했습니다.';
+            } finally {
+                loading.value = false;
+            }
+        }
+
+        // period가 안 바뀌면 기존대로 클라이언트 필터링 (sentiment, trustMin 등)
         // filteredNews computed가 자동으로 재계산됨
     };
 
     // ========== 모달 관리 ==========
-    
+
     /**
      * 뉴스 상세 모달 열기
      */
@@ -428,20 +459,20 @@ function news() {
     };
 
     // ========== 생명주기 관리 ==========
-    
+
     /**
      * 컴포넌트 마운트 시 초기화
      */
     const initializeNews = async () => {
         // 최근 검색어 로드
         loadRecentKeywords();
-        
+
         // 초기 뉴스 로드
         await loadInitialNews();
-        
+
         // 스크롤 이벤트 등록
         window.addEventListener('scroll', handleScroll);
-        
+
         console.log('✅ 뉴스 컴포저블 초기화 완료');
     };
 
@@ -451,12 +482,12 @@ function news() {
     const cleanupNews = () => {
         // 스크롤 이벤트 제거
         window.removeEventListener('scroll', handleScroll);
-        
+
         // 타임아웃 정리
         if (scrollTimeout) {
             clearTimeout(scrollTimeout);
         }
-        
+
         console.log('✅ 뉴스 컴포저블 정리 완료');
     };
 
@@ -474,38 +505,38 @@ function news() {
         isLoadingMore,
         isSearchMode,
         memberId,
-        
+
         // 계산된 속성
         filteredNews,
         visibleNews,
-        
+
         // 유틸리티 함수
         calculateStartDate,
         mapNewsData,
         formatSummary,
-        
+
         // 검색어 관리
         loadRecentKeywords,
         addRecentKeyword,
         deleteKeyword,
         clearAll,
         clickKeyword,
-        
+
         // 뉴스 검색 및 로드
         searchNews,
         loadInitialNews,
         loadMoreNews,
-        
+
         // 스크롤 관리
         handleScroll,
-        
+
         // 필터 관리
         applyFilter,
-        
+
         // 모달 관리
         openDetail,
         closeDetail,
-        
+
         // 생명주기
         initializeNews,
         cleanupNews,
@@ -514,4 +545,4 @@ function news() {
 
 // Named export
 
-export {news};
+export { news };
