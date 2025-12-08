@@ -30,7 +30,7 @@ function useInterviewProgress(sessionId) {
   const aiLoading = ref(false);
   const saveLoading = ref(false); // 저장 로딩 상태
 
-  let ffmpeg = null;
+  let ffmpeg = null;  // 영상에서 오디오/프레임 추출하기 위해 사용
 
   // ====== 질문 로딩 ======
   const loadQuestions = async () => {
@@ -47,33 +47,40 @@ function useInterviewProgress(sessionId) {
   };
 
   // ====== MediaRecorder ======
-  let stream = null;
-  let mediaRecorder = null;
-  let recordedChunks = [];
+  let stream = null;  // 오디오/비디오 스트림
+  let mediaRecorder = null; // MediaRecorder 인스턴스
+  let recordedChunks = [];  // 녹화 도중 잘린 Blob 조각들 저장
 
+  // ====== 녹화 시작 =========
   const startRecording = async () => {
     errorMessage.value = "";
-    lastRecordedBlob.value = null;
+    lastRecordedBlob.value = null;  // 이전에 녹화했던 Blob 초기화
     recordedChunks = [];
 
+    // 모드에 따라 다르게 스트림 받기
     stream = await navigator.mediaDevices.getUserMedia(
       mode.value === "audio" ? { audio: true } : { audio: true, video: true }
     );
 
+    // 비디오인 경우에는 웹캠 미리보기 
     if (mode.value === "video") {
       requestAnimationFrame(() => {
         if (previewRef.value) previewRef.value.srcObject = stream;
       });
     }
 
+    // 스트림으로 MediaRecorder 생성
     mediaRecorder = new MediaRecorder(stream);
+    // 데이터가 있을 때마다 청크 쌓아두기
     mediaRecorder.ondataavailable = (e) => {
       if (e.data.size > 0) recordedChunks.push(e.data);
     };
 
+    // 녹화 시작
     mediaRecorder.start();
     isRecording.value = true;
 
+    // 레코드 타임 증가 & 녹화/녹음 시간 1분으로 제한
     recordTime.value = 0;
     timer = setInterval(() => {
       recordTime.value++;
@@ -81,10 +88,12 @@ function useInterviewProgress(sessionId) {
     }, 1000);
   };
 
+  // ===== 녹화 중지 ===========
   const stopRecording = () => {
     return new Promise((resolve) => {
       if (!mediaRecorder) return resolve(null);
 
+      // 녹화 멈춤 이벤트 발생하면 쌓아둔 청크로 Blob 생성
       mediaRecorder.onstop = () => {
         const blob = new Blob(recordedChunks, {
           type: mode.value === "audio" ? "audio/webm" : "video/webm",
@@ -97,23 +106,27 @@ function useInterviewProgress(sessionId) {
       clearInterval(timer);
       isRecording.value = false;
 
+      // 카메라/마이크 해제
       if (stream) stream.getTracks().forEach((t) => t.stop());
       if (previewRef.value) previewRef.value.srcObject = null;
     });
   };
 
+  // 녹음 버튼 토글
   const toggleRecording = async () => {
     if (isRecording.value) await stopRecording();
     else await startRecording();
   };
 
+  // 모드 변경 (음성/영상)
   const setMode = async (newMode) => {
-    if (isRecording.value) await stopRecording();
+    if (isRecording.value) await stopRecording(); // 변경 전에 먼저 녹화/녹음 중지
     mode.value = newMode;
   };
 
   // ====== 이전 질문 이동 ======
   const goPrevQuestion = async () => {
+    // 첫 질문이 아닐 때만 이동 가능
     if (current.value > 1) {
       if (isRecording.value) await stopRecording();
       current.value--;
@@ -127,7 +140,7 @@ function useInterviewProgress(sessionId) {
   const goNextQuestion = async () => {
     if (isRecording.value) await stopRecording();
 
-    // 마지막 질문이면 종료
+    // 마지막 질문이면 이동 불가능
     if (current.value >= total.value) return;
 
     // "다음 질문"이 아니라 "현재 질문"에 피드백 있는지 체크
@@ -157,7 +170,8 @@ function useInterviewProgress(sessionId) {
     }
     return ffmpeg;
   };
-
+  
+  // ====== 영상에서 오디오 추출 ======
   const extractAudio = async (video) => {
     const ffmpeg = await getFFmpeg();
 
@@ -183,9 +197,11 @@ function useInterviewProgress(sessionId) {
     await ffmpeg.deleteFile("input.webm");
     await ffmpeg.deleteFile("audio.wav");
 
+    // 4) 읽어온 데이터를 실제 JS Blob으로 만들어서 반환
     return new Blob([data.buffer], { type: "audio/wav" });
   };
 
+  // 영상에서 프레임 추출
   const extractFrames = async (video) => {
     const ffmpeg = await getFFmpeg();
 
@@ -212,6 +228,8 @@ function useInterviewProgress(sessionId) {
     }
 
     await ffmpeg.deleteFile("input.webm");
+
+    // 이미지 Blob 배열 반환
     return frames;
   };
 
@@ -219,8 +237,8 @@ function useInterviewProgress(sessionId) {
   const handleSubmit = async () => {
     errorMessage.value = "";
 
-    const questionId = questionIds.value[current.value - 1];
-    let blob = lastRecordedBlob.value;
+    const questionId = questionIds.value[current.value - 1];  //questionId 얻기
+    let blob = lastRecordedBlob.value;  // 녹화본 가져오기
 
     if (!blob && !isRecording.value) {
       errorMessage.value = "녹화/녹음을 완료해야 답변을 제출할 수 있습니다.";
@@ -234,6 +252,7 @@ function useInterviewProgress(sessionId) {
     }
 
     try {
+      // 백엔드로 보낼 FormData 생성
       const formData = new FormData();
       
       formData.append("questionId", questionId);
@@ -247,13 +266,13 @@ function useInterviewProgress(sessionId) {
 
       let answerId;
 
-      // 최초 제출 (insert)
+      // 최초 제출 (원본 파일만 insert)
       if (!answerIds.value[questionId]) {
         const submit = await interviewApi.submitAnswer(formData);
         answerId = Number(submit.data);
         answerIds.value[questionId] = answerId;
       }
-      // 재제출 (update)
+      // 재제출 (원본 파일만 update)
       else {
         answerId = answerIds.value[questionId];
         formData.append("answerId", answerId);
@@ -261,15 +280,19 @@ function useInterviewProgress(sessionId) {
       }
 
       // ===== AI 피드백 요청 =====
+      // 피드백용 FormData 생성
       const feedbackForm = new FormData();
       feedbackForm.append("answerId", answerId);
 
+      // 음성일 때는 음성 그대로
       if (mode.value === "audio") {
         feedbackForm.append("audio", blob, "audio.webm");
       } else {
+        // 영상일 때는 오디오/프레임 추출
         const audioConverted = await extractAudio(blob);
         const frames = await extractFrames(blob);
 
+        // 추출한 오디오/프레임 별로 피드백 구성
         feedbackForm.append("videoAudio", audioConverted, "video_audio.webm");
         frames.forEach((f, i) =>
           feedbackForm.append("frames", f, `frame_${i}.png`)
@@ -277,6 +300,7 @@ function useInterviewProgress(sessionId) {
       }
 
       aiLoading.value = true;
+      // 피드백 생성 요청
       const res = await interviewApi.createFeedback(feedbackForm);
       aiLoading.value = false;
 
@@ -298,6 +322,7 @@ function useInterviewProgress(sessionId) {
     try {
       saveLoading.value = true;
 
+      // 면접 세션에 대한 종합 피드백 생성 요청
       await interviewApi.createInterviewFinalFeedback(sessionId);
       
       router.push(`/interview/report/detail?sessionId=${sessionId}`);
