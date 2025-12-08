@@ -3,7 +3,7 @@ import "./axiosConfig";
 
 // 직무 인사이트 조회 및 생성
 function getJobInsight(memberId){
-  return axios.get("/jobInsight/today", {params: {memberId}});
+  return axios.get("/jobInsight/week", {params: {memberId}});
 }
 
 // 키워드 저장
