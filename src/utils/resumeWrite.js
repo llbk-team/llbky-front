@@ -30,34 +30,93 @@ function useResumeWrite() {
     const saveLoading = ref(false);
 
     /* 이력서 데이터 */
-    const resumeData = reactive({
-        title: "",
-        name: "",
-        phone: "",
-        email: "",
-        educations: [{ school: "", major: "", startDate: "", endDate: "" }],
+    // const resumeData = reactive({
+    //     title: "",
+    //     name: "",
+    //     phone: "",
+    //     email: "",
+    //     educations: [{ school: "", major: "", startDate: "", endDate: "" }],
+    //     careers: [
+    //         {
+    //             company: "",
+    //             position: "",
+    //             startDate: "",
+    //             endDate: "",
+    //             responsibilities: "",
+    //             isCurrent: false,
+    //         },
+    //     ],
+    //     skills: [{ name: "" }],
+    //     activities: [
+    //         {
+    //             name: "",
+    //             organization: "",
+    //             startDate: "",
+    //             endDate: "",
+    //             description: "",
+    //         },
+    //     ],
+    //     certificates: [{ name: "", date: "", issuer: "" }],
+    // });
+
+    const resumeData = reactive({ // 발표용 데이터
+        title: "백엔드 개발자 이력서",
+        name: "홍길동",
+        phone: "010-1234-5678",
+        email: "hong.dev@example.com",
+
+        educations: [
+            {
+                school: "한국IT대학교",
+                major: "컴퓨터공학과",
+                startDate: "2018-03",
+                endDate: "2022-02"
+            }
+        ],
+
         careers: [
             {
-                company: "",
-                position: "",
-                startDate: "",
-                endDate: "",
-                responsibilities: "",
+                company: "AI테크놀로지",
+                position: "백엔드 개발자",
+                startDate: "2022-03",
+                endDate: "2024-01",
                 isCurrent: false,
-            },
+                responsibilities:
+                    "Spring Boot 기반 기업 서비스 기능 개발 및 유지보수.\n" +
+                    "REST API 설계 및 트래픽 최적화.\n" +
+                    "CI/CD 구축 및 배포 자동화 경험."
+            }
         ],
-        skills: [{ name: "" }],
+
+        skills: [
+            { name: "Java" },
+            { name: "Spring Boot" },
+            { name: "MySQL" },
+            { name: "JPA/Hibernate" },
+            { name: "Docker" }
+        ],
+
         activities: [
             {
-                name: "",
-                organization: "",
-                startDate: "",
-                endDate: "",
-                description: "",
-            },
+                name: "IT 프로그래밍 동아리",
+                organization: "한국IT대학교",
+                startDate: "2019-03",
+                endDate: "2021-12",
+                description:
+                    "팀 프로젝트 기획 및 백엔드 개발 담당.\n" +
+                    "교내 해커톤 2회 참가 및 수상 경험."
+            }
         ],
-        certificates: [{ name: "", date: "", issuer: "" }],
+
+        certificates: [
+            {
+                name: "정보처리기사",
+                date: "2021-06",
+                issuer: "한국산업인력공단"
+            }
+        ]
     });
+
 
     /* 섹션 토글 */
     const toggleSection = (key) => {
