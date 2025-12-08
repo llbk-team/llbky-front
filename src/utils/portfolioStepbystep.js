@@ -1,6 +1,6 @@
-// 포트폴리오 작성 도우미 페이지 컴포넌트용 js 파일
+// 포트폴리오 작성 도우미 페이지 컴포넌트용 js 파일 (임시 저장 기능 추가)
 import portfolioGuideApi from "@/apis/portfolioGuideApi";
-import { ref, computed } from "vue";
+import { ref, computed, watch, onBeforeUnmount } from "vue";
 import { useRouter } from "vue-router";
 import { useStore } from "vuex";
 
@@ -8,6 +8,7 @@ import { useStore } from "vuex";
 function portfolioStepbystep() {
     const router = useRouter();
     const store = useStore();
+    
     // 전체 진행률 및 현재 단계
     const overallProgress = ref(0);
     const currentStep = ref(1);
@@ -17,12 +18,12 @@ function portfolioStepbystep() {
     const guideId = ref(null);   // DB의 guideId
     const userName = ref('');  // DB의 memberName
     const userEmail = ref('');  // DB의 email
-
     const jobGroup = ref('');  // DB의 jobGroup
     const jobRole = ref('');  // DB의 jobRole
 
     const isLoggedIn = computed(() => store.getters['user/isLoggedIn']);
     const currentUser = computed(() => store.getters['user/userInfo']);
+    
     // 포트폴리오 단계 (DB에서 가져올 데이터)
     const portfolioSteps = ref([]);
 
@@ -43,6 +44,13 @@ function portfolioStepbystep() {
     // AI 로딩 상태
     const aiLoading = ref(false);
 
+    // ⭐ 임시 저장 관련 상태 추가
+    const isSaving = ref(false); // 저장 중 표시
+    const lastSavedTime = ref(null); // 마지막 저장 시간
+    const hasUnsavedChanges = ref(false); // 저장되지 않은 변경사항 여부
+    const autoSaveTimer = ref(null); // 자동 저장 타이머
+    const AUTOSAVE_INTERVAL = 30000; // 30초마다 자동 저장
+
     // 모든 단계가 100% 완료되었는지 확인하는 계산된 속성
     const isAllComplete = computed(() => {
         // 5단계가 존재하고 그 진행률이 100%인지 확인
@@ -52,6 +60,188 @@ function portfolioStepbystep() {
         const allStagesComplete = portfolioSteps.value.every(step => step.progress === 100);
         
         return stage5 && stage5.progress === 100 && allStagesComplete;
+    });
+
+    // ⭐ 임시 저장 키 생성 (사용자별 고유키)
+    const getStorageKey = () => {
+        return `portfolio_temp_${memberId.value || 'guest'}`;
+    };
+
+    // ⭐ 임시 저장 함수
+    const saveTemporaryContent = async () => {
+        if (!memberId.value) {
+            console.warn('❌ 로그인된 사용자가 없어 임시 저장을 건너뜁니다.');
+            return;
+        }
+
+        try {
+            isSaving.value = true;
+            
+            // 현재 작성 중인 모든 데이터 수집
+            const tempData = {
+                timestamp: new Date().toISOString(),
+                currentStep: currentStep.value,
+                openStepIndex: openStepIndex.value,
+                openItemIndex: openItemIndex.value,
+                currentContent: currentContent.value,
+                portfolioSteps: portfolioSteps.value.map(step => ({
+                    ...step,
+                    items: step.items.map(item => ({
+                        title: item.title,
+                        userInput: item.userInput || '',
+                        status: item.status,
+                        feedback: item.feedback
+                    }))
+                })),
+                overallProgress: overallProgress.value
+            };
+
+            // localStorage에 저장
+            localStorage.setItem(getStorageKey(), JSON.stringify(tempData));
+            
+            lastSavedTime.value = new Date();
+            hasUnsavedChanges.value = false;
+            
+            console.log('✅ 임시 저장 완료:', lastSavedTime.value.toLocaleTimeString());
+
+        } catch (error) {
+            console.error('❌ 임시 저장 실패:', error);
+        } finally {
+            isSaving.value = false;
+        }
+    };
+
+    // ⭐ 임시 저장된 내용 불러오기
+    const loadTemporaryContent = async () => {
+        try {
+            const storageKey = getStorageKey();
+            const tempDataStr = localStorage.getItem(storageKey);
+            
+            if (!tempDataStr) {
+                console.log('📭 저장된 임시 데이터가 없습니다.');
+                return false;
+            }
+
+            const tempData = JSON.parse(tempDataStr);
+            const savedTime = new Date(tempData.timestamp);
+            const hoursDiff = (new Date() - savedTime) / (1000 * 60 * 60);
+
+            // 24시간 이상 된 데이터는 삭제
+            if (hoursDiff > 24) {
+                localStorage.removeItem(storageKey);
+                console.log('🗑️ 오래된 임시 데이터 삭제 (24시간 초과)');
+                return false;
+            }
+
+            // 임시 데이터가 있다면 사용자에게 복원할지 확인
+            const shouldRestore = confirm(
+                `${savedTime.toLocaleString()}에 저장된 임시 데이터를 발견했습니다.\n` +
+                '작성 중이던 내용을 복원하시겠습니까?'
+            );
+
+            if (shouldRestore && tempData.portfolioSteps) {
+                // 데이터 복원
+                currentStep.value = tempData.currentStep || 1;
+                openStepIndex.value = tempData.openStepIndex || 0;
+                openItemIndex.value = tempData.openItemIndex || null;
+                currentContent.value = tempData.currentContent || '';
+                overallProgress.value = tempData.overallProgress || 0;
+
+                // 포트폴리오 단계 데이터 복원 (기존 구조와 병합)
+                if (portfolioSteps.value && portfolioSteps.value.length > 0) {
+                    tempData.portfolioSteps.forEach((tempStep, stepIndex) => {
+                        if (portfolioSteps.value[stepIndex]) {
+                            tempStep.items.forEach((tempItem, itemIndex) => {
+                                if (portfolioSteps.value[stepIndex].items[itemIndex]) {
+                                    portfolioSteps.value[stepIndex].items[itemIndex].userInput = tempItem.userInput || '';
+                                    portfolioSteps.value[stepIndex].items[itemIndex].status = tempItem.status || '미작성';
+                                    if (tempItem.feedback) {
+                                        portfolioSteps.value[stepIndex].items[itemIndex].feedback = tempItem.feedback;
+                                    }
+                                }
+                            });
+                            portfolioSteps.value[stepIndex].progress = tempStep.progress || 0;
+                        }
+                    });
+                }
+
+                lastSavedTime.value = savedTime;
+                hasUnsavedChanges.value = false;
+                
+                console.log('✅ 임시 데이터 복원 완료');
+                return true;
+            }
+
+            return false;
+        } catch (error) {
+            console.error('❌ 임시 데이터 로드 실패:', error);
+            return false;
+        }
+    };
+
+    // ⭐ 임시 저장 데이터 삭제
+    const clearTemporaryContent = () => {
+        try {
+            localStorage.removeItem(getStorageKey());
+            lastSavedTime.value = null;
+            hasUnsavedChanges.value = false;
+            console.log('🗑️ 임시 저장 데이터 삭제 완료');
+        } catch (error) {
+            console.error('❌ 임시 데이터 삭제 실패:', error);
+        }
+    };
+
+    // ⭐ 자동 저장 시작
+    const startAutoSave = () => {
+        if (autoSaveTimer.value) {
+            clearInterval(autoSaveTimer.value);
+        }
+
+        autoSaveTimer.value = setInterval(() => {
+            if (hasUnsavedChanges.value && !isSaving.value) {
+                saveTemporaryContent();
+            }
+        }, AUTOSAVE_INTERVAL);
+        
+        console.log('🔄 자동 저장 시작 (30초 간격)');
+    };
+
+    // ⭐ 자동 저장 중지
+    const stopAutoSave = () => {
+        if (autoSaveTimer.value) {
+            clearInterval(autoSaveTimer.value);
+            autoSaveTimer.value = null;
+            console.log('⏹️ 자동 저장 중지');
+        }
+    };
+
+    // ⭐ 변경사항 감지 (currentContent 변경 시)
+    watch(currentContent, () => {
+        hasUnsavedChanges.value = true;
+    });
+
+    // ⭐ 페이지 떠날 때 경고 및 임시 저장
+    const handleBeforeUnload = (event) => {
+        if (hasUnsavedChanges.value) {
+            // 임시 저장 실행
+            saveTemporaryContent();
+            
+            // 브라우저 경고 메시지
+            event.preventDefault();
+            event.returnValue = '작성 중인 내용이 있습니다. 정말 나가시겠습니까?';
+            return event.returnValue;
+        }
+    };
+
+    // ⭐ 컴포넌트 해제 시 정리
+    onBeforeUnmount(() => {
+        stopAutoSave();
+        window.removeEventListener('beforeunload', handleBeforeUnload);
+        
+        // 마지막 저장
+        if (hasUnsavedChanges.value) {
+            saveTemporaryContent();
+        }
     });
 
     // 특정 단계를 열기 전에 이전 단계가 완료되었는지 확인
@@ -79,6 +269,9 @@ function portfolioStepbystep() {
             currentStep.value = parseInt(portfolioSteps.value[openStepIndex.value].label);
         }
         openItemIndex.value = null;
+        
+        // ⭐ 단계 변경 시 임시 저장
+        hasUnsavedChanges.value = true;
     };
 
     // 항목 토글
@@ -90,12 +283,17 @@ function portfolioStepbystep() {
         if (openItemIndex.value !== null && !showItemFeedback.value[index]) {
             currentContent.value = item.userInput || "";
         }
+        
+        // ⭐ 항목 변경 시 임시 저장
+        hasUnsavedChanges.value = true;
     };
 
     // 입력 취소
     const cancelItemInput = (index) => {
         openItemIndex.value = null;
         currentContent.value = "";
+        // ⭐ 취소 시에도 변경사항으로 간주
+        hasUnsavedChanges.value = true;
     };
 
     // 피드백 초기화
@@ -110,7 +308,7 @@ function portfolioStepbystep() {
     // AI 피드백 요청
     const submitItemContent = async (index) => {
         try {
-             if (!memberId.value) {
+            if (!memberId.value) {
                 console.warn('❌ 사용자 정보가 없습니다. 다시 로그인해주세요.');
                 router.push('/login');
                 return;
@@ -130,11 +328,10 @@ function portfolioStepbystep() {
             // 원본 내용 저장 (나중에 복원을 위해)
             originalContent.value = currentContent.value;
 
-          
             const requestData = {
-               userInput: currentContent.value,
+                userInput: currentContent.value,
                 inputFieldType: currentItem.title,
-                memberId: memberId.value,          // 🔥 실제 로그인된 사용자 ID
+                memberId: memberId.value,          
                 jobGroup: jobGroup.value,          
                 jobRole: jobRole.value,            
                 careerYears: 2,                    
@@ -146,11 +343,10 @@ function portfolioStepbystep() {
             // 실시간 코칭 API 호출 (POST /portfolio-guide/coaching)
             const response = await portfolioGuideApi.getRealtimeCoaching(requestData);
 
-
             if (response.data) {
                 const feedback = response.data;
                 
-                // 피드백 표시g
+                // 피드백 표시
                 showItemFeedback.value[index] = true;
 
                 // AI 코치 패널에 표시할 상세 피드백 (전체 객체)
@@ -162,6 +358,10 @@ function portfolioStepbystep() {
 
                 // 사용자 입력을 임시 저장 (아직 완료되지 않음)
                 currentItem.feedback = feedback; // 전체 피드백 객체 저장
+                
+                // ⭐ AI 피드백 받은 후 임시 저장
+                hasUnsavedChanges.value = true;
+                await saveTemporaryContent();
 
                 console.log('✅ AI 피드백 수신 완료');
             }
@@ -183,13 +383,12 @@ function portfolioStepbystep() {
             }
 
             alert(errorMessage);
-             if (error.response?.status === 401) {
+            if (error.response?.status === 401) {
                 errorMessage = '인증이 만료되었습니다. 다시 로그인해주세요.';
                 store.dispatch('user/logout'); // 로그아웃 처리
                 router.push('/login');
                 return;
             }
-
 
         } finally {
             // 로딩 종료 (성공/실패 모두)
@@ -202,6 +401,9 @@ function portfolioStepbystep() {
         selectedExampleIndex.value = index;
         selectedExample.value = exampleText;
         console.log('🎯 예시 선택:', { index, exampleText });
+        
+        // ⭐ 예시 선택 시 변경사항 표시
+        hasUnsavedChanges.value = true;
     };
 
     // 원본 내용 사용
@@ -209,10 +411,13 @@ function portfolioStepbystep() {
         selectedExample.value = originalContent.value;
         selectedExampleIndex.value = null;
         console.log('📝 원본 내용 사용:', originalContent.value);
+        
+        // ⭐ 원본 사용 시 변경사항 표시
+        hasUnsavedChanges.value = true;
     };
 
     // 선택된 내용 적용
-    const applySelectedContent = (itemIndex) => {
+    const applySelectedContent = async (itemIndex) => {
         const currentItem = portfolioSteps.value[openStepIndex.value].items[itemIndex];
         
         // 선택된 내용을 적용 (예시 또는 원본)
@@ -242,11 +447,15 @@ function portfolioStepbystep() {
         openItemIndex.value = null;
         currentContent.value = "";
         
+        // ⭐ 내용 적용 후 임시 저장
+        hasUnsavedChanges.value = false; // 완료 상태이므로 미저장 변경사항 해제
+        await saveTemporaryContent();
+        
         alert('✅ 내용이 성공적으로 적용되었습니다!');
     };
 
     // 피드백 없이 바로 완료하는 함수
-    const completeItemWithoutFeedback = (index) => {
+    const completeItemWithoutFeedback = async (index) => {
         // 해당 항목 상태 '완료'로 업데이트
         portfolioSteps.value[openStepIndex.value].items[index].status = '완료';
         
@@ -259,6 +468,10 @@ function portfolioStepbystep() {
         // 입력창 닫기
         openItemIndex.value = null;
         currentContent.value = "";
+        
+        // ⭐ 완료 후 임시 저장
+        hasUnsavedChanges.value = false;
+        await saveTemporaryContent();
     };
 
     // 진행률 업데이트
@@ -279,6 +492,9 @@ function portfolioStepbystep() {
             acc + step.items.filter(item => item.status === '완료').length, 0);
         
         overallProgress.value = Math.round((totalCompleted / totalItems) * 100);
+        
+        // ⭐ 진행률 변경 시 변경사항 표시
+        hasUnsavedChanges.value = true;
     };
 
     // DB에서 포트폴리오 가이드 표준 데이터 가져오기
@@ -665,7 +881,7 @@ function portfolioStepbystep() {
         return text;
     };
 
-const setUserInfoFromStore = () => {
+    const setUserInfoFromStore = () => {
         console.log('🔍 Vuex store에서 사용자 정보 확인 중...');
         
         if (!isLoggedIn.value || !currentUser.value) {
@@ -698,8 +914,7 @@ const setUserInfoFromStore = () => {
         return true;
     };
 
-
-    // 초기화 함수
+    // ⭐ 수정된 초기화 함수 (임시 저장 기능 포함)
     const initializePortfolio = async () => {
         // 로그인 및 사용자 정보 설정
         const ok = setUserInfoFromStore();
@@ -716,12 +931,25 @@ const setUserInfoFromStore = () => {
             await fetchAllStandards();
         }
 
+        // ⭐ 임시 저장된 내용 복원 시도
+        await loadTemporaryContent();
+
+        // ⭐ 자동 저장 시작 및 이벤트 리스너 등록
+        startAutoSave();
+        window.addEventListener('beforeunload', handleBeforeUnload);
+
         // 가이드 정보 로드 (선택적 - 실패해도 계속 진행)
         fetchGuideInfo().catch(err => console.warn('가이드 정보 없음:', err));
         fetchMemberGuides().catch(err => console.warn('회원 가이드 목록 없음:', err));
 
         // 저장된 피드백 로드 (선택적)
         fetchSavedFeedback().catch(err => console.warn('저장된 피드백 없음:', err));
+    };
+
+    // ⭐ 수동 임시 저장 함수 (사용자가 직접 호출)
+    const saveManually = async () => {
+        await saveTemporaryContent();
+        alert('✅ 임시 저장이 완료되었습니다!');
     };
 
     return {
@@ -740,6 +968,11 @@ const setUserInfoFromStore = () => {
         originalContent,
         isAllComplete,
         aiLoading,
+        
+        // ⭐ 임시 저장 관련 상태
+        isSaving,
+        lastSavedTime,
+        hasUnsavedChanges,
         
         // 사용자 정보
         memberId,
@@ -773,6 +1006,15 @@ const setUserInfoFromStore = () => {
         fetchSavedFeedback,
         formatFeedbackAsText,
         initializePortfolio,
+        
+        // ⭐ 임시 저장 관련 함수
+        saveTemporaryContent,
+        loadTemporaryContent,
+        clearTemporaryContent,
+        saveManually,
+        startAutoSave,
+        stopAutoSave,
+        
         router
     };
 }

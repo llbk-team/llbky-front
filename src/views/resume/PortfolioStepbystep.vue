@@ -5,7 +5,28 @@
         <h1 class="fw-bold fs-3 mb-1" style="color:#111111;">포트폴리오 작성 도우미</h1>
         <p class="subtitle1">취업 준비 · 작성 진행률: {{ overallProgress }}%</p>
       </div>
-      <div class="fs-5">{{ overallProgress }}% 전체 진행률</div>
+      <div class="d-flex align-items-center">
+        <!-- ⭐ 임시 저장 상태 표시 -->
+        <div class="me-3">
+          <span v-if="isSaving" class="text-muted small">
+            <i class="bi bi-cloud-upload"></i> 저장 중...
+          </span>
+          <span v-else-if="lastSavedTime" class="text-success small">
+            <i class="bi bi-cloud-check"></i> {{ formatSaveTime(lastSavedTime) }} 저장됨
+          </span>
+          <span v-else-if="hasUnsavedChanges" class="text-warning small">
+            <i class="bi bi-exclamation-circle"></i> 저장되지 않음
+          </span>
+        </div>
+        <!-- ⭐ 수동 저장 버튼 -->
+        <button 
+          class="btn btn-sm btn-outline-primary me-3" 
+          @click="saveManually"
+          :disabled="isSaving">
+          <i class="bi bi-save"></i> 임시 저장
+        </button>
+        <div class="fs-5">{{ overallProgress }}% 전체 진행률</div>
+      </div>
     </div>
 
     <div class="row g-4 align-items-start">
@@ -282,7 +303,7 @@
 </template>
 
 <script setup>
-import { onMounted } from "vue";
+import { onMounted, computed } from "vue";
 import { portfolioStepbystep } from "@/utils/portfolioStepbystep";
 
 
@@ -303,6 +324,11 @@ const {
   isAllComplete,
   aiLoading,
   
+  // ⭐ 임시 저장 관련 상태
+  isSaving,
+  lastSavedTime,
+  hasUnsavedChanges,
+  
   // 함수
   toggleStep,
   toggleItem,
@@ -314,9 +340,24 @@ const {
   applySelectedContent,
   completeItemWithoutFeedback,
   initializePortfolio,
+  
+  // ⭐ 임시 저장 관련 함수
+  saveManually,
+  
   router
 } = portfolioStepbystep();
 
+// ⭐ 저장 시간 포맷팅 함수
+const formatSaveTime = (time) => {
+  if (!time) return '';
+  const now = new Date();
+  const diff = Math.floor((now - new Date(time)) / 1000); // 초 단위 차이
+  
+  if (diff < 60) return '방금';
+  if (diff < 3600) return `${Math.floor(diff / 60)}분 전`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)}시간 전`;
+  return new Date(time).toLocaleDateString();
+};
 
 // 초기 설정 - 1단계 열기 및 데이터 로드
 onMounted(() => {
