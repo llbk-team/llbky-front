@@ -22,13 +22,13 @@
       <p>
         <strong>희망 직무 중심 성장 제안</strong><br />
         AI가 사용자의 <strong>희망 직무</strong>를 중심으로 최근 트렌드와
-        이력서·면접·학습 데이터를 함께 분석했습니다.<br />
+        서류·면접·학습 데이터를 함께 분석했습니다.<br />
         아래는 시장 흐름과 현재 역량을 바탕으로 제안하는 성장 방향입니다.
       </p>
 
       <ul class="feedback-list">
         <li>
-          <strong>이력서 분석:</strong>
+          <strong>서류 분석:</strong>
           {{ growth?.resume }}
         </li>
 
