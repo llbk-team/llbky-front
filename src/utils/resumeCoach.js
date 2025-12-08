@@ -1,6 +1,6 @@
 // src/utils/resumeCoach.js
 import { ref, reactive, computed, onMounted } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import resumeApi from "@/apis/resumeApi";
 
 function useResumeCoach() {
@@ -14,6 +14,7 @@ function useResumeCoach() {
   const loading = ref(false);
   const error = ref("");
   const saving = ref(false);
+  const saveLoading = ref(false);
 
   const isEditMode = ref(false);
   const backupEditData = ref(null);
@@ -170,9 +171,17 @@ function useResumeCoach() {
       resume.value = { ...resume.value, ...updated };
 
       backupEditData.value = deepClone(editData);
-      isEditMode.value = false;
 
-      alert("변경사항이 저장되었습니다!");
+      saveLoading.value = true;
+
+      // 4) AI 종합 분석 다시 수행 
+      await resumeApi.analyze(resume.value.memberId, resume.value.resumeId);
+
+      saveLoading.value = false;
+
+      // 5) 분석 결과 다시 로드
+      const { data: reportData } = await resumeApi.findanalyze(resume.value.resumeId);
+      report.value = reportData;
     } catch {
       alert("저장 중 오류가 발생했습니다.");
     } finally {
@@ -181,9 +190,17 @@ function useResumeCoach() {
   };
 
   const toggleEditMode = async () => {
-    isEditMode.value ? await saveChanges() : initializeEditData();
-    if (!isEditMode.value) isEditMode.value = true;
+    if (isEditMode.value) {
+      // 현재 수정모드 → 저장 후 보기모드
+      await saveChanges();
+      isEditMode.value = false;
+    } else {
+      // 현재 보기모드 → 수정모드로 진입
+      initializeEditData();
+      isEditMode.value = true;
+    }
   };
+
 
   const cancelEdit = () => {
     if (backupEditData.value) {
@@ -264,6 +281,7 @@ function useResumeCoach() {
     loading,
     error,
     saving,
+    saveLoading,
 
     careers,
     educations,

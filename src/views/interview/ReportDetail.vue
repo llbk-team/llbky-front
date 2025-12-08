@@ -129,7 +129,7 @@
               <div 
                 class="progress-bar bg-mint" 
                 role="progressbar" 
-                :style="{ width: (mode === 'single' ? singleAvgScore : avgScore) + '%' }"
+                :style="{ width: (mode === 'single' ? singleTotalScore : totalScore) + '%' }"
               ></div>
             </div>
 

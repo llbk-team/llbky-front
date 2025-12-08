@@ -12,10 +12,11 @@ function find(resumeId){
 }
 
 // 이력서 목록 조회
-function list (memberId = 1){
+function list (memberId){
   return axios.get(`/resume/list/${memberId}`);
 }
 
+// 이력서 수정
 function update(resume){
   return axios.put("/resume/update", resume);
 }

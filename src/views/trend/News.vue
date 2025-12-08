@@ -67,7 +67,6 @@
         <div v-for="(item, i) in visibleNews" :key="item.id || i" class="news-card" @click="openDetail(item)">
           <!-- 상단 태그 -->
           <div class="tag-row">
-            <span class="tag category">채용 시장</span>
             <span class="tag" :class="item.sentiment">{{
               item.sentimentLabel
             }}</span>

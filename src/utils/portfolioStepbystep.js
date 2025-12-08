@@ -18,9 +18,8 @@ function portfolioStepbystep() {
     const userName = ref('');  // DB의 memberName
     const userEmail = ref('');  // DB의 email
 
-    // 직군/직무 정보 (DB에서 가져온 값으로 하드코딩)
-    const jobGroup = ref('개발');  // DB의 jobGroup
-    const jobRole = ref('백엔드');  // DB의 jobRole
+    const jobGroup = ref('');  // DB의 jobGroup
+    const jobRole = ref('');  // DB의 jobRole
 
     const isLoggedIn = computed(() => store.getters['user/isLoggedIn']);
     const currentUser = computed(() => store.getters['user/userInfo']);
@@ -55,9 +54,25 @@ function portfolioStepbystep() {
         return stage5 && stage5.progress === 100 && allStagesComplete;
     });
 
+    // 특정 단계를 열기 전에 이전 단계가 완료되었는지 확인
+    const isPreviousStepComplete = (stepIndex) => {
+        if (stepIndex === 0) return true; // 1단계는 항상 접근 가능
+        
+        // 이전 단계의 진행률이 100%인지 확인
+        const previousStep = portfolioSteps.value[stepIndex - 1];
+        return previousStep && previousStep.progress === 100;
+    };
+
     // 단계 토글
     const toggleStep = (step) => {
         const index = portfolioSteps.value.indexOf(step);
+        
+        // ⭐ 이전 단계 완료 여부 확인 (닫을 때는 검증 안 함)
+        if (openStepIndex.value !== index && !isPreviousStepComplete(index)) {
+            alert(`이전 단계를 먼저 완료해주세요. (${index}단계는 ${index}단계 완료 후 진행 가능)`);
+            return;
+        }
+        
         openStepIndex.value = openStepIndex.value === index ? null : index;
         // 단계 변경 시 항목 초기화
         if (openStepIndex.value !== null) {
@@ -115,7 +130,7 @@ function portfolioStepbystep() {
             // 원본 내용 저장 (나중에 복원을 위해)
             originalContent.value = currentContent.value;
 
-            // 🔥 수정: 하드코딩된 값들을 명시적으로 포함
+          
             const requestData = {
                userInput: currentContent.value,
                 inputFieldType: currentItem.title,
@@ -269,23 +284,43 @@ function portfolioStepbystep() {
     // DB에서 포트폴리오 가이드 표준 데이터 가져오기
     const fetchPortfolioStandards = async () => {
         try {
-            // 직군/직무별 평가 기준 조회
-            const response = await portfolioGuideApi.getStandardsByJob(jobGroup.value, jobRole.value);
+            // 사용자/직군/직무 유효성 확인
+            console.log('🔎 표준 데이터 조회 요청:', {
+                memberId: memberId.value,
+                jobGroup: jobGroup.value,
+                jobRole: jobRole.value
+            });
+
+            if (!memberId.value) {
+                console.warn('❌ memberId가 없습니다. 로그인 정보를 확인하세요.');
+                await fetchAllStandards();
+                return;
+            }
+
+            if (!jobGroup.value || !jobRole.value) {
+                console.warn('⚠️ 직군/직무가 설정되지 않았습니다. 전체 표준을 불러옵니다.');
+                await fetchAllStandards();
+                return;
+            }
+
+            // 직군/직무별 평가 기준 조회 (가능하면 memberId도 전달)
+            const response = await portfolioGuideApi.getStandardsByJob(jobGroup.value, jobRole.value, memberId.value);
             
-            if (response.data) {
-                const standards = response.data;
-                console.log('표준 데이터:', standards);
-                
-                // DB에서 받은 데이터를 포트폴리오 단계 형식으로 변환
-                if (Array.isArray(standards) && standards.length > 0) {
-                    portfolioSteps.value = transformStandardsToSteps(standards);
-                } else {
-                    // 데이터가 없으면 전체 표준 데이터 조회
-                    await fetchAllStandards();
-                }
+            const standards = response?.data;
+            console.log('📦 표준 데이터 응답:', standards);
+            
+            // DB에서 받은 데이터를 포트폴리오 단계 형식으로 변환
+            if (Array.isArray(standards) && standards.length > 0) {
+                portfolioSteps.value = transformStandardsToSteps(standards);
+                console.log('✅ 직군/직무 기준으로 표준 데이터 적용:', {
+                    stepsCount: portfolioSteps.value.length
+                });
+            } else {
+                console.warn('ℹ️ 직군/직무 기준 데이터가 없어 전체 표준으로 대체합니다.');
+                await fetchAllStandards();
             }
         } catch (error) {
-            console.error('표준 데이터 조회 중 오류:', error);
+            console.error('❌ 표준 데이터 조회 중 오류:', error);
             // 오류 시 전체 표준 데이터 조회 시도
             await fetchAllStandards();
         }
@@ -312,33 +347,56 @@ function portfolioStepbystep() {
         }
     };
 
-    // DB 데이터를 화면 형식으로 변환
+    // DB 데이터를 화면 형식으로 변환 (수정된 버전)
     const transformStandardsToSteps = (standards) => {
         console.log('🔍 받은 standards 데이터:', standards);
 
+        // ⭐ 1단계: standardId 순으로 정렬 (DB 순서 유지)
+        const sortedStandards = [...standards].sort((a, b) => {
+            const idA = a.standardId || 0;
+            const idB = b.standardId || 0;
+            return idA - idB;
+        });
+
+        console.log('📊 standardId 순 정렬 결과:', sortedStandards.map(s => ({
+            standardId: s.standardId,
+            standardName: s.standardName
+        })));
+
+        // ⭐ 2단계: 정렬된 순서대로 1~5단계 매핑
         const stepMap = {};
 
-        standards.forEach(standard => {
-            console.log('📋 처리 중인 standard:', standard);
-            console.log('📋 evaluationItems 타입:', typeof standard.evaluationItems);
-            console.log('📋 evaluationItems 내용:', standard.evaluationItems);
+        sortedStandards.forEach((standard, index) => {
+            // ⭐ 핵심: 배열 인덱스로 1~5단계 강제 매핑
+            const stepNum = (index % 5) + 1;  // 0→1, 1→2, 2→3, 3→4, 4→5, 5→1, ...
+            
+            console.log(`📋 처리 중: standardId=${standard.standardId} → ${stepNum}단계`);
 
-            // standardName을 파싱하여 단계 정보 추출
-            const stepNum = standard.standardId || 1;
-            const stepTopic = standard.standardName || '단계';
+            const stepTopic = standard.standardName || `${stepNum}단계`;
 
+            // 단계가 없으면 새로 생성
             if (!stepMap[stepNum]) {
                 stepMap[stepNum] = {
                     label: `${stepNum}단계`,
                     topic: stepTopic,
                     progress: 0,
                     items: [],
-                    standardId: standard.standardId,
-                    description: standard.description,
-                    promptTemplate: standard.promptTemplate,
-                    weightPercentage: standard.weightPercentage
+                    // ⭐ 원본 standardId 정보 보존 (API 호출용)
+                    standardIds: [],
+                    descriptions: [],
+                    promptTemplates: [],
+                    weightPercentages: []
                 };
             }
+
+            // ⭐ 메타 정보 누적 저장 (여러 standard가 같은 단계에 들어갈 수 있음)
+            stepMap[stepNum].standardIds.push(standard.standardId);
+            stepMap[stepNum].descriptions.push(standard.standardDescription || standard.description);
+            stepMap[stepNum].promptTemplates.push(standard.promptTemplate);
+            stepMap[stepNum].weightPercentages.push(standard.weightPercentage || 20);
+
+            console.log('📋 evaluationItems 타입:', typeof standard.evaluationItems);
+            console.log('📋 evaluationItems 내용:', standard.evaluationItems);
 
             // evaluationItems가 문자열인 경우 JSON 파싱
             let evaluationItems = standard.evaluationItems;
@@ -369,7 +427,8 @@ function portfolioStepbystep() {
                         imageUpload: false,
                         userInput: '',
                         weight: item.weight || 0,
-                        standardId: standard.standardId,
+                        // ⭐ 원본 메타데이터 보존
+                        originalStandardId: standard.standardId,
                         evaluationKey: itemKey
                     });
                 });
@@ -378,27 +437,60 @@ function portfolioStepbystep() {
             }
         });
         
-        // 배열로 변환
-        const steps = Object.keys(stepMap)
-            .sort((a, b) => parseInt(a) - parseInt(b))
-            .map(key => stepMap[key]);
-        
-        // 항목이 없는 단계는 기본 항목 추가
-        steps.forEach(step => {
-            if (step.items.length === 0) {
-                step.items.push({
-                    title: step.topic,
-                    description: step.description || '',
-                    status: '미작성',
-                    placeholder: `${step.topic}에 대해 작성하세요`,
-                    imageUpload: false,
-                    userInput: '',
-                    weight: 0
+        // ⭐ 3단계: 1~5단계 순으로 배열 생성
+        const steps = [];
+        for (let i = 1; i <= 5; i++) {
+            if (stepMap[i]) {
+                steps.push(stepMap[i]);
+            }
+        }
+
+        // ⭐ 4단계: 빈 단계가 있으면 기본 항목 추가
+        for (let i = 1; i <= 5; i++) {
+            if (!stepMap[i]) {
+                steps.push({
+                    label: `${i}단계`,
+                    topic: `${i}단계`,
+                    progress: 0,
+                    items: [{
+                        title: `${i}단계 내용`,
+                        description: `${i}단계 작성 내용`,
+                        status: '미작성',
+                        placeholder: `${i}단계에 대해 작성하세요`,
+                        imageUpload: false,
+                        userInput: '',
+                        weight: 0
+                    }],
+                    standardIds: [],
+                    descriptions: [],
+                    promptTemplates: [],
+                    weightPercentages: [20]
                 });
             }
-        });
+            
+            // 각 단계별 항목이 없으면 기본 항목 추가
+            const currentStep = steps[i - 1];
+            if (currentStep && currentStep.items.length === 0) {
+                currentStep.items.push({
+                    title: currentStep.topic,
+                    description: currentStep.descriptions[0] || '',
+                    status: '미작성',
+                    placeholder: `${currentStep.topic}에 대해 작성하세요`,
+                    imageUpload: false,
+                    userInput: '',
+                    weight: 0,
+                    originalStandardId: currentStep.standardIds[0]
+                });
+            }
+        }
         
-        console.log('✅ 변환된 단계 데이터:', steps);
+        console.log('✅ 변환된 단계 데이터 (1~5단계):', steps.map(step => ({
+            label: step.label,
+            topic: step.topic,
+            itemCount: step.items.length,
+            standardIds: step.standardIds
+        })));
+        
         return steps;
     };
 
@@ -609,14 +701,20 @@ const setUserInfoFromStore = () => {
 
     // 초기화 함수
     const initializePortfolio = async () => {
+        // 로그인 및 사용자 정보 설정
+        const ok = setUserInfoFromStore();
+        if (!ok) return; // 로그인되지 않았으면 중단
 
-        if (!setUserInfoFromStore()) {
-            return; // 로그인되지 않았으면 중단
-        }
         openStepIndex.value = 0;
 
-        // 표준 데이터 로드
+        // 표준 데이터 로드 (회원의 직군/직무 기반)
         await fetchPortfolioStandards();
+
+        // 선택 정보가 누락된 경우 대비하여 한 번 더 전체 표준 로드 보강
+        if (!portfolioSteps.value || portfolioSteps.value.length === 0) {
+            console.log('🛠️ 보강: 단계 데이터가 없어 전체 표준 재로드');
+            await fetchAllStandards();
+        }
 
         // 가이드 정보 로드 (선택적 - 실패해도 계속 진행)
         fetchGuideInfo().catch(err => console.warn('가이드 정보 없음:', err));
@@ -655,6 +753,7 @@ const setUserInfoFromStore = () => {
         setUserInfoFromStore,
         isLoggedIn,
         currentUser,
+        isPreviousStepComplete,
         toggleStep,
         toggleItem,
         cancelItemInput,
