@@ -9,7 +9,7 @@
           <span>AI가 함께합니다</span>
         </h1>
         <p class="desc">
-          이력서 작성부터 면접 준비, 학습 트렌드 분석까지<br />
+          이력서 작성부터 면접 준비, 학습, 트렌드 분석까지<br />
           당신만을 위한 맞춤 커리어 코칭으로 목표를 실현하세요.
         </p>
         <button v-if="!isLoggedIn" class="btn-main" @click="router.push('/login')">
@@ -118,7 +118,7 @@ const stats = [
 const steps = [
   { num: "01", title: "목표 설정", desc: "원하는 직무와 기업을 선택하고 커리어 목표를 세우세요." },
   { num: "02", title: "AI 분석", desc: "이력서, 자소서를 업로드하면 AI가 즉시 피드백을 제공합니다." },
-  { num: "03", title: "성장 추적", desc: "매번 분석 결과를 통해 당신의 커리어 성장을 확인하세요." },
+  { num: "03", title: "성장 제안", desc: "AI 학습 코치와 함께 부족한 역량을 강화해보세요." },
 ];
 </script>
 
