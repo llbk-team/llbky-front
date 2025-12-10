@@ -44,7 +44,7 @@
       <div class="card sentiment-box">
         <div class="card-header header-with-btn">
           <div class="header-left">
-            <h4>산업별 시장 분위기</h4>
+            <h4>뉴스 기반 산업별 시장 분위기</h4>
             <p>
               관심 직무와 관련된 산업군의 최신 뉴스 흐름을 기반으로 분위기를 분석했습니다.
               긍정·중립·부정 비율을 통해 각 산업군이 현재 어떤 분위기와 이슈에 반응하고 있는지
