@@ -286,7 +286,7 @@ function news() {
 
         try {
             // ✅ getTodayNews로 변경 (일주일치 확인 → 오늘 없으면 자동 수집)
-            const response = await newsApi.getTodayNews(memberId.value, 15);
+            const response = await newsApi.getTodayNews(memberId.value, 50);
 
             if (response.data.status === 'success' && response.data.data) {
                 const newsItems = Array.isArray(response.data.data) ? response.data.data : [];
