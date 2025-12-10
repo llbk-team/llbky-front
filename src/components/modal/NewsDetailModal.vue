@@ -39,14 +39,14 @@
             </div>
           </div>
 
-          <!-- 신뢰도 -->
+          <!-- 신뢰도
           <div class="trust-box">
             <span class="trust-label">신뢰도</span>
             <div class="trust-bar">
               <div class="trust-fill" :style="{ width: (newsDetail?.trustScore || news.trust) + '%' }"></div>
             </div>
             <span class="trust-score">{{ newsDetail?.trustScore || news.trust }}%</span>
-          </div>
+          </div>-->
 
           <!-- 기사 내용 -->
           <div class="article">

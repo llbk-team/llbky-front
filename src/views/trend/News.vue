@@ -85,13 +85,13 @@
 
           <!-- 신뢰도 + 출처 -->
           <div class="card-footer">
-            <div class="trust">
+           <!-- <div class="trust">
               <span class="label">신뢰도</span>
               <div class="bar">
                 <div class="fill" :style="{ width: item.trust + '%' }"></div>
               </div>
               <span class="score">{{ item.trust }}%</span>
-            </div>
+            </div>-->
             <div class="source">
               출처: {{ item.source }} · {{ item.date }}
             </div>

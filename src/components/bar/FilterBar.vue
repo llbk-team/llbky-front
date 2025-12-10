@@ -21,12 +21,12 @@
     </div>
 
   
-
+<!--
     <div class="filter-item trust-item">
       <label>신뢰도</label>
       <input type="range" v-model="trustMin" min="0" max="100" />
       <span class="trust-value">{{ trustMin }}% 이상</span>
-    </div>
+    </div>-->
   </section>
 </template>
 
