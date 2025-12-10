@@ -1,6 +1,6 @@
 // 트렌드 페이지 컴포넌트 js
 
-import { ref, onMounted, nextTick } from "vue";
+import { ref, onMounted, nextTick, computed } from "vue";
 import Chart from "chart.js/auto";
 import WordCloud from "wordcloud";
 import trendApi from "@/apis/trendApi";
@@ -180,6 +180,18 @@ export function useTrendAnalysis() {
     saveLoading.value = false;
   });
 
+  const formattedSummary = computed(() => {
+  if (!finalSummary.value) return "";
+
+  return finalSummary.value
+    .split('. ')
+    .map(s => s.trim())
+    .filter(s => s.length > 0)
+    .map(s => s + '.')   // 마침표 유지
+    .join('\n');         // 줄바꿈
+});
+
+
   
 
 
@@ -194,6 +206,7 @@ export function useTrendAnalysis() {
 
     // 추가됨
     finalSummary,
-    showReason
+    showReason,
+    formattedSummary
   };
 }

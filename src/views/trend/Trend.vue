@@ -42,28 +42,33 @@
 
       <!-- 산업별 시장 분위기 -->
       <div class="card sentiment-box">
-        <div class="card-header">
-          <h4>산업별 시장 분위기</h4>
-          <p>관심 직무와 관련된 산업군의 최신 뉴스 흐름을 기반으로 분위기를 분석했습니다.
-            긍정·중립·부정 비율을 통해 각 산업군이 현재 어떤 분위기와 이슈에 반응하고 있는지 확인할 수 있어요</p>
+        <div class="card-header header-with-btn">
+          <div class="header-left">
+            <h4>산업별 시장 분위기</h4>
+            <p>
+              관심 직무와 관련된 산업군의 최신 뉴스 흐름을 기반으로 분위기를 분석했습니다.
+              긍정·중립·부정 비율을 통해 각 산업군이 현재 어떤 분위기와 이슈에 반응하고 있는지
+              확인할 수 있어요
+            </p>
+          </div>
 
-          <!-- ❔ 도움말 버튼 -->
-          <button class="info-btn" @click="showReason = !showReason">
-            ?
-          </button>
+          <!-- 오른쪽 정렬 -->
+          <div class="info-wrapper">
+            <button class="info-btn" @click="showReason = !showReason">?</button>
+
+            <!-- 버튼 옆에 뜨는 미니 팝오버 -->
+            <transition name="fade">
+              <div v-if="showReason" class="info-popover">
+                <h5>📌 분석 이유</h5>
+                <p>{{ formattedSummary }}</p>
+              </div>
+            </transition>
+          </div>
         </div>
 
         <div class="sentiment-chart-container">
           <canvas id="sentimentChart"></canvas>
         </div>
-
-        <!-- 🔽 토글 영역: finalSummary -->
-        <transition name="fade">
-          <div v-if="showReason" class="sentiment-summary-box">
-            <h5>📌 왜 이런 분위기가 나왔나요?</h5>
-            <p class="summary-text">{{ finalSummary }}</p>
-          </div>
-        </transition>
       </div>
 
     </div>
@@ -105,7 +110,8 @@ const {
   marketInsight,
   saveLoading,
   finalSummary,
-  showReason
+  showReason,
+  formattedSummary
 } = useTrendAnalysis();
 
 </script>

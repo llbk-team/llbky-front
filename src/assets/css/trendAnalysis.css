@@ -340,9 +340,89 @@
 }
 
 /* fade 애니메이션 */
-.fade-enter-active, .fade-leave-active {
+.fade-enter-active,
+.fade-leave-active {
   transition: opacity 0.25s ease;
 }
-.fade-enter-from, .fade-leave-to {
+
+.fade-enter-from,
+.fade-leave-to {
   opacity: 0;
 }
+
+/* insight-row 레이아웃 깨짐 방지 */
+.insight-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 26px;
+  margin-bottom: 40px;
+}
+
+.wordcloud-box,
+.sentiment-box {
+  min-width: 0;
+  /* 박스가 넘치며 비율을 깨뜨리는 문제 해결 */
+}
+
+/* header + 버튼 정렬 */
+.header-with-btn {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.header-left {
+  flex: 1;
+}
+
+/* 버튼 + 팝오버 묶음 */
+.info-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+/* 팝오버 스타일 */
+.info-popover {
+  position: absolute;
+  top: 32px;
+  right: 0;
+  width: 260px;
+
+  background: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 14px 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+
+  z-index: 30;
+}
+
+.info-popover h5 {
+  margin: 0 0 6px 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #111;
+}
+
+.info-popover p {
+  font-size: 13px;
+  color: #444;
+  line-height: 1.5;
+  white-space: pre-line;
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+/* fade 애니메이션 */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+
