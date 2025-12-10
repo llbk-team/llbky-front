@@ -8,7 +8,7 @@ import { useStore } from "vuex";
 function portfolioStepbystep() {
     const router = useRouter();
     const store = useStore();
-    
+
     // 전체 진행률 및 현재 단계
     const overallProgress = ref(0);
     const currentStep = ref(1);
@@ -16,6 +16,7 @@ function portfolioStepbystep() {
     // 사용자 정보 (하드코딩 - DB 데이터)
     const memberId = ref(null);  // DB의 memberId
     const guideId = ref(null);   // DB의 guideId
+    const isGuideCreated = ref(false);  // 가이드 생성 여부
     const userName = ref('');  // DB의 memberName
     const userEmail = ref('');  // DB의 email
     const jobGroup = ref('');  // DB의 jobGroup
@@ -23,7 +24,7 @@ function portfolioStepbystep() {
 
     const isLoggedIn = computed(() => store.getters['user/isLoggedIn']);
     const currentUser = computed(() => store.getters['user/userInfo']);
-    
+
     // 포트폴리오 단계 (DB에서 가져올 데이터)
     const portfolioSteps = ref([]);
 
@@ -40,7 +41,7 @@ function portfolioStepbystep() {
     const selectedExample = ref(""); // 선택된 예시 내용
     const selectedExampleIndex = ref(null); // 선택된 예시의 인덱스
     const originalContent = ref(""); // 원본 작성 내용
-    
+
     // AI 로딩 상태
     const aiLoading = ref(false);
 
@@ -55,10 +56,10 @@ function portfolioStepbystep() {
     const isAllComplete = computed(() => {
         // 5단계가 존재하고 그 진행률이 100%인지 확인
         const stage5 = portfolioSteps.value.find(step => step.label === "5단계");
-        
+
         // 모든 단계가 100%인지 확인
         const allStagesComplete = portfolioSteps.value.every(step => step.progress === 100);
-        
+
         return stage5 && stage5.progress === 100 && allStagesComplete;
     });
 
@@ -76,7 +77,7 @@ function portfolioStepbystep() {
 
         try {
             isSaving.value = true;
-            
+
             // 현재 작성 중인 모든 데이터 수집
             const tempData = {
                 timestamp: new Date().toISOString(),
@@ -98,10 +99,10 @@ function portfolioStepbystep() {
 
             // localStorage에 저장
             localStorage.setItem(getStorageKey(), JSON.stringify(tempData));
-            
+
             lastSavedTime.value = new Date();
             hasUnsavedChanges.value = false;
-            
+
             console.log('✅ 임시 저장 완료:', lastSavedTime.value.toLocaleTimeString());
 
         } catch (error) {
@@ -116,7 +117,7 @@ function portfolioStepbystep() {
         try {
             const storageKey = getStorageKey();
             const tempDataStr = localStorage.getItem(storageKey);
-            
+
             if (!tempDataStr) {
                 console.log('📭 저장된 임시 데이터가 없습니다.');
                 return false;
@@ -167,7 +168,7 @@ function portfolioStepbystep() {
 
                 lastSavedTime.value = savedTime;
                 hasUnsavedChanges.value = false;
-                
+
                 console.log('✅ 임시 데이터 복원 완료');
                 return true;
             }
@@ -192,19 +193,19 @@ function portfolioStepbystep() {
     };
 
     // ⭐ 자동 저장 시작
-    const startAutoSave = () => {
-        if (autoSaveTimer.value) {
-            clearInterval(autoSaveTimer.value);
-        }
+    // const startAutoSave = () => {
+    //     if (autoSaveTimer.value) {
+    //         clearInterval(autoSaveTimer.value);
+    //     }
 
-        autoSaveTimer.value = setInterval(() => {
-            if (hasUnsavedChanges.value && !isSaving.value) {
-                saveTemporaryContent();
-            }
-        }, AUTOSAVE_INTERVAL);
-        
-        console.log('🔄 자동 저장 시작 (30초 간격)');
-    };
+    //     autoSaveTimer.value = setInterval(() => {
+    //         if (hasUnsavedChanges.value && !isSaving.value) {
+    //             saveTemporaryContent();
+    //         }
+    //     }, AUTOSAVE_INTERVAL);
+
+    //     console.log('🔄 자동 저장 시작 (30초 간격)');
+    // };
 
     // ⭐ 자동 저장 중지
     const stopAutoSave = () => {
@@ -225,7 +226,7 @@ function portfolioStepbystep() {
         if (hasUnsavedChanges.value) {
             // 임시 저장 실행
             saveTemporaryContent();
-            
+
             // 브라우저 경고 메시지
             event.preventDefault();
             event.returnValue = '작성 중인 내용이 있습니다. 정말 나가시겠습니까?';
@@ -237,7 +238,7 @@ function portfolioStepbystep() {
     onBeforeUnmount(() => {
         stopAutoSave();
         window.removeEventListener('beforeunload', handleBeforeUnload);
-        
+
         // 마지막 저장
         if (hasUnsavedChanges.value) {
             saveTemporaryContent();
@@ -247,7 +248,7 @@ function portfolioStepbystep() {
     // 특정 단계를 열기 전에 이전 단계가 완료되었는지 확인
     const isPreviousStepComplete = (stepIndex) => {
         if (stepIndex === 0) return true; // 1단계는 항상 접근 가능
-        
+
         // 이전 단계의 진행률이 100%인지 확인
         const previousStep = portfolioSteps.value[stepIndex - 1];
         return previousStep && previousStep.progress === 100;
@@ -256,20 +257,20 @@ function portfolioStepbystep() {
     // 단계 토글
     const toggleStep = (step) => {
         const index = portfolioSteps.value.indexOf(step);
-        
+
         // ⭐ 이전 단계 완료 여부 확인 (닫을 때는 검증 안 함)
         if (openStepIndex.value !== index && !isPreviousStepComplete(index)) {
             alert(`이전 단계를 먼저 완료해주세요. (${index}단계는 ${index}단계 완료 후 진행 가능)`);
             return;
         }
-        
+
         openStepIndex.value = openStepIndex.value === index ? null : index;
         // 단계 변경 시 항목 초기화
         if (openStepIndex.value !== null) {
             currentStep.value = parseInt(portfolioSteps.value[openStepIndex.value].label);
         }
         openItemIndex.value = null;
-        
+
         // ⭐ 단계 변경 시 임시 저장
         hasUnsavedChanges.value = true;
     };
@@ -278,12 +279,12 @@ function portfolioStepbystep() {
     const toggleItem = (item, index) => {
         openItemIndex.value = openItemIndex.value === index ? null : index;
         selectedItem.value = item;
-        
+
         // 기존 작성 내용이 있으면 로드
         if (openItemIndex.value !== null && !showItemFeedback.value[index]) {
             currentContent.value = item.userInput || "";
         }
-        
+
         // ⭐ 항목 변경 시 임시 저장
         hasUnsavedChanges.value = true;
     };
@@ -331,11 +332,11 @@ function portfolioStepbystep() {
             const requestData = {
                 userInput: currentContent.value,
                 inputFieldType: currentItem.title,
-                memberId: memberId.value,          
-                jobGroup: jobGroup.value,          
-                jobRole: jobRole.value,            
-                careerYears: 2,                    
-                currentStep: currentStep.value  
+                memberId: memberId.value,
+                jobGroup: jobGroup.value,
+                jobRole: jobRole.value,
+                careerYears: 2,
+                currentStep: currentStep.value
             };
 
             console.log('🚀 AI 피드백 요청 (하드코딩 포함):', requestData);
@@ -345,7 +346,7 @@ function portfolioStepbystep() {
 
             if (response.data) {
                 const feedback = response.data;
-                
+
                 // 피드백 표시
                 showItemFeedback.value[index] = true;
 
@@ -358,7 +359,7 @@ function portfolioStepbystep() {
 
                 // 사용자 입력을 임시 저장 (아직 완료되지 않음)
                 currentItem.feedback = feedback; // 전체 피드백 객체 저장
-                
+
                 // ⭐ AI 피드백 받은 후 임시 저장
                 hasUnsavedChanges.value = true;
                 await saveTemporaryContent();
@@ -401,7 +402,7 @@ function portfolioStepbystep() {
         selectedExampleIndex.value = index;
         selectedExample.value = exampleText;
         console.log('🎯 예시 선택:', { index, exampleText });
-        
+
         // ⭐ 예시 선택 시 변경사항 표시
         hasUnsavedChanges.value = true;
     };
@@ -411,7 +412,7 @@ function portfolioStepbystep() {
         selectedExample.value = originalContent.value;
         selectedExampleIndex.value = null;
         console.log('📝 원본 내용 사용:', originalContent.value);
-        
+
         // ⭐ 원본 사용 시 변경사항 표시
         hasUnsavedChanges.value = true;
     };
@@ -419,10 +420,10 @@ function portfolioStepbystep() {
     // 선택된 내용 적용
     const applySelectedContent = async (itemIndex) => {
         const currentItem = portfolioSteps.value[openStepIndex.value].items[itemIndex];
-        
+
         // 선택된 내용을 적용 (예시 또는 원본)
         const finalContent = selectedExample.value || originalContent.value;
-        
+
         if (!finalContent || finalContent.trim() === '') {
             alert('적용할 내용이 없습니다.');
             return;
@@ -432,25 +433,25 @@ function portfolioStepbystep() {
         currentItem.userInput = finalContent;
         currentItem.status = '완료';
         currentItem.appliedFeedback = currentAiFeedback.value; // 적용된 피드백도 저장
-        
+
         // 진행률 업데이트
         updateProgress();
-        
+
         // 피드백 창 닫기
         showItemFeedback.value[itemIndex] = false;
         currentAiFeedback.value = null;
         selectedExample.value = "";
         selectedExampleIndex.value = null;
         originalContent.value = "";
-        
+
         // 입력창으로 돌아가기
         openItemIndex.value = null;
         currentContent.value = "";
-        
+
         // ⭐ 내용 적용 후 임시 저장
         hasUnsavedChanges.value = false; // 완료 상태이므로 미저장 변경사항 해제
         await saveTemporaryContent();
-        
+
         alert('✅ 내용이 성공적으로 적용되었습니다!');
     };
 
@@ -458,17 +459,17 @@ function portfolioStepbystep() {
     const completeItemWithoutFeedback = async (index) => {
         // 해당 항목 상태 '완료'로 업데이트
         portfolioSteps.value[openStepIndex.value].items[index].status = '완료';
-        
+
         // 사용자 입력 저장  
         portfolioSteps.value[openStepIndex.value].items[index].userInput = currentContent.value;
-        
+
         // 단계 진행률 업데이트
         updateProgress();
-        
+
         // 입력창 닫기
         openItemIndex.value = null;
         currentContent.value = "";
-        
+
         // ⭐ 완료 후 임시 저장
         hasUnsavedChanges.value = false;
         await saveTemporaryContent();
@@ -481,18 +482,18 @@ function portfolioStepbystep() {
             const items = step.items;
             const completedCount = items.filter(item => item.status === '완료').length;
             const progress = Math.round((completedCount / items.length) * 100);
-            
+
             // 단계 진행률 업데이트
             portfolioSteps.value[stepIndex].progress = progress;
         });
-        
+
         // 전체 진행률 업데이트
         const totalItems = portfolioSteps.value.reduce((acc, step) => acc + step.items.length, 0);
-        const totalCompleted = portfolioSteps.value.reduce((acc, step) => 
+        const totalCompleted = portfolioSteps.value.reduce((acc, step) =>
             acc + step.items.filter(item => item.status === '완료').length, 0);
-        
+
         overallProgress.value = Math.round((totalCompleted / totalItems) * 100);
-        
+
         // ⭐ 진행률 변경 시 변경사항 표시
         hasUnsavedChanges.value = true;
     };
@@ -521,10 +522,10 @@ function portfolioStepbystep() {
 
             // 직군/직무별 평가 기준 조회 (가능하면 memberId도 전달)
             const response = await portfolioGuideApi.getStandardsByJob(jobGroup.value, jobRole.value, memberId.value);
-            
+
             const standards = response?.data;
             console.log('📦 표준 데이터 응답:', standards);
-            
+
             // DB에서 받은 데이터를 포트폴리오 단계 형식으로 변환
             if (Array.isArray(standards) && standards.length > 0) {
                 portfolioSteps.value = transformStandardsToSteps(standards);
@@ -546,11 +547,11 @@ function portfolioStepbystep() {
     const fetchAllStandards = async () => {
         try {
             const response = await portfolioGuideApi.getAllStandards();
-            
+
             if (response.data) {
                 const standards = response.data;
                 console.log('전체 표준 데이터:', standards);
-                
+
                 if (Array.isArray(standards) && standards.length > 0) {
                     portfolioSteps.value = transformStandardsToSteps(standards);
                 } else {
@@ -585,7 +586,7 @@ function portfolioStepbystep() {
         sortedStandards.forEach((standard, index) => {
             // ⭐ 핵심: 배열 인덱스로 1~5단계 강제 매핑
             const stepNum = (index % 5) + 1;  // 0→1, 1→2, 2→3, 3→4, 4→5, 5→1, ...
-            
+
             console.log(`📋 처리 중: standardId=${standard.standardId} → ${stepNum}단계`);
 
             const stepTopic = standard.standardName || `${stepNum}단계`;
@@ -652,7 +653,7 @@ function portfolioStepbystep() {
                 console.warn('⚠️ evaluationItems가 없거나 형식이 잘못됨:', standard.standardId);
             }
         });
-        
+
         // ⭐ 3단계: 1~5단계 순으로 배열 생성
         const steps = [];
         for (let i = 1; i <= 5; i++) {
@@ -683,7 +684,7 @@ function portfolioStepbystep() {
                     weightPercentages: [20]
                 });
             }
-            
+
             // 각 단계별 항목이 없으면 기본 항목 추가
             const currentStep = steps[i - 1];
             if (currentStep && currentStep.items.length === 0) {
@@ -699,14 +700,14 @@ function portfolioStepbystep() {
                 });
             }
         }
-        
+
         console.log('✅ 변환된 단계 데이터 (1~5단계):', steps.map(step => ({
             label: step.label,
             topic: step.topic,
             itemCount: step.items.length,
             standardIds: step.standardIds
         })));
-        
+
         return steps;
     };
 
@@ -793,6 +794,8 @@ function portfolioStepbystep() {
                 console.log('✅ 회원 가이드 목록 조회 성공:', response.data);
                 // 가이드 목록을 사용하여 UI 업데이트 등
             }
+            console.log('📝 기존 가이드 없음 → 새 가이드 생성');
+            await createGuide();  // 추가
         } catch (error) {
             console.error('❌ 회원 가이드 목록 조회 실패:', error);
         }
@@ -883,7 +886,7 @@ function portfolioStepbystep() {
 
     const setUserInfoFromStore = () => {
         console.log('🔍 Vuex store에서 사용자 정보 확인 중...');
-        
+
         if (!isLoggedIn.value || !currentUser.value) {
             console.warn('❌ 로그인되지 않은 상태입니다.');
             router.push('/login');
@@ -891,12 +894,12 @@ function portfolioStepbystep() {
         }
 
         const user = currentUser.value;
-        
+
         // 🔥 핵심: store에서 실제 사용자 정보 가져오기
         memberId.value = user.memberId || user.id || user.member_id;
         userName.value = user.name || user.username || user.member_name || '';
         userEmail.value = user.email || user.member_email || '';
-        
+
         // 직군/직무 정보도 있다면 설정
         if (user.jobGroup || user.job_group) {
             jobGroup.value = user.jobGroup || user.job_group;
@@ -926,30 +929,204 @@ function portfolioStepbystep() {
         await fetchPortfolioStandards();
 
         // 선택 정보가 누락된 경우 대비하여 한 번 더 전체 표준 로드 보강
-        if (!portfolioSteps.value || portfolioSteps.value.length === 0) {
-            console.log('🛠️ 보강: 단계 데이터가 없어 전체 표준 재로드');
-            await fetchAllStandards();
+        // if (!portfolioSteps.value || portfolioSteps.value.length === 0) {
+        //     console.log('🛠️ 보강: 단계 데이터가 없어 전체 표준 재로드');
+        //     await fetchAllStandards();
+        // }
+
+        // ⭐ 기존 가이드 로드 시도
+        try {
+            const guidesResponse = await portfolioGuideApi.getGuidesByMember(memberId.value);
+            if (guidesResponse.data && guidesResponse.data.length > 0) {
+                const latestGuide = guidesResponse.data[0];
+                guideId.value = latestGuide.guideId;
+                isGuideCreated.value = true;
+
+                // ⭐ 수정: standard와 저장된 내용 병합
+                if (latestGuide.guideContent) {
+                    let parsedContent = latestGuide.guideContent;
+
+                    // 문자열이면 파싱
+                    if (typeof parsedContent === 'string') {
+                        parsedContent = JSON.parse(parsedContent);
+                    }
+
+                    const savedSteps = parsedContent.guideSteps || parsedContent.steps;
+
+                    // ⭐ 병합: standard 구조는 유지하고 userInput만 복원
+                    if (savedSteps && Array.isArray(savedSteps)) {
+                        savedSteps.forEach((savedStep, stepIndex) => {
+                            if (portfolioSteps.value[stepIndex]) {
+                                // 진행률 복원
+                                portfolioSteps.value[stepIndex].progress = savedStep.progress || 0;
+
+                                // 각 항목의 userInput, status 복원
+                                savedStep.items?.forEach((savedItem, itemIndex) => {
+                                    if (portfolioSteps.value[stepIndex].items[itemIndex]) {
+                                        portfolioSteps.value[stepIndex].items[itemIndex].userInput =
+                                            savedItem.userInput || savedItem.content || '';
+                                        portfolioSteps.value[stepIndex].items[itemIndex].status =
+                                            savedItem.status || '미작성';
+                                        if (savedItem.feedback) {
+                                            portfolioSteps.value[stepIndex].items[itemIndex].feedback = savedItem.feedback;
+                                        }
+                                    }
+                                });
+                            }
+                        });
+                    }
+
+                    currentStep.value = latestGuide.currentStep || 1;
+                }
+
+                console.log('✅ 기존 가이드 로드 및 병합 완료:', guideId.value);
+            } else {
+                console.log('새 가이드를 생성합니다.');
+                await createGuide();
+            }
+        } catch (error) {
+            console.log('가이드 조회 실패, 새 가이드 생성:', error);
+            await createGuide();
         }
 
         // ⭐ 임시 저장된 내용 복원 시도
         await loadTemporaryContent();
 
-        // ⭐ 자동 저장 시작 및 이벤트 리스너 등록
-        startAutoSave();
+        // ⭐ 이벤트 리스너 등록
         window.addEventListener('beforeunload', handleBeforeUnload);
 
-        // 가이드 정보 로드 (선택적 - 실패해도 계속 진행)
-        fetchGuideInfo().catch(err => console.warn('가이드 정보 없음:', err));
-        fetchMemberGuides().catch(err => console.warn('회원 가이드 목록 없음:', err));
+        // ✅ 가이드 정보만 로드 (fetchSavedFeedback 삭제)
+        if (guideId.value) {
+            fetchGuideInfo().catch(err => console.warn('가이드 정보 없음:', err));
+        }
+    };
 
-        // 저장된 피드백 로드 (선택적)
-        fetchSavedFeedback().catch(err => console.warn('저장된 피드백 없음:', err));
+    // ⭐ 가이드 생성 함수
+    const createGuide = async () => {
+        try {
+            isSaving.value = true;
+
+            const createRequest = {
+                memberId: memberId.value,
+                title: "포트폴리오 작성 가이드",
+                standardId: 1  // 기본 표준 (실제로는 직군/직무에 따라 선택)
+            };
+
+            const response = await portfolioGuideApi.createGuide(createRequest);
+
+
+            if (response.data) {
+                guideId.value = response.data.guideId;
+                isGuideCreated.value = true;
+                console.log('✅ 가이드 생성 완료:', guideId.value);
+            }
+
+        } catch (error) {
+            console.error('❌ 가이드 생성 실패:', error);
+        } finally {
+            isSaving.value = false;
+        }
+    };
+
+    // ⭐ 가이드 저장 함수
+    const saveGuide = async () => {
+        if (!guideId.value) {
+            console.warn('가이드 ID가 없습니다. 먼저 가이드를 생성해주세요.');
+            return;
+        }
+
+        try {
+            isSaving.value = true;
+            hasUnsavedChanges.value = false;
+
+            const saveRequest = {
+                guideId: guideId.value,
+                currentStep: currentStep.value,
+                 completionPercentage: overallProgress.value, 
+                // 저장 전에 DTO 형식으로 변환
+                guideSteps: portfolioSteps.value.map(step => ({
+                    stepNumber: parseInt(step.label),
+                    stepTitle: step.topic,
+                    stepProgress: step.progress,
+                    items: step.items.map(item => ({
+                        title: item.title,
+                        content: item.userInput,  // ⭐
+                        status: item.status
+                    }))
+                }))  // 현재 작성된 모든 내용
+            };
+            console.log("💡 guideSteps 타입:", typeof portfolioSteps.value);
+            console.log("💡 guideSteps 실제 값:", portfolioSteps.value);
+
+            const response = await portfolioGuideApi.saveGuide(saveRequest);
+            console.log("📌 저장 요청 payload:", JSON.stringify(saveRequest, null, 2));
+            if (response.data) {
+                lastSavedTime.value = new Date().toISOString();
+                console.log('✅ 가이드 저장 완료');
+            }
+
+
+
+        } catch (error) {
+            console.error('❌ 가이드 저장 실패:', error);
+            hasUnsavedChanges.value = true;
+        } finally {
+            isSaving.value = false;
+        }
+    };
+
+    // ⭐ PDF 다운로드 함수 (핵심!)
+    const downloadPortfolioPdf = async () => {
+        if (!guideId.value) {
+            alert('아직 가이드가 생성되지 않았습니다. 먼저 내용을 저장해주세요.');
+            await createGuide();  // 가이드가 없으면 생성
+            return;
+        }
+
+        // 저장되지 않은 변경사항이 있으면 먼저 저장
+        if (hasUnsavedChanges.value) {
+            await saveGuide();
+        }
+
+        try {
+            console.log(`🔄 PDF 다운로드 시작 - guideId: ${guideId.value}`);
+
+            // ⚡ Postman 테스트 URL: GET http://localhost:8080/portfolio-guide/123/pdf?memberId=1
+            const response = await portfolioGuideApi.downloadGuidePdf(guideId.value, memberId.value);
+
+            // ⚡ Blob 데이터를 파일로 다운로드 (검색 결과 기반 구현)
+            const fileURL = window.URL.createObjectURL(new Blob([response.data]));
+            const fileLink = document.createElement('a');
+            fileLink.href = fileURL;
+            fileLink.setAttribute('download', `포트폴리오_가이드_${guideId.value}.pdf`);
+            document.body.appendChild(fileLink);
+            fileLink.click();
+
+            // 메모리 정리
+            document.body.removeChild(fileLink);
+            window.URL.revokeObjectURL(fileURL);
+
+            console.log('✅ PDF 다운로드 성공');
+
+        } catch (error) {
+            console.error('❌ PDF 다운로드 실패:', error);
+            alert('PDF 다운로드에 실패했습니다. 다시 시도해주세요.');
+        }
     };
 
     // ⭐ 수동 임시 저장 함수 (사용자가 직접 호출)
     const saveManually = async () => {
+        if (!isGuideCreated.value) {
+            await createGuide();
+            if (!guideId.value) {
+                console.error('❌ 가이드 생성 실패');
+                alert('가이드 생성에 실패했습니다.');
+                return;
+            }
+
+        }
+        await saveGuide();
         await saveTemporaryContent();
-        alert('✅ 임시 저장이 완료되었습니다!');
     };
 
     return {
@@ -968,20 +1145,21 @@ function portfolioStepbystep() {
         originalContent,
         isAllComplete,
         aiLoading,
-        
+
         // ⭐ 임시 저장 관련 상태
         isSaving,
         lastSavedTime,
         hasUnsavedChanges,
-        
+
         // 사용자 정보
         memberId,
         guideId,
+        isGuideCreated,
         userName,
         userEmail,
         jobGroup,
         jobRole,
-        
+
         // 함수
         setUserInfoFromStore,
         isLoggedIn,
@@ -1006,15 +1184,20 @@ function portfolioStepbystep() {
         fetchSavedFeedback,
         formatFeedbackAsText,
         initializePortfolio,
-        
+
+        // ⭐ 가이드 생성 및 저장
+        createGuide,
+        saveGuide,
+        downloadPortfolioPdf,
+
         // ⭐ 임시 저장 관련 함수
         saveTemporaryContent,
         loadTemporaryContent,
         clearTemporaryContent,
         saveManually,
-        startAutoSave,
+        // startAutoSave,
         stopAutoSave,
-        
+
         router
     };
 }
