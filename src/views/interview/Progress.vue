@@ -135,6 +135,12 @@
               <small class="text-muted">{{ formatTime(recordTime) }}</small>
             </div>
 
+            <!-- AI가 피드백 분석 중일 때 -->
+            <div v-else-if="aiLoading" class="text-primary fw-bold small">
+              🤖 AI가 답변을 분석하고 있습니다...
+            </div>
+
+            <!-- 기본 상태일 때 -->
             <div v-else class="text-muted small">
               아직 녹음/녹화를 시작하지 않았습니다.
             </div>
@@ -189,10 +195,28 @@
       <div class="col-lg-3">
 
         <!-- AI 분석 중 스피너 -->
-        <div v-if="aiLoading" class="spinner-container mt-3 mb-3">
+        <div v-if="aiLoading" class="spinner-container mt-3 mb-6">
           <div class="spinner"></div>
           <p class="text-muted mt-2">AI가 분석 중입니다...</p>
+
+          <!-- 스피너 도는 동안 프레임 보여주기 -->
+          <div v-if="loadingFrames.length" class="mt-5 frame-preview-box">
+            <p class="small text-muted mb-1">📸 영상 분석 중...</p>
+            <div class="d-flex flex-wrap gap-2 justify-content-center">
+              <img
+                :src="loadingFrames[currentFrameIndex]"
+                style="
+                  width: 180px;
+                  height: 180px;
+                  object-fit: cover;
+                  border-radius: 10px;
+                  box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+                "
+              />
+            </div>
+          </div>
         </div>
+
 
         <!-- 분석 결과 -->
         <div class="bg-white border rounded-4 p-3 shadow-sm h-100" v-else-if="feedback && feedback.overallSummary">
@@ -274,6 +298,9 @@ const {
   feedbackMap,
   aiLoading,
   saveLoading,
+  loadingFrames,
+  currentFrameIndex,
+  frameTimer,
 
   loadQuestions,
   toggleRecording,

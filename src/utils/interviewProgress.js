@@ -31,6 +31,9 @@ function useInterviewProgress(sessionId) {
   const saveLoading = ref(false); // 저장 로딩 상태
 
   let ffmpeg = null;  // 영상에서 오디오/프레임 추출하기 위해 사용
+  const loadingFrames = ref([]);  // AI 분석 대기 중에 보여줄 프레임들
+  const currentFrameIndex = ref(0);
+  let frameTimer = null;  // 프레임 슬라이드쇼 타이머
 
   // ====== 질문 로딩 ======
   const loadQuestions = async () => {
@@ -292,6 +295,18 @@ function useInterviewProgress(sessionId) {
         const audioConverted = await extractAudio(blob);
         const frames = await extractFrames(blob);
 
+        // 추출한 프레임 저장
+        loadingFrames.value = frames.map(frameBlob => URL.createObjectURL(frameBlob));
+        currentFrameIndex.value = 0;  // 첫 번째 프레임부터 시작
+
+        // 프레임 슬라이드쇼 타이머 실행
+        if (frameTimer) clearInterval(frameTimer);
+        frameTimer = setInterval(() => {
+          if (loadingFrames.value.length > 0) {
+            currentFrameIndex.value = (currentFrameIndex.value + 1) % loadingFrames.value.length;
+          }
+        }, 4000);
+
         // 추출한 오디오/프레임 별로 피드백 구성
         feedbackForm.append("videoAudio", audioConverted, "video_audio.webm");
         frames.forEach((f, i) =>
@@ -304,9 +319,15 @@ function useInterviewProgress(sessionId) {
       const res = await interviewApi.createFeedback(feedbackForm);
       aiLoading.value = false;
 
+      
       // 저장
       feedbackMap.value[questionId] = res.data;
       feedback.value = res.data;
+      
+      // 프레임 타이머 중지
+      if (frameTimer) clearInterval(frameTimer);      
+      loadingFrames.value = []; //  피드백 응답 오면 프레임 숨기기
+      currentFrameIndex.value = 0;
 
       submitted.value[questionId] = true;
 
@@ -360,6 +381,9 @@ function useInterviewProgress(sessionId) {
     feedbackMap,
     aiLoading,
     saveLoading,
+    loadingFrames,
+    currentFrameIndex,
+    frameTimer,
 
     loadQuestions,
     toggleRecording,
