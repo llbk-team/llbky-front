@@ -40,16 +40,32 @@
         </div>
       </div>
 
+      <!-- 산업별 시장 분위기 -->
       <div class="card sentiment-box">
         <div class="card-header">
-          <h4>산업별 채용 시장 분위기</h4>
-          <p>긍정·중립·부정 비율로 본 산업별 채용 감정 분석</p>
+          <h4>산업별 시장 분위기</h4>
+          <p>관심 직무와 관련된 산업군의 최신 뉴스 흐름을 기반으로 분위기를 분석했습니다.
+            긍정·중립·부정 비율을 통해 각 산업군이 현재 어떤 분위기와 이슈에 반응하고 있는지 확인할 수 있어요</p>
+
+          <!-- ❔ 도움말 버튼 -->
+          <button class="info-btn" @click="showReason = !showReason">
+            ?
+          </button>
         </div>
 
         <div class="sentiment-chart-container">
           <canvas id="sentimentChart"></canvas>
         </div>
+
+        <!-- 🔽 토글 영역: finalSummary -->
+        <transition name="fade">
+          <div v-if="showReason" class="sentiment-summary-box">
+            <h5>📌 왜 이런 분위기가 나왔나요?</h5>
+            <p class="summary-text">{{ finalSummary }}</p>
+          </div>
+        </transition>
       </div>
+
     </div>
 
     <!-- 시장 인사이트 요약 -->
@@ -87,7 +103,9 @@ const {
   sentimentData,
   wordCloudData,
   marketInsight,
-  saveLoading
+  saveLoading,
+  finalSummary,
+  showReason
 } = useTrendAnalysis();
 
 </script>

@@ -19,6 +19,12 @@ export function useTrendAnalysis() {
   const wordCloudData = ref([]);
   const marketInsight = ref([]);
 
+  // 추가됨: finalSummary 저장
+  const finalSummary = ref("");
+
+  // 추가됨: ? 버튼 토글 상태
+  const showReason = ref(false);
+
   // 스피너
   const saveLoading = ref(false);
 
@@ -53,6 +59,9 @@ export function useTrendAnalysis() {
 
     /** 시장 인사이트 */
     marketInsight.value = insightJson.marketInsight;
+
+    // 추가됨: finalSummary 반영
+    finalSummary.value = insightJson.finalSummary;
 
     await nextTick();
     renderCharts();
@@ -125,6 +134,8 @@ export function useTrendAnalysis() {
       }
     });
 
+    
+
     // --- 워드클라우드 ---
     WordCloud(document.getElementById("wordCloud"), {
       list: wordCloudData.value,
@@ -169,6 +180,8 @@ export function useTrendAnalysis() {
     saveLoading.value = false;
   });
 
+  
+
 
   return {
     summaryCards,
@@ -177,6 +190,10 @@ export function useTrendAnalysis() {
     wordCloudData,
     marketInsight,
     loadTrend,
-    saveLoading
+    saveLoading,
+
+    // 추가됨
+    finalSummary,
+    showReason
   };
 }
