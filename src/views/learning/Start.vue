@@ -110,7 +110,7 @@
                 <textarea v-model="memoContent" rows="14" class="form-control mb-3 mt-4" placeholder="예: Session vs JWT 차이점 정리..."></textarea>
 
                 <div class="d-flex justify-content-between align-items-center">
-                  <small class="text-muted">{{ memoContent.length }}/500자</small>
+                  <small class="text-muted"></small>
                   <div>
                     <button class="btn btn-outline-secondary me-2" @click="cancelMemo">취소</button>
                     <button class="btn btn-mint" @click="submitMemo">⚡ AI 검증 받기</button>

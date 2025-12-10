@@ -2,6 +2,7 @@
 import { ref, computed, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import learningApi from "@/apis/learningApi";
+import { marked } from "marked";
 
 function learningReport() {
   const route = useRoute();
@@ -26,7 +27,7 @@ function learningReport() {
           label: `${day.dayNumber}일차`,
           title: day.title,
           date: day.learningDate ?? "",
-          memo: day.learningDaySummary,
+          memo: marked(day.learningDaySummary || ""),
           open: false
         }))
       }));

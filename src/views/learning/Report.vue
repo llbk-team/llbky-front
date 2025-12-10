@@ -29,23 +29,22 @@
           <h5 class="fw-bold mb-3 text-dark">{{ currentWeek.label }} 상세 학습 기록</h5>
           <p class="text-muted mb-4">{{ currentWeek.topic }}</p>
           <ul class="list-group">
-            <li v-for="(day, dIndex) in currentWeek.days" :key="dIndex" class="list-group-item clickable" @click="toggleDay(dIndex)">
-              <div class="d-flex justify-content-between align-items-center">
+            <li v-for="(day, dIndex) in currentWeek.days" :key="dIndex" class="list-group-item">
+              <div class="d-flex justify-content-between align-items-center clickable" @click="toggleDay(dIndex)">
                 <div>
                   <strong>{{ day.label }}</strong> - {{ day.title }}
                 </div>
-                <span class="text-muted small">
-                  {{ day.open ? "접기 ▲" : "펼치기 ▼" }}
-                </span>
+                <span class="text-muted small">{{ day.open ? "접기 ▲" : "펼치기 ▼" }}</span>
               </div>
               <transition name="slide">
                 <div v-if="day.open" class="mt-2 p-3 rounded bg-light">
                   <p class="small text-muted mb-1">{{ day.date }}</p>
-                  <p class="mb-0">{{ day.memo }}</p>
+                  <div class="memo-text" v-html="day.memo"></div>
                 </div>
               </transition>
             </li>
           </ul>
+
         </div>
       </div>
     </div>
