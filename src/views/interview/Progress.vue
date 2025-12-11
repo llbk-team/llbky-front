@@ -140,6 +140,11 @@
               🤖 AI가 답변을 분석하고 있습니다...
             </div>
 
+            <!-- AI가 피드백 분석 중일 때 -->
+            <div v-else-if="analysisDone" class="text-primary fw-bold small">
+              🎉 분석 완료! 오른쪽에서 AI 피드백을 확인하세요.
+            </div>
+
             <!-- 기본 상태일 때 -->
             <div v-else class="text-muted small">
               아직 녹음/녹화를 시작하지 않았습니다.
@@ -297,6 +302,7 @@ const {
   feedback,
   feedbackMap,
   aiLoading,
+  analysisDone,
   saveLoading,
   loadingFrames,
   currentFrameIndex,

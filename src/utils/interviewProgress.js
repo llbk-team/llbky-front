@@ -29,6 +29,7 @@ function useInterviewProgress(sessionId) {
   const feedbackMap = ref({}); // 질문별 피드백 저장
   const aiLoading = ref(false);
   const saveLoading = ref(false); // 저장 로딩 상태
+  const analysisDone = ref(false);  // AI 분석 끝난 상태
 
   let ffmpeg = null;  // 영상에서 오디오/프레임 추출하기 위해 사용
   const loadingFrames = ref([]);  // AI 분석 대기 중에 보여줄 프레임들
@@ -136,6 +137,7 @@ function useInterviewProgress(sessionId) {
 
       const qid = questionIds.value[current.value - 1];
       feedback.value = feedbackMap.value[qid] || null;
+      analysisDone.value = !!feedbackMap.value[qid];
     }
   };
 
@@ -160,6 +162,7 @@ function useInterviewProgress(sessionId) {
     // 이동한 질문에 피드백 있으면 바로 오른쪽 패널에 표시
     const nextId = questionIds.value[current.value - 1];
     feedback.value = feedbackMap.value[nextId] || null;
+    analysisDone.value = !!feedbackMap.value[nextId];
 
     // 에러 메시지 초기화
     errorMessage.value = "";
@@ -238,6 +241,7 @@ function useInterviewProgress(sessionId) {
 
   // ====== 답변 제출 ======
   const handleSubmit = async () => {
+    analysisDone.value = false;
     errorMessage.value = "";
 
     const questionId = questionIds.value[current.value - 1];  //questionId 얻기
@@ -249,10 +253,15 @@ function useInterviewProgress(sessionId) {
     }
 
     if (isRecording.value) blob = await stopRecording();
-    if (!blob) {
-      errorMessage.value = "녹화/녹음을 완료해야 답변을 제출할 수 있습니다.";
-      return;
-    }
+
+    aiLoading.value = true;
+    loadingFrames.value = [];
+    currentFrameIndex.value = 0;
+
+    // if (!blob) {
+    //   errorMessage.value = "녹화/녹음을 완료해야 답변을 제출할 수 있습니다.";
+    //   return;
+    // }
 
     try {
       // 백엔드로 보낼 FormData 생성
@@ -314,10 +323,10 @@ function useInterviewProgress(sessionId) {
         );
       }
 
-      aiLoading.value = true;
       // 피드백 생성 요청
       const res = await interviewApi.createFeedback(feedbackForm);
       aiLoading.value = false;
+      analysisDone.value = true;
 
       
       // 저장
@@ -361,7 +370,10 @@ function useInterviewProgress(sessionId) {
     return `${min}:${String(sec % 60).padStart(2, "0")}`;
   };
 
-  onUnmounted(() => clearInterval(timer));
+  onUnmounted(() => {
+    clearInterval(timer);
+    clearInterval(frameTimer);
+  });
 
   return {
     mode,
@@ -380,6 +392,7 @@ function useInterviewProgress(sessionId) {
     feedback,
     feedbackMap,
     aiLoading,
+    analysisDone,
     saveLoading,
     loadingFrames,
     currentFrameIndex,
