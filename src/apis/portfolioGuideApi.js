@@ -137,10 +137,10 @@ function downloadMemberPdf(memberId) {
 export default {
   // 표준 데이터 조회
   getAllStandards,
-  getStandardById,
+ 
   getStandardsByJob,
   getStandardsByMember,    // ⭐ 추가
-  getStandardsCount,  
+ 
 
   // 가이드 생성 및 저장
   createGuide,
