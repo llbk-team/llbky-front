@@ -529,7 +529,30 @@ function portfolioStepbystep() {
         }
     };
 
-    // DB 데이터를 화면 형식으로 변환 (수정된 버전)
+    // 서브 질문 추출 함수
+    const extractSubQuestions = (questionText) => {
+        const subQuestions = [];
+        
+        // 콜론 이후 부분 추출
+        const afterColon = questionText.split(':')[1];
+        if (!afterColon) return subQuestions;
+        
+        // 1), 2), 3) 등으로 분리
+        const matches = afterColon.match(/\d+\)\s*[^0-9)]+/g);
+        if (matches) {
+            matches.forEach(match => {
+                // "1) 항목명" → "항목명"
+                const cleaned = match.replace(/^\d+\)\s*/, '').trim();
+                if (cleaned) {
+                    subQuestions.push(cleaned);
+                }
+            });
+        }
+        
+        return subQuestions;
+    };
+
+    // ✅ 최종 수정 버전: prompt_template을 실제 질문으로 사용
     const transformStandardsToSteps = (standards) => {
         console.log('🔍 받은 standards 데이터:', standards);
 
@@ -554,6 +577,7 @@ function portfolioStepbystep() {
 
             console.log(`📋 처리 중: standardId=${standard.standardId} → ${stepNum}단계`);
 
+            // ⭐ 단계 토픽 = standardName (짧은 제목)
             const stepTopic = standard.standardName || `${stepNum}단계`;
 
             // 단계가 없으면 새로 생성
@@ -577,45 +601,42 @@ function portfolioStepbystep() {
             stepMap[stepNum].promptTemplates.push(standard.promptTemplate);
             stepMap[stepNum].weightPercentages.push(standard.weightPercentage || 20);
 
-            console.log('📋 evaluationItems 타입:', typeof standard.evaluationItems);
-            console.log('📋 evaluationItems 내용:', standard.evaluationItems);
+            // ✅ 핵심 수정: prompt_template을 실제 질문으로 사용
+            if (standard.promptTemplate && standard.promptTemplate.trim() !== '') {
+                const questionText = standard.promptTemplate;
+                
+                // 서브 질문 추출 (1), 2), 3) 형식 분리)
+                const subQuestions = extractSubQuestions(questionText);
+                
+                console.log(`📌 ${stepNum}단계 질문 추가:`, {
+                    topic: stepTopic,
+                    mainQuestion: questionText.split(':')[0],
+                    subQuestionCount: subQuestions.length
+                });
 
-            // evaluationItems가 문자열인 경우 JSON 파싱
-            let evaluationItems = standard.evaluationItems;
-            if (typeof evaluationItems === 'string') {
-                try {
-                    evaluationItems = JSON.parse(evaluationItems);
-                    console.log('✅ JSON 파싱 완료:', evaluationItems);
-                } catch (e) {
-                    console.error('❌ JSON 파싱 실패:', e);
-                    evaluationItems = null;
-                }
-            }
-
-            // evaluationItems (JSONB)를 파싱하여 항목 생성
-            if (evaluationItems && typeof evaluationItems === 'object') {
-                const itemKeys = Object.keys(evaluationItems);
-                console.log(`📌 ${stepTopic}의 항목 개수: ${itemKeys.length}개`, itemKeys);
-
-                itemKeys.forEach((itemKey) => {
-                    const item = evaluationItems[itemKey];
-                    console.log(`  ➡️ ${itemKey}:`, item);
-
-                    stepMap[stepNum].items.push({
-                        title: item.description || itemKey,
-                        description: standard.standardDescription || standard.description || '',
-                        status: '미작성',
-                        placeholder: `${item.description || itemKey}을(를) 입력하세요`,
-                        imageUpload: false,
-                        userInput: '',
-                        weight: item.weight || 0,
-                        // ⭐ 원본 메타데이터 보존
-                        originalStandardId: standard.standardId,
-                        evaluationKey: itemKey
-                    });
+                stepMap[stepNum].items.push({
+                    // ⭐ prompt_template의 메인 질문을 title로
+                    title: questionText.split(':')[0].trim() || stepTopic,
+                    
+                    // ⭐ 전체 질문 텍스트 (서브 질문 포함)
+                    fullQuestion: questionText,
+                    
+                    description: standard.standardDescription || standard.description || '',
+                    status: '미작성',
+                    placeholder: `질문에 대한 답변을 작성하세요`,
+                    imageUpload: false,
+                    userInput: '',
+                    weight: standard.weightPercentage || 20,
+                    
+                    // ⭐ 원본 메타데이터 보존
+                    originalStandardId: standard.standardId,
+                    subQuestions: subQuestions,  // 서브 질문 배열
+                    
+                    // ⭐ AI 평가 기준 (evaluation_items)
+                    evaluationCriteria: standard.evaluationItems || null
                 });
             } else {
-                console.warn('⚠️ evaluationItems가 없거나 형식이 잘못됨:', standard.standardId);
+                console.warn('⚠️ promptTemplate이 비어있음:', standard.standardId);
             }
         });
 
@@ -636,12 +657,14 @@ function portfolioStepbystep() {
                     progress: 0,
                     items: [{
                         title: `${i}단계 내용`,
+                        fullQuestion: `${i}단계에 대해 작성하세요`,
                         description: `${i}단계 작성 내용`,
                         status: '미작성',
                         placeholder: `${i}단계에 대해 작성하세요`,
                         imageUpload: false,
                         userInput: '',
-                        weight: 0
+                        weight: 20,
+                        subQuestions: []
                     }],
                     standardIds: [],
                     descriptions: [],
@@ -655,13 +678,15 @@ function portfolioStepbystep() {
             if (currentStep && currentStep.items.length === 0) {
                 currentStep.items.push({
                     title: currentStep.topic,
+                    fullQuestion: currentStep.promptTemplates[0] || currentStep.topic,
                     description: currentStep.descriptions[0] || '',
                     status: '미작성',
                     placeholder: `${currentStep.topic}에 대해 작성하세요`,
                     imageUpload: false,
                     userInput: '',
-                    weight: 0,
-                    originalStandardId: currentStep.standardIds[0]
+                    weight: 20,
+                    originalStandardId: currentStep.standardIds[0],
+                    subQuestions: []
                 });
             }
         }
@@ -779,12 +804,6 @@ function portfolioStepbystep() {
 
         // 표준 데이터 로드 (회원의 직군/직무 기반)
         await fetchPortfolioStandards();
-
-        // 선택 정보가 누락된 경우 대비하여 한 번 더 전체 표준 로드 보강
-        // if (!portfolioSteps.value || portfolioSteps.value.length === 0) {
-        //     console.log('🛠️ 보강: 단계 데이터가 없어 전체 표준 재로드');
-        //     await fetchAllStandards();
-        // }
 
         // ⭐ 기존 가이드 로드 시도
         try {

@@ -475,3 +475,24 @@
   color: #1e40af;
   line-height: 1.5;
 }
+
+
+.sub-questions-guide {
+  background: #f8f9fa;
+  border-left: 4px solid #0d6efd;
+}
+
+.sub-questions-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.sub-questions-list li {
+  color: #495057;
+  line-height: 1.6;
+}
+
+ .step-icon.complete {
+     color: #28a745; /* 초록색 체크 */
+   }
