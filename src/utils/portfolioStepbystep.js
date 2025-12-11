@@ -13,14 +13,14 @@ function portfolioStepbystep() {
     const overallProgress = ref(0);
     const currentStep = ref(1);
 
-    // 사용자 정보 (하드코딩 - DB 데이터)
-    const memberId = ref(null);  // DB의 memberId
-    const guideId = ref(null);   // DB의 guideId
-    const isGuideCreated = ref(false);  // 가이드 생성 여부
-    const userName = ref('');  // DB의 memberName
-    const userEmail = ref('');  // DB의 email
-    const jobGroup = ref('');  // DB의 jobGroup
-    const jobRole = ref('');  // DB의 jobRole
+    // 사용자 정보
+    const memberId = ref(null);
+    const guideId = ref(null);
+    const isGuideCreated = ref(false);
+    const userName = ref('');
+    const userEmail = ref('');
+    const jobGroup = ref('');
+    const jobRole = ref('');
 
     const isLoggedIn = computed(() => store.getters['user/isLoggedIn']);
     const currentUser = computed(() => store.getters['user/userInfo']);
@@ -29,37 +29,28 @@ function portfolioStepbystep() {
     const portfolioSteps = ref([]);
 
     // 아코디언 상태 관리
-    const openStepIndex = ref(0); // 기본적으로 1단계 열림
+    const openStepIndex = ref(0);
     const openItemIndex = ref(null);
-    const showItemFeedback = ref(Array(20).fill(false)); // 각 항목별 피드백 표시 여부
-    const itemFeedbacks = ref(Array(20).fill("")); // 각 항목별 피드백 내용 (드롭다운용 간단 텍스트)
-    const currentAiFeedback = ref(null); // AI 코치 패널용 상세 피드백 객체
+    const showItemFeedback = ref(Array(20).fill(false));
+    const currentAiFeedback = ref(null);
     const currentContent = ref("");
     const selectedItem = ref(null);
 
-    // 예시 선택 기능 관련 상태
-    const selectedExample = ref(""); // 선택된 예시 내용
-    const selectedExampleIndex = ref(null); // 선택된 예시의 인덱스
-    const originalContent = ref(""); // 원본 작성 내용
-
-    // AI 로딩 상태
+    // 예시 선택 관련 상태
+    const selectedExample = ref("");
+    const selectedExampleIndex = ref(null);
+    const originalContent = ref("");
     const aiLoading = ref(false);
 
-    // ⭐ 임시 저장 관련 상태 추가
-    const isSaving = ref(false); // 저장 중 표시
-    const lastSavedTime = ref(null); // 마지막 저장 시간
-    const hasUnsavedChanges = ref(false); // 저장되지 않은 변경사항 여부
-    const autoSaveTimer = ref(null); // 자동 저장 타이머
-    const AUTOSAVE_INTERVAL = 30000; // 30초마다 자동 저장
+    // ⭐ 임시 저장 관련 상태
+    const isSaving = ref(false);
+    const lastSavedTime = ref(null);
+    const hasUnsavedChanges = ref(false);
 
-    // 모든 단계가 100% 완료되었는지 확인하는 계산된 속성
+    // 모든 단계 완료 여부
     const isAllComplete = computed(() => {
-        // 5단계가 존재하고 그 진행률이 100%인지 확인
         const stage5 = portfolioSteps.value.find(step => step.label === "5단계");
-
-        // 모든 단계가 100%인지 확인
         const allStagesComplete = portfolioSteps.value.every(step => step.progress === 100);
-
         return stage5 && stage5.progress === 100 && allStagesComplete;
     });
 
@@ -192,29 +183,6 @@ function portfolioStepbystep() {
         }
     };
 
-    // ⭐ 자동 저장 시작
-    // const startAutoSave = () => {
-    //     if (autoSaveTimer.value) {
-    //         clearInterval(autoSaveTimer.value);
-    //     }
-
-    //     autoSaveTimer.value = setInterval(() => {
-    //         if (hasUnsavedChanges.value && !isSaving.value) {
-    //             saveTemporaryContent();
-    //         }
-    //     }, AUTOSAVE_INTERVAL);
-
-    //     console.log('🔄 자동 저장 시작 (30초 간격)');
-    // };
-
-    // ⭐ 자동 저장 중지
-    const stopAutoSave = () => {
-        if (autoSaveTimer.value) {
-            clearInterval(autoSaveTimer.value);
-            autoSaveTimer.value = null;
-            console.log('⏹️ 자동 저장 중지');
-        }
-    };
 
     // ⭐ 변경사항 감지 (currentContent 변경 시)
     watch(currentContent, () => {
@@ -234,12 +202,9 @@ function portfolioStepbystep() {
         }
     };
 
-    // ⭐ 컴포넌트 해제 시 정리
+    // 컴포넌트 해제 시 정리
     onBeforeUnmount(() => {
-        stopAutoSave();
         window.removeEventListener('beforeunload', handleBeforeUnload);
-
-        // 마지막 저장
         if (hasUnsavedChanges.value) {
             saveTemporaryContent();
         }
@@ -520,8 +485,8 @@ function portfolioStepbystep() {
                 return;
             }
 
-            // 직군/직무별 평가 기준 조회 (가능하면 memberId도 전달)
-            const response = await portfolioGuideApi.getStandardsByJob(jobGroup.value, jobRole.value, memberId.value);
+            // 직군/직무별 평가 기준 조회
+            const response = await portfolioGuideApi.getStandardsByMember(memberId.value);
 
             const standards = response?.data;
             console.log('📦 표준 데이터 응답:', standards);
@@ -771,119 +736,6 @@ function portfolioStepbystep() {
         ];
     };
 
-    // 가이드 정보 조회
-    const fetchGuideInfo = async () => {
-        try {
-            const response = await portfolioGuideApi.getGuideById(guideId.value);
-
-            if (response.data) {
-                console.log('✅ 가이드 정보 조회 성공:', response.data);
-                // 가이드 정보를 사용하여 필요한 설정 수행
-            }
-        } catch (error) {
-            console.error('❌ 가이드 정보 조회 실패:', error);
-        }
-    };
-
-    // 회원별 가이드 목록 조회
-    const fetchMemberGuides = async () => {
-        try {
-            const response = await portfolioGuideApi.getGuidesByMember(memberId.value);
-
-            if (response.data) {
-                console.log('✅ 회원 가이드 목록 조회 성공:', response.data);
-                // 가이드 목록을 사용하여 UI 업데이트 등
-            }
-            console.log('📝 기존 가이드 없음 → 새 가이드 생성');
-            await createGuide();  // 추가
-        } catch (error) {
-            console.error('❌ 회원 가이드 목록 조회 실패:', error);
-        }
-    };
-
-    // 저장된 가이드 피드백 조회
-    const fetchSavedFeedback = async () => {
-        try {
-            const response = await portfolioGuideApi.getGuideFeedback(guideId.value);
-
-            if (response.data) {
-                console.log('✅ 저장된 피드백 조회 성공:', response.data);
-
-                // 저장된 피드백 (JSON 객체)를 UI에 표시
-                const savedFeedback = response.data;
-
-                // 프론트엔드에서 피드백 텍스트 렌더링
-                const feedbackText = formatFeedbackAsText(savedFeedback);
-
-                // 현재 단계에 피드백 표시 (임시로 첫 번째 항목에 표시)
-                if (portfolioSteps.value.length > 0 && portfolioSteps.value[0].items.length > 0) {
-                    itemFeedbacks.value[0] = feedbackText;
-                }
-
-                return savedFeedback;
-            }
-        } catch (error) {
-            console.error('❌ 저장된 피드백 조회 실패:', error);
-            return null;
-        }
-    };
-
-    /**
-     * 백엔드에서 받은 피드백 JSON 데이터를 읽기 쉬운 텍스트로 변환
-     * 프론트엔드에서 UI 렌더링을 담당
-     * @param {Object} feedback - PortfolioGuideResult 객체
-     * @returns {string} 포맷된 피드백 텍스트
-     */
-    const formatFeedbackAsText = (feedback) => {
-        if (!feedback) {
-            return "저장된 피드백이 없습니다.";
-        }
-
-        let text = "\n───── AI 코칭 피드백 ─────\n\n";
-
-        // 1. 적절성 점수 출력 (0-100점)
-        if (feedback.appropriatenessScore !== null && feedback.appropriatenessScore !== undefined) {
-            text += `📊 적절성 점수: ${feedback.appropriatenessScore}/100점\n\n`;
-        }
-
-        // 2. 코칭 메시지 출력
-        if (feedback.coachingMessage && feedback.coachingMessage.trim()) {
-            text += `💬 코칭 메시지:\n${feedback.coachingMessage}\n\n`;
-        }
-
-        // 3. 개선 제안 사항 리스트 출력
-        if (feedback.suggestions && Array.isArray(feedback.suggestions) && feedback.suggestions.length > 0) {
-            text += "💡 개선 제안 사항:\n";
-            feedback.suggestions.forEach((suggestion, index) => {
-                text += `  ${index + 1}. ${suggestion}\n`;
-            });
-            text += "\n";
-        }
-
-        // 4. 작성 예시 리스트 출력
-        if (feedback.examples && Array.isArray(feedback.examples) && feedback.examples.length > 0) {
-            text += "✨ 작성 예시:\n";
-            feedback.examples.forEach((example, index) => {
-                text += `  예시 ${index + 1}: ${example}\n`;
-            });
-            text += "\n";
-        }
-
-        // 5. 다음 작성해야 할 단계 안내
-        if (feedback.nextStepGuide && feedback.nextStepGuide.trim()) {
-            text += `🚀 다음 단계:\n${feedback.nextStepGuide}\n\n`;
-        }
-
-        // 6. 전체 포트폴리오 진행률 표시
-        if (feedback.progressPercentage !== null && feedback.progressPercentage !== undefined) {
-            text += `📈 진행률: ${feedback.progressPercentage}%\n\n`;
-        }
-
-        text += "──────────────────\n";
-
-        return text;
-    };
-
     const setUserInfoFromStore = () => {
         console.log('🔍 Vuex store에서 사용자 정보 확인 중...');
 
@@ -992,13 +844,8 @@ function portfolioStepbystep() {
         // ⭐ 임시 저장된 내용 복원 시도
         await loadTemporaryContent();
 
-        // ⭐ 이벤트 리스너 등록
+        // 이벤트 리스너 등록
         window.addEventListener('beforeunload', handleBeforeUnload);
-
-        // ✅ 가이드 정보만 로드 (fetchSavedFeedback 삭제)
-        if (guideId.value) {
-            fetchGuideInfo().catch(err => console.warn('가이드 정보 없음:', err));
-        }
     };
 
     // ⭐ 가이드 생성 함수
@@ -1175,28 +1022,15 @@ function portfolioStepbystep() {
         applySelectedContent,
         completeItemWithoutFeedback,
         updateProgress,
-        fetchPortfolioStandards,
-        fetchAllStandards,
-        transformStandardsToSteps,
-        loadDefaultSteps,
-        fetchGuideInfo,
-        fetchMemberGuides,
-        fetchSavedFeedback,
-        formatFeedbackAsText,
         initializePortfolio,
 
-        // ⭐ 가이드 생성 및 저장
+        // 가이드 생성 및 저장
         createGuide,
         saveGuide,
         downloadPortfolioPdf,
 
-        // ⭐ 임시 저장 관련 함수
-        saveTemporaryContent,
-        loadTemporaryContent,
-        clearTemporaryContent,
+        // 임시 저장
         saveManually,
-        // startAutoSave,
-        stopAutoSave,
 
         router
     };

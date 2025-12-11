@@ -11,14 +11,6 @@ function getAllStandards() {
   return axios.get("/portfolio-standard");
 }
 
-/**
- * 특정 평가 기준 조회 (ID로)
- * @param {Number} standardId - 표준 ID
- * @returns {Promise} PortfolioStandard
- */
-function getStandardById(standardId) {
-  return axios.get(`/portfolio-standard/${standardId}`);
-}
 
 /**
  * 직군 + 직무로 평가 기준 조회
@@ -27,16 +19,20 @@ function getStandardById(standardId) {
  * @param {Number} memberId - 회원 ID (선택)
  * @returns {Promise} List<PortfolioStandard>
  */
-function getStandardsByJob(jobGroup, jobRole, memberId) {
-  const params = { jobGroup, jobRole };
-  
-  // memberId가 있으면 추가 (백엔드에서 회원 정보로 직군/직무 조회)
-  if (memberId) {
-    params.memberId = memberId;
-  }
-  
-  return axios.get("/portfolio-standard/by-job", { params });
+function getStandardsByJob(jobGroup, jobRole) {
+  return axios.get("/portfolio-standard/by-job", {
+    params: { jobGroup, jobRole }
+  });
 }
+
+
+function getStandardsByMember(memberId) {
+  return axios.get("/portfolio-standard/member", {
+    params: { memberId }
+  });
+}
+
+
 
 // 포트폴리오 가이드 코칭 API
 
@@ -143,6 +139,8 @@ export default {
   getAllStandards,
   getStandardById,
   getStandardsByJob,
+  getStandardsByMember,    // ⭐ 추가
+  getStandardsCount,  
 
   // 가이드 생성 및 저장
   createGuide,
