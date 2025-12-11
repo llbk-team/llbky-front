@@ -12,7 +12,6 @@ function news() {
     const filters = ref({
         period: "week",
         sentiment: "",
-        trustMin: 70,
     });
 
     const loading = ref(false);
@@ -55,47 +54,56 @@ function news() {
      * API 응답 데이터를 화면용 데이터로 변환
      */
     const mapNewsData = (newsItems) => {
-        if (!Array.isArray(newsItems)) {
-            console.warn('⚠️ mapNewsData: newsItems가 배열이 아님:', newsItems);
-            return [];
-        }
+    if (!Array.isArray(newsItems)) {
+        console.warn('⚠️ mapNewsData: newsItems가 배열이 아님:', newsItems);
+        return [];
+    }
 
-        try {
-            const mapped = newsItems.map((n) => {
-                const result = {
-                    id: n.summaryId || n.summary_id || n.id,
-                    title: n.title || "제목 없음",
-                    summary_short: n.summaryText || n.summary_text || n.summary_short || "",
-                    keywords: Array.isArray(n.keywords)
-                        ? n.keywords.map(k => {
-                            if (typeof k === 'string') return k;
-                            if (typeof k === 'object') return k.keyword || k.name || k.value || JSON.stringify(k);
-                            return String(k);
-                        })
-                        : [],
-                    trust: n.trustScore ?? n.trust_score ?? n.trust ?? 0,
-                    sentiment: n.sentiment || "neutral",
-                    sentimentLabel:
-                        n.sentiment === 'positive' ? '긍정적' :
-                            n.sentiment === 'negative' ? '부정적' : '중립적',
-                    bias_detected: n.biasDetected ?? n.bias_detected ?? false,
-                    bias_type: n.biasType || n.bias_type || "",
-                    date: n.publishedAt || n.published_at || n.date || "",
-                    source: n.sourceName || n.source_name || n.source || "",
-                    source_url: n.sourceUrl || n.source_url || "",
-                };
+    console.log('🔄 mapNewsData 시작 - 항목 수:', newsItems.length);
+    console.log('📰 첫 번째 원본 데이터:', newsItems[0]);
 
-                return result;
-            });
+    try {
+        const mapped = newsItems.map((n, index) => {
+            console.log(`🔍 [${index}] 변환 중:`, n.title);
+            console.log(`   - summaryId: ${n.summaryId}`);
+            console.log(`   - keywords (원본):`, n.keywords);
+            
+            const result = {
+                id: n.summaryId || n.summary_id || n.id,
+                title: n.title || "제목 없음",
+                summary_short: n.summaryText || n.summary_text || n.summary_short || "",
+                keywords: Array.isArray(n.keywords)
+                    ? n.keywords.map(k => {
+                        if (typeof k === 'object' && k !== null) {
+                            return k.keyword || k.name || k.value || JSON.stringify(k);
+                        }
+                        return String(k);
+                    })
+                    : [],
+                trust: n.trustScore ?? n.trust_score ?? n.trust ?? 0,
+                sentiment: n.sentiment || "neutral",
+                sentimentLabel:
+                    n.sentiment === 'positive' ? '긍정적' :
+                    n.sentiment === 'negative' ? '부정적' : '중립적',
+                bias_detected: n.biasDetected ?? n.bias_detected ?? false,
+                bias_type: n.biasType || n.bias_type || "",
+                date: n.publishedAt || n.published_at || n.date || "",
+                source: n.sourceName || n.source_name || n.source || "",
+                source_url: n.sourceUrl || n.source_url || "",
+            };
 
-            console.log('✅ mapNewsData 변환 완료:', mapped.length, '개 항목');
-            return mapped;
+            console.log(`   ✅ 변환 완료 - keywords (변환):`, result.keywords);
+            return result;
+        });
 
-        } catch (error) {
-            console.error('❌ mapNewsData 에러:', error);
-            return [];
-        }
-    };
+        console.log('✅ mapNewsData 완료:', mapped.length, '개 항목');
+        return mapped;
+
+    } catch (error) {
+        console.error('❌ mapNewsData 에러:', error);
+        return [];
+    }
+};
 
     /**
      * 요약 텍스트를 HTML ul/li 형태로 변환
@@ -122,22 +130,12 @@ function news() {
     const filteredNews = computed(() => {
         let filtered = newsList.value;
 
-        // // 1. 날짜 필터링 (period)
-        // const startDate = calculateStartDate(filters.value.period);
-        // filtered = filtered.filter(n => {
-        //     const newsDate = new Date(n.date || n.publishedAt);
-        //     return newsDate >= startDate;
-        // });
-
         // 1. 감정 필터링
         if (filters.value.sentiment) {
             filtered = filtered.filter(n => n.sentiment === filters.value.sentiment);
         }
 
-        // 2. 신뢰도 필터링
-        filtered = filtered.filter(n => n.trust >= filters.value.trustMin);
-
-        // 3. 키워드 검색
+        // 2. 키워드 검색
         if (keyword.value) {
             filtered = filtered.filter(n =>
                 n.title.includes(keyword.value) ||
@@ -226,25 +224,36 @@ function news() {
         }
 
         const term = keyword.value.trim();
-
-        // 최근 검색어 저장
         addRecentKeyword(term);
 
         loading.value = true;
         apiError.value = null;
 
         try {
-            const response = await newsApi.searchNews([term], memberId.value);
+            // ✅ limit과 period 명시적으로 전달
+            const response = await newsApi.searchNews(
+                [term],
+                memberId.value,
+                50,           // ✅ limit 추가
+                'month'       // ✅ period 추가
+            );
+
+            console.log('🔍 검색 API 응답:', response);  // ✅ 디버깅 로그 추가
+            console.log('📊 응답 데이터:', response.data);
 
             if (response.data.status === 'success' && response.data.data) {
                 const newsItems = Array.isArray(response.data.data) ? response.data.data : [];
 
+                console.log('✅ 받은 뉴스 개수:', newsItems.length);
+                console.log('📰 첫 번째 뉴스:', newsItems[0]);
+
                 if (newsItems.length > 0) {
                     newsList.value = mapNewsData(newsItems);
-                    isSearchMode.value = true;   // 검색 모드 활성화
+                    console.log('✅ 변환된 뉴스:', newsList.value.length, '개');
+
+                    isSearchMode.value = true;
                     hasMore.value = false;
                     keyword.value = '';
-
                 } else {
                     apiError.value = '검색 결과가 없습니다.';
                 }
@@ -254,7 +263,7 @@ function news() {
 
         } catch (error) {
             console.error('❌ 뉴스 검색 실패:', error);
-            console.error('에러 응답:', error.response?.data);
+            console.error('❌ 에러 응답:', error.response?.data);
             apiError.value = error.response?.data?.message || '뉴스 검색에 실패했습니다.';
         } finally {
             loading.value = false;
@@ -275,10 +284,7 @@ function news() {
      * 초기 뉴스 피드 로드
      */
     const loadInitialNews = async () => {
-        if (newsList.value.length > 0) {
-            console.log('이미 뉴스가 로드되어 있음');
-            return;
-        }
+
 
         loading.value = true;
         apiError.value = null;
@@ -417,7 +423,9 @@ function news() {
                 const response = await newsApi.feedNews(
                     memberId.value,
                     15,
-                    newFilters.period  // ✅ 새로운 period로 서버 요청
+                    newFilters.period,
+                    null,  // ✅ lastPublishedAt을 명시적으로 null 전달
+                    null   // ✅ lastSummaryId를 명시적으로 null 전달
                 );
 
                 if (response.data.status === 'success' && response.data.data) {
@@ -438,8 +446,6 @@ function news() {
             }
         }
 
-        // period가 안 바뀌면 기존대로 클라이언트 필터링 (sentiment, trustMin 등)
-        // filteredNews computed가 자동으로 재계산됨
     };
 
     // ========== 모달 관리 ==========
@@ -464,6 +470,12 @@ function news() {
      * 컴포넌트 마운트 시 초기화
      */
     const initializeNews = async () => {
+        // ✅ 항상 초기화 (이전 데이터 제거)
+        newsList.value = [];
+        hasMore.value = true;
+        isSearchMode.value = false;
+        apiError.value = null;
+
         // 최근 검색어 로드
         loadRecentKeywords();
 

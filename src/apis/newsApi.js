@@ -4,7 +4,7 @@ import "./axiosConfig";
 /**
  * 관련 뉴스 키워드로 검색
  */
-async function searchRelatedNews(summaryId, limit = 15) {
+async function searchRelatedNews(summaryId, limit = 50) {
   
   const response = await axios.get(`/trend/news/${summaryId}/related-search`, {
     params: { limit }
@@ -17,19 +17,18 @@ async function searchRelatedNews(summaryId, limit = 15) {
 /**
  * 네이버 뉴스 검색
  */
-async function searchNews(keywords, memberId,limit=15,period='month') {
-
-   const keywordArray = Array.isArray(keywords) ? keywords : [keywords];
+async function searchNews(keywords, memberId, limit=50, period='month') {
+  const keywordString = Array.isArray(keywords) ? keywords.join(',') : keywords;
   
-   const response = await axios.get(`/trend/news/search`,{
-      params:{
-      keywords: keywordArray, 
-          memberId: memberId,
-          period: period,
-          limit: limit
-      }
-    });
-
+  const response = await axios.get(`/trend/news/search`, {
+    params: {
+      keywords: keywordString,  // 문자열로 전달
+      memberId: memberId,
+      period: period,
+      limit: limit
+    }
+  });
+  
   return response;
 }
 
