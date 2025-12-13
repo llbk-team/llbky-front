@@ -10,7 +10,7 @@ function news() {
     const recentKeywords = ref([]);
     const selectedNews = ref(null);
     const filters = ref({
-        period: "week",
+        period: "month",
         sentiment: "",
     });
 
@@ -20,7 +20,6 @@ function news() {
     const hasMore = ref(true);           // 더 불러올 데이터가 있는지
     const isLoadingMore = ref(false);    // 추가 로딩 중인지
     const isSearchMode = ref(false);     // 검색 모드 여부
-
 
     const store = useStore();
     // ⚠️ FIXME: 하드코딩된 memberId - 실제 로그인 시스템에서 가져와야 함
@@ -54,56 +53,56 @@ function news() {
      * API 응답 데이터를 화면용 데이터로 변환
      */
     const mapNewsData = (newsItems) => {
-    if (!Array.isArray(newsItems)) {
-        console.warn('⚠️ mapNewsData: newsItems가 배열이 아님:', newsItems);
-        return [];
-    }
+        if (!Array.isArray(newsItems)) {
+            console.warn('⚠️ mapNewsData: newsItems가 배열이 아님:', newsItems);
+            return [];
+        }
 
-    console.log('🔄 mapNewsData 시작 - 항목 수:', newsItems.length);
-    console.log('📰 첫 번째 원본 데이터:', newsItems[0]);
+        console.log('🔄 mapNewsData 시작 - 항목 수:', newsItems.length);
+        console.log('📰 첫 번째 원본 데이터:', newsItems[0]);
 
-    try {
-        const mapped = newsItems.map((n, index) => {
-            console.log(`🔍 [${index}] 변환 중:`, n.title);
-            console.log(`   - summaryId: ${n.summaryId}`);
-            console.log(`   - keywords (원본):`, n.keywords);
-            
-            const result = {
-                id: n.summaryId || n.summary_id || n.id,
-                title: n.title || "제목 없음",
-                summary_short: n.summaryText || n.summary_text || n.summary_short || "",
-                keywords: Array.isArray(n.keywords)
-                    ? n.keywords.map(k => {
-                        if (typeof k === 'object' && k !== null) {
-                            return k.keyword || k.name || k.value || JSON.stringify(k);
-                        }
-                        return String(k);
-                    })
-                    : [],
-                trust: n.trustScore ?? n.trust_score ?? n.trust ?? 0,
-                sentiment: n.sentiment || "neutral",
-                sentimentLabel:
-                    n.sentiment === 'positive' ? '긍정적' :
-                    n.sentiment === 'negative' ? '부정적' : '중립적',
-                bias_detected: n.biasDetected ?? n.bias_detected ?? false,
-                bias_type: n.biasType || n.bias_type || "",
-                date: n.publishedAt || n.published_at || n.date || "",
-                source: n.sourceName || n.source_name || n.source || "",
-                source_url: n.sourceUrl || n.source_url || "",
-            };
+        try {
+            const mapped = newsItems.map((n, index) => {
+                console.log(`🔍 [${index}] 변환 중:`, n.title);
+                console.log(`   - summaryId: ${n.summaryId}`);
+                console.log(`   - keywords (원본):`, n.keywords);
 
-            console.log(`   ✅ 변환 완료 - keywords (변환):`, result.keywords);
-            return result;
-        });
+                const result = {
+                    id: n.summaryId || n.summary_id || n.id,
+                    title: n.title || "제목 없음",
+                    summary_short: n.summaryText || n.summary_text || n.summary_short || "",
+                    keywords: Array.isArray(n.keywords)
+                        ? n.keywords.map(k => {
+                            if (typeof k === 'object' && k !== null) {
+                                return k.keyword || k.name || k.value || JSON.stringify(k);
+                            }
+                            return String(k);
+                        })
+                        : [],
+                    trust: n.trustScore ?? n.trust_score ?? n.trust ?? 0,
+                    sentiment: n.sentiment || "neutral",
+                    sentimentLabel:
+                        n.sentiment === 'positive' ? '긍정적' :
+                            n.sentiment === 'negative' ? '부정적' : '중립적',
+                    bias_detected: n.biasDetected ?? n.bias_detected ?? false,
+                    bias_type: n.biasType || n.bias_type || "",
+                    date: n.publishedAt || n.published_at || n.date || "",
+                    source: n.sourceName || n.source_name || n.source || "",
+                    source_url: n.sourceUrl || n.source_url || "",
+                };
 
-        console.log('✅ mapNewsData 완료:', mapped.length, '개 항목');
-        return mapped;
+                console.log(`   ✅ 변환 완료 - keywords (변환):`, result.keywords);
+                return result;
+            });
 
-    } catch (error) {
-        console.error('❌ mapNewsData 에러:', error);
-        return [];
-    }
-};
+            console.log('✅ mapNewsData 완료:', mapped.length, '개 항목');
+            return mapped;
+
+        } catch (error) {
+            console.error('❌ mapNewsData 에러:', error);
+            return [];
+        }
+    };
 
     /**
      * 요약 텍스트를 HTML ul/li 형태로 변환
@@ -290,35 +289,77 @@ function news() {
         apiError.value = null;
         hasMore.value = true;
 
+        let eventSource = null;
+
         try {
-            // ✅ getTodayNews로 변경 (일주일치 확인 → 오늘 없으면 자동 수집)
-            const response = await newsApi.getTodayNews(memberId.value, 50);
 
-            if (response.data.status === 'success' && response.data.data) {
-                const newsItems = Array.isArray(response.data.data) ? response.data.data : [];
-
-                if (newsItems.length > 0) {
-                    newsList.value = mapNewsData(newsItems);
-
-                    // ✅ 오늘 뉴스 기반이므로 무한스크롤은 feedNews로 전환
+            eventSource = newsApi.streamTodayNews(
+                memberId.value,
+                100,
+                // 하나씩 받을 때마다
+                (news) => {
+                    const mapped = mapNewsData([news])[0];
+                    newsList.value.push(mapped);  // ✅ 하나씩 추가
+                    
+                    // ⚡ 첫 번째 뉴스 받자마자 로딩 해제 (빠른 화면 표시)
+                    if (newsList.value.length === 1) {
+                        loading.value = false;
+                    }
+                    
+                    console.log('뉴스 수신:', mapped.title);
+                },
+                // 완료
+                () => {
+                    loading.value = false;  // 혹시 모를 경우 대비
                     hasMore.value = true;
-
-                } else {
-                    apiError.value = '회원님의 직군에 맞는 뉴스가 아직 없습니다.';
-                    hasMore.value = false;
+                    console.log('✅ 스트리밍 완료:', newsList.value.length, '건');
+                },
+                // 에러
+                (error) => {
+                    loading.value = false;
+                    apiError.value = '뉴스를 불러오는 데 실패했습니다.';
+                    console.error('❌ 스트리밍 에러:', error);
                 }
-            } else {
-                apiError.value = response.data.message || '뉴스 피드를 불러오는데 실패했습니다.';
-                hasMore.value = false;
-            }
+            );
+
+
+            // ✅ getTodayNews로 변경 (일주일치 확인 → 오늘 없으면 자동 수집)
+            // const response = await newsApi.getTodayNews(memberId.value, 50);
+
+            // if (response.data.status === 'success' && response.data.data) {
+            //     const newsItems = Array.isArray(response.data.data) ? response.data.data : [];
+
+            //     if (newsItems.length > 0) {
+            //         newsList.value = mapNewsData(newsItems);
+
+            //         // ✅ 오늘 뉴스 기반이므로 무한스크롤은 feedNews로 전환
+            //         hasMore.value = true;
+
+            //     } else {
+            //         apiError.value = '회원님의 직군에 맞는 뉴스가 아직 없습니다.';
+            //         hasMore.value = false;
+            //     }
+            // } else {
+            //     apiError.value = response.data.message || '뉴스 피드를 불러오는데 실패했습니다.';
+            //     hasMore.value = false;
+            // }
+
+            // } catch (error) {
+            //     console.error('❌ 오늘 뉴스 로드 실패:', error);
+            //     apiError.value = error.response?.data?.message || '뉴스를 불러오는 데 실패했습니다.';
+            //     hasMore.value = false;
+            // }  finally {
+            //     loading.value = false;
+            // }
 
         } catch (error) {
-            console.error('❌ 오늘 뉴스 로드 실패:', error);
-            apiError.value = error.response?.data?.message || '뉴스를 불러오는 데 실패했습니다.';
-            hasMore.value = false;
-        } finally {
+            console.error('❌ SSE 연결 실패:', error);
             loading.value = false;
-        }
+            apiError.value = '뉴스를 불러오는 데 실패했습니다.';
+        } return () => {
+            eventSource?.close();
+        };
+
     };
 
     // ========== 무한 스크롤 ==========
