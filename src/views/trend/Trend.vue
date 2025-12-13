@@ -1,8 +1,8 @@
 <!-- 트렌드 분석 컴포넌트 -->
 <template>
   <div class="trend-page">
-    <h2 class="page-title">채용 시장 트렌드 분석</h2>
-    <p class="page-subtitle">AI가 분석한 산업별 키워드 트렌드와 시장 흐름</p>
+    <h2 class="page-title">트렌드 분석</h2>
+    <p class="page-subtitle">AI가 분석한 뉴스 기반 산업별 키워드 트렌드와 시장 흐름</p>
 
     <!-- 상단 요약 카드 -->
     <div class="summary-cards">
@@ -14,8 +14,8 @@
 
     <!-- 채용 시장 키워드 트렌드 -->
     <div class="chart-container pretty-trend">
-      <h4 class="chart-title">채용 시장 키워드 트렌드</h4>
-      <p class="chart-subtitle">최근 7일간 주요 기술 및 직무 키워드 평균 관심도</p>
+      <h4 class="chart-title">산업 키워드 트렌드</h4>
+      <p class="chart-subtitle">최근 7일간 뉴스 기반 주요 기술 및 직무 검색 관심도 기반 키워드</p>
 
       <div class="chart-wrapper">
         <canvas id="trendChart"></canvas>
@@ -32,8 +32,8 @@
     <div class="insight-row">
       <div class="card wordcloud-box">
         <div class="card-header">
-          <h4>핵심 기술 키워드</h4>
-          <p>AI가 추출한 주요 스킬 및 산업별 키워드</p>
+          <h4>뉴스 핵심 이슈 키워드</h4>
+          <p>AI가 추출한 뉴스에서 최근 이슈의 중심이 된 키워드</p>
         </div>
 
         <div id="wordCloud" class="wordcloud">

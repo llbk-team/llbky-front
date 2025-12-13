@@ -40,7 +40,7 @@ export function useTrendAnalysis() {
     /** Summary Card */
     const s = insightJson.summarycard;
     summaryCards.value = [
-      { label: "주목 키워드", value: s.majorKeyword },
+      { label: "주요 이슈 키워드", value: s.majorKeyword },
       { label: "전체 평균 관심도", value: s.avgInterest },
       { label: "분석 키워드 수", value: s.keywordCount + "개" }
     ];
