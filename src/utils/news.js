@@ -283,13 +283,12 @@ function news() {
      * 초기 뉴스 피드 로드
      */
     const loadInitialNews = async () => {
-
         loading.value = true;
         apiError.value = null;
         hasMore.value = true;
 
         try {
-            //✅ getTodayNews로 변경 (일주일치 확인 → 오늘 없으면 자동 수집)
+            // ✅ 일반 API 호출로 뉴스 조회
             const response = await newsApi.getTodayNews(memberId.value, 50);
 
             if (response.data.status === 'success' && response.data.data) {
@@ -297,10 +296,7 @@ function news() {
 
                 if (newsItems.length > 0) {
                     newsList.value = mapNewsData(newsItems);
-
-                    // ✅ 오늘 뉴스 기반이므로 무한스크롤은 feedNews로 전환
                     hasMore.value = true;
-
                 } else {
                     apiError.value = '회원님의 직군에 맞는 뉴스가 아직 없습니다.';
                     hasMore.value = false;
@@ -309,16 +305,13 @@ function news() {
                 apiError.value = response.data.message || '뉴스 피드를 불러오는데 실패했습니다.';
                 hasMore.value = false;
             }
-        }
-
-        catch (error) {
-            console.error('❌ 오늘 뉴스 로드 실패:', error);
+        } catch (error) {
+            console.error('❌ 뉴스 로드 실패:', error);
             apiError.value = error.response?.data?.message || '뉴스를 불러오는 데 실패했습니다.';
             hasMore.value = false;
         } finally {
             loading.value = false;
         }
-
     };
 
     // ========== 무한 스크롤 ==========
