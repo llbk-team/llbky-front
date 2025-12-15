@@ -32,8 +32,8 @@
     <div class="insight-row">
       <div class="card wordcloud-box">
         <div class="card-header">
-          <h4>뉴스 핵심 이슈 키워드</h4>
-          <p>AI가 추출한 뉴스에서 최근 이슈의 중심이 된 키워드</p>
+          <h4>연관 키워드 AI 분석</h4>
+          <p>AI가 분석한 뉴스 연관 키워드</p>
         </div>
 
         <div id="wordCloud" class="wordcloud">
