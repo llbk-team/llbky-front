@@ -284,81 +284,40 @@ function news() {
      */
     const loadInitialNews = async () => {
 
-
         loading.value = true;
         apiError.value = null;
         hasMore.value = true;
 
-        let eventSource = null;
-
         try {
+            //✅ getTodayNews로 변경 (일주일치 확인 → 오늘 없으면 자동 수집)
+            const response = await newsApi.getTodayNews(memberId.value, 50);
 
-            eventSource = newsApi.streamTodayNews(
-                memberId.value,
-                100,
-                // 하나씩 받을 때마다
-                (news) => {
-                    const mapped = mapNewsData([news])[0];
-                    newsList.value.push(mapped);  // ✅ 하나씩 추가
-                    
-                    // ⚡ 첫 번째 뉴스 받자마자 로딩 해제 (빠른 화면 표시)
-                    if (newsList.value.length === 1) {
-                        loading.value = false;
-                    }
-                    
-                    console.log('뉴스 수신:', mapped.title);
-                },
-                // 완료
-                () => {
-                    loading.value = false;  // 혹시 모를 경우 대비
+            if (response.data.status === 'success' && response.data.data) {
+                const newsItems = Array.isArray(response.data.data) ? response.data.data : [];
+
+                if (newsItems.length > 0) {
+                    newsList.value = mapNewsData(newsItems);
+
+                    // ✅ 오늘 뉴스 기반이므로 무한스크롤은 feedNews로 전환
                     hasMore.value = true;
-                    console.log('✅ 스트리밍 완료:', newsList.value.length, '건');
-                },
-                // 에러
-                (error) => {
-                    loading.value = false;
-                    apiError.value = '뉴스를 불러오는 데 실패했습니다.';
-                    console.error('❌ 스트리밍 에러:', error);
+
+                } else {
+                    apiError.value = '회원님의 직군에 맞는 뉴스가 아직 없습니다.';
+                    hasMore.value = false;
                 }
-            );
+            } else {
+                apiError.value = response.data.message || '뉴스 피드를 불러오는데 실패했습니다.';
+                hasMore.value = false;
+            }
+        }
 
-
-            // ✅ getTodayNews로 변경 (일주일치 확인 → 오늘 없으면 자동 수집)
-            // const response = await newsApi.getTodayNews(memberId.value, 50);
-
-            // if (response.data.status === 'success' && response.data.data) {
-            //     const newsItems = Array.isArray(response.data.data) ? response.data.data : [];
-
-            //     if (newsItems.length > 0) {
-            //         newsList.value = mapNewsData(newsItems);
-
-            //         // ✅ 오늘 뉴스 기반이므로 무한스크롤은 feedNews로 전환
-            //         hasMore.value = true;
-
-            //     } else {
-            //         apiError.value = '회원님의 직군에 맞는 뉴스가 아직 없습니다.';
-            //         hasMore.value = false;
-            //     }
-            // } else {
-            //     apiError.value = response.data.message || '뉴스 피드를 불러오는데 실패했습니다.';
-            //     hasMore.value = false;
-            // }
-
-            // } catch (error) {
-            //     console.error('❌ 오늘 뉴스 로드 실패:', error);
-            //     apiError.value = error.response?.data?.message || '뉴스를 불러오는 데 실패했습니다.';
-            //     hasMore.value = false;
-            // }  finally {
-            //     loading.value = false;
-            // }
-
-        } catch (error) {
-            console.error('❌ SSE 연결 실패:', error);
+        catch (error) {
+            console.error('❌ 오늘 뉴스 로드 실패:', error);
+            apiError.value = error.response?.data?.message || '뉴스를 불러오는 데 실패했습니다.';
+            hasMore.value = false;
+        } finally {
             loading.value = false;
-            apiError.value = '뉴스를 불러오는 데 실패했습니다.';
-        } return () => {
-            eventSource?.close();
-        };
+        }
 
     };
 
