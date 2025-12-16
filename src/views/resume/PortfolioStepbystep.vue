@@ -20,7 +20,7 @@
         </div>
         <!-- ⭐ 수동 저장 버튼 -->
         <button class="btn btn-sm btn-outline-primary me-3" @click="saveManually" :disabled="isSaving">
-          <i class="bi bi-save"></i> 임시 저장
+          <i class="bi bi-save"></i> 저장
         </button>
         <div class="fs-5">{{ overallProgress }}% 전체 진행률</div>
       </div>
