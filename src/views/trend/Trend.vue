@@ -12,10 +12,10 @@
       </div>
     </div>
 
-    <!-- 채용 시장 키워드 트렌드 -->
+    <!-- 키워드 트렌드 -->
     <div class="chart-container pretty-trend">
       <h4 class="chart-title">산업 키워드 트렌드</h4>
-      <p class="chart-subtitle">최근 7일간 뉴스 기반 주요 기술 및 직무 검색 관심도 기반 키워드</p>
+      <p class="chart-subtitle">최근 수집된 뉴스에서 추출한 기술·직무 관련 키워드를 기준으로, 최근 7일 평균 언급 추이를 분석한 결과 </p>
 
       <div class="chart-wrapper">
         <canvas id="trendChart"></canvas>
@@ -28,7 +28,7 @@
       </div>
     </div>
 
-    <!-- 핵심 기술 키워드 + 산업별 채용 시장 분위기 -->
+    <!-- 연관 키워드 AI 분석 + 산업별 시장 분위기 -->
     <div class="insight-row">
       <div class="card wordcloud-box">
         <div class="card-header">
