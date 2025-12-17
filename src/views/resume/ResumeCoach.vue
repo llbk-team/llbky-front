@@ -3,7 +3,7 @@
   <div class="page-wrapper">
     <div class="main-layout">
       <section class="content">
-        <h1 class="title">서류 AI 코칭</h1>
+        <h1 class="title">이력서 AI 코칭</h1>
 
         <!-- 로딩 / 에러 -->
         <div v-if="loading" class="alert alert-secondary py-2 mb-3">
