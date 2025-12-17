@@ -20,7 +20,7 @@
         </div>
         <!-- ⭐ 수동 저장 버튼 -->
         <button class="btn btn-sm btn-outline-primary me-3" @click="saveManually" :disabled="isSaving">
-          <i class="bi bi-save"></i> 임시 저장
+          <i class="bi bi-save"></i> 저장
         </button>
         <div class="fs-5">{{ overallProgress }}% 전체 진행률</div>
       </div>
@@ -150,10 +150,6 @@
                     <button class="btn-close btn-sm" @click="cancelItemFeedback(itemIndex)" aria-label="Close"></button>
                   </div>
 
-                  <!-- 점수 표시 -->
-                  <div v-if="currentAiFeedback?.appropriatenessScore" class="feedback-score mb-3">
-                    <span class="badge bg-success">적절성 {{ currentAiFeedback.appropriatenessScore }}점</span>
-                  </div>
 
                   <!-- 원본 작성 내용 표시 -->
                   <div class="mb-3 p-2 bg-white border rounded">

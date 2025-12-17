@@ -94,7 +94,7 @@ function portfolioStepbystep() {
             lastSavedTime.value = new Date();
             hasUnsavedChanges.value = false;
 
-            console.log('✅ 임시 저장 완료:', lastSavedTime.value.toLocaleTimeString());
+            // console.log('✅ 임시 저장 완료:', lastSavedTime.value.toLocaleTimeString());
 
         } catch (error) {
             console.error('❌ 임시 저장 실패:', error);
@@ -121,7 +121,7 @@ function portfolioStepbystep() {
             // 24시간 이상 된 데이터는 삭제
             if (hoursDiff > 24) {
                 localStorage.removeItem(storageKey);
-                console.log('🗑️ 오래된 임시 데이터 삭제 (24시간 초과)');
+                // console.log('🗑️ 오래된 임시 데이터 삭제 (24시간 초과)');
                 return false;
             }
 
@@ -160,7 +160,7 @@ function portfolioStepbystep() {
                 lastSavedTime.value = savedTime;
                 hasUnsavedChanges.value = false;
 
-                console.log('✅ 임시 데이터 복원 완료');
+                // console.log('✅ 임시 데이터 복원 완료');
                 return true;
             }
 
@@ -177,7 +177,7 @@ function portfolioStepbystep() {
             localStorage.removeItem(getStorageKey());
             lastSavedTime.value = null;
             hasUnsavedChanges.value = false;
-            console.log('🗑️ 임시 저장 데이터 삭제 완료');
+            // console.log('🗑️ 임시 저장 데이터 삭제 완료');
         } catch (error) {
             console.error('❌ 임시 데이터 삭제 실패:', error);
         }
@@ -304,7 +304,7 @@ function portfolioStepbystep() {
                 currentStep: currentStep.value
             };
 
-            console.log('🚀 AI 피드백 요청 (하드코딩 포함):', requestData);
+            // console.log('🚀 AI 피드백 요청 (하드코딩 포함):', requestData);
 
             // 실시간 코칭 API 호출 (POST /portfolio-guide/coaching)
             const response = await portfolioGuideApi.getRealtimeCoaching(requestData);
@@ -329,13 +329,13 @@ function portfolioStepbystep() {
                 hasUnsavedChanges.value = true;
                 await saveTemporaryContent();
 
-                console.log('✅ AI 피드백 수신 완료');
+                // console.log('✅ AI 피드백 수신 완료');
             }
         } catch (error) {
-            console.error('❌ API 호출 중 오류:', error);
-            console.error('상태 코드:', error.response?.status);
-            console.error('응답 헤더:', error.response?.headers);
-            console.error('에러 상세:', error.response?.data || error.message);
+            // console.error('❌ API 호출 중 오류:', error);
+            // console.error('상태 코드:', error.response?.status);
+            // console.error('응답 헤더:', error.response?.headers);
+            // console.error('에러 상세:', error.response?.data || error.message);
 
             // 더 자세한 에러 메시지
             let errorMessage = '서버와의 통신 중 오류가 발생했습니다.\n\n';
@@ -366,7 +366,7 @@ function portfolioStepbystep() {
     const selectExample = (index, exampleText) => {
         selectedExampleIndex.value = index;
         selectedExample.value = exampleText;
-        console.log('🎯 예시 선택:', { index, exampleText });
+        // console.log('🎯 예시 선택:', { index, exampleText });
 
         // ⭐ 예시 선택 시 변경사항 표시
         hasUnsavedChanges.value = true;
@@ -376,7 +376,7 @@ function portfolioStepbystep() {
     const useOriginalContent = (itemIndex) => {
         selectedExample.value = originalContent.value;
         selectedExampleIndex.value = null;
-        console.log('📝 원본 내용 사용:', originalContent.value);
+        // console.log('📝 원본 내용 사용:', originalContent.value);
 
         // ⭐ 원본 사용 시 변경사항 표시
         hasUnsavedChanges.value = true;
@@ -467,11 +467,11 @@ function portfolioStepbystep() {
     const fetchPortfolioStandards = async () => {
         try {
             // 사용자/직군/직무 유효성 확인
-            console.log('🔎 표준 데이터 조회 요청:', {
-                memberId: memberId.value,
-                jobGroup: jobGroup.value,
-                jobRole: jobRole.value
-            });
+            // console.log('🔎 표준 데이터 조회 요청:', {
+            //     memberId: memberId.value,
+            //     jobGroup: jobGroup.value,
+            //     jobRole: jobRole.value
+            // });
 
             if (!memberId.value) {
                 console.warn('❌ memberId가 없습니다. 로그인 정보를 확인하세요.');
@@ -489,14 +489,14 @@ function portfolioStepbystep() {
             const response = await portfolioGuideApi.getStandardsByMember(memberId.value);
 
             const standards = response?.data;
-            console.log('📦 표준 데이터 응답:', standards);
+            // console.log('📦 표준 데이터 응답:', standards);
 
             // DB에서 받은 데이터를 포트폴리오 단계 형식으로 변환
             if (Array.isArray(standards) && standards.length > 0) {
                 portfolioSteps.value = transformStandardsToSteps(standards);
-                console.log('✅ 직군/직무 기준으로 표준 데이터 적용:', {
-                    stepsCount: portfolioSteps.value.length
-                });
+                // console.log('✅ 직군/직무 기준으로 표준 데이터 적용:', {
+                //     stepsCount: portfolioSteps.value.length
+                // });
             } else {
                 console.warn('ℹ️ 직군/직무 기준 데이터가 없어 전체 표준으로 대체합니다.');
                 await fetchAllStandards();
@@ -515,7 +515,7 @@ function portfolioStepbystep() {
 
             if (response.data) {
                 const standards = response.data;
-                console.log('전체 표준 데이터:', standards);
+                // console.log('전체 표준 데이터:', standards);
 
                 if (Array.isArray(standards) && standards.length > 0) {
                     portfolioSteps.value = transformStandardsToSteps(standards);
@@ -554,7 +554,7 @@ function portfolioStepbystep() {
 
     // ✅ 최종 수정 버전: prompt_template을 실제 질문으로 사용
     const transformStandardsToSteps = (standards) => {
-        console.log('🔍 받은 standards 데이터:', standards);
+        // console.log('🔍 받은 standards 데이터:', standards);
 
         // ⭐ 1단계: standardId 순으로 정렬 (DB 순서 유지)
         const sortedStandards = [...standards].sort((a, b) => {
@@ -563,10 +563,10 @@ function portfolioStepbystep() {
             return idA - idB;
         });
 
-        console.log('📊 standardId 순 정렬 결과:', sortedStandards.map(s => ({
-            standardId: s.standardId,
-            standardName: s.standardName
-        })));
+        // console.log('📊 standardId 순 정렬 결과:', sortedStandards.map(s => ({
+        //     standardId: s.standardId,
+        //     standardName: s.standardName
+        // })));
 
         // ⭐ 2단계: 정렬된 순서대로 1~5단계 매핑
         const stepMap = {};
@@ -575,7 +575,7 @@ function portfolioStepbystep() {
             // ⭐ 핵심: 배열 인덱스로 1~5단계 강제 매핑
             const stepNum = (index % 5) + 1;  // 0→1, 1→2, 2→3, 3→4, 4→5, 5→1, ...
 
-            console.log(`📋 처리 중: standardId=${standard.standardId} → ${stepNum}단계`);
+            // console.log(`📋 처리 중: standardId=${standard.standardId} → ${stepNum}단계`);
 
             // ⭐ 단계 토픽 = standardName (짧은 제목)
             const stepTopic = standard.standardName || `${stepNum}단계`;
@@ -608,11 +608,11 @@ function portfolioStepbystep() {
                 // 서브 질문 추출 (1), 2), 3) 형식 분리)
                 const subQuestions = extractSubQuestions(questionText);
                 
-                console.log(`📌 ${stepNum}단계 질문 추가:`, {
-                    topic: stepTopic,
-                    mainQuestion: questionText.split(':')[0],
-                    subQuestionCount: subQuestions.length
-                });
+                // console.log(`📌 ${stepNum}단계 질문 추가:`, {
+                //     topic: stepTopic,
+                //     mainQuestion: questionText.split(':')[0],
+                //     subQuestionCount: subQuestions.length
+                // });
 
                 stepMap[stepNum].items.push({
                     // ⭐ prompt_template의 메인 질문을 title로
@@ -691,12 +691,12 @@ function portfolioStepbystep() {
             }
         }
 
-        console.log('✅ 변환된 단계 데이터 (1~5단계):', steps.map(step => ({
-            label: step.label,
-            topic: step.topic,
-            itemCount: step.items.length,
-            standardIds: step.standardIds
-        })));
+        // console.log('✅ 변환된 단계 데이터 (1~5단계):', steps.map(step => ({
+        //     label: step.label,
+        //     topic: step.topic,
+        //     itemCount: step.items.length,
+        //     standardIds: step.standardIds
+        // })));
 
         return steps;
     };
@@ -762,7 +762,7 @@ function portfolioStepbystep() {
     };
 
     const setUserInfoFromStore = () => {
-        console.log('🔍 Vuex store에서 사용자 정보 확인 중...');
+        // console.log('🔍 Vuex store에서 사용자 정보 확인 중...');
 
         if (!isLoggedIn.value || !currentUser.value) {
             console.warn('❌ 로그인되지 않은 상태입니다.');
@@ -785,11 +785,11 @@ function portfolioStepbystep() {
             jobRole.value = user.jobRole || user.job_role;
         }
 
-        console.log('✅ 사용자 정보 설정 완료:', {
-            memberId: memberId.value,
-            userName: userName.value,
-            userEmail: userEmail.value
-        });
+        // console.log('✅ 사용자 정보 설정 완료:', {
+        //     memberId: memberId.value,
+        //     userName: userName.value,
+        //     userEmail: userEmail.value
+        // });
 
         return true;
     };
@@ -850,7 +850,7 @@ function portfolioStepbystep() {
                     currentStep.value = latestGuide.currentStep || 1;
                 }
 
-                console.log('✅ 기존 가이드 로드 및 병합 완료:', guideId.value);
+                // console.log('✅ 기존 가이드 로드 및 병합 완료:', guideId.value);
             } else {
                 console.log('새 가이드를 생성합니다.');
                 await createGuide();
@@ -884,7 +884,7 @@ function portfolioStepbystep() {
             if (response.data) {
                 guideId.value = response.data.guideId;
                 isGuideCreated.value = true;
-                console.log('✅ 가이드 생성 완료:', guideId.value);
+                // console.log('✅ 가이드 생성 완료:', guideId.value);
             }
 
         } catch (error) {
@@ -921,14 +921,18 @@ function portfolioStepbystep() {
                     }))
                 }))  // 현재 작성된 모든 내용
             };
-            console.log("💡 guideSteps 타입:", typeof portfolioSteps.value);
-            console.log("💡 guideSteps 실제 값:", portfolioSteps.value);
+            // console.log("💡 guideSteps 타입:", typeof portfolioSteps.value);
+            // console.log("💡 guideSteps 실제 값:", portfolioSteps.value);
 
             const response = await portfolioGuideApi.saveGuide(saveRequest);
-            console.log("📌 저장 요청 payload:", JSON.stringify(saveRequest, null, 2));
+            // console.log("📌 저장 요청 payload:", JSON.stringify(saveRequest, null, 2));
             if (response.data) {
                 lastSavedTime.value = new Date().toISOString();
-                console.log('✅ 가이드 저장 완료');
+               
+
+
+                await saveTemporaryContent();
+                
             }
 
 
@@ -992,7 +996,7 @@ function portfolioStepbystep() {
 
         }
         await saveGuide();
-        await saveTemporaryContent();
+        // await saveTemporaryContent();
     };
 
     return {
