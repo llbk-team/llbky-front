@@ -3,7 +3,7 @@ const resumeRouting = [
   {
     path: '/resume/list',
     name: 'resume',
-    component: () => import('../views/resume/ResumeMain.vue')
+    component: () => import('../views/resume/Document.vue')
   },
   {
     path: '/resume/write',
