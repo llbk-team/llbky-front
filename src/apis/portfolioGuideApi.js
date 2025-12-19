@@ -94,26 +94,15 @@ function getGuideFeedback(guideId, memberId) {
   return axios.get(`/portfolio-guide/${guideId}/feedback`, { params });
 }
 
-/**
- * 실시간 포트폴리오 코칭 API
- * POST /portfolio-guide/coaching
- * Content-Type: application/json
- * Body: {memberId, inputFieldType, userInput, currentStep, guideId, jobGroup, jobRole, careerYears}
- * @param {Object} coachingRequest - memberId, inputFieldType, userInput, currentStep, guideId, jobGroup, jobRole, careerYears
- * @returns {Promise} GuideResult
- */
+
+ // 실시간 포트폴리오 코칭 API
 function getRealtimeCoaching(coachingRequest) {
   return axios.post("/portfolio-guide/coaching", coachingRequest);
 }
 
-/**
- * ⭐ PDF 다운로드
- * GET /portfolio-guide/{guideId}/pdf?memberId=1
- * @param {Number} guideId - 가이드 ID
- * @param {Number} memberId - 회원 ID (선택)
- * @returns {Promise} Blob 데이터
- */
-function downloadGuidePdf(guideId, memberId) {
+
+ //PDF 다운로드
+ function downloadGuidePdf(guideId, memberId) {
   const params = memberId ? { memberId } : {};
   
   return axios.get(`/portfolio-guide/${guideId}/pdf`, {
@@ -122,16 +111,22 @@ function downloadGuidePdf(guideId, memberId) {
   });
 }
 
-/**
- * ⭐ 회원별 전체 가이드 PDF 다운로드
- * GET /portfolio-guide/member/{memberId}/pdf
- * @param {Number} memberId - 회원 ID
- * @returns {Promise} Blob 데이터
- */
+//회원별 전체 가이드 PDF 다운로드
 function downloadMemberPdf(memberId) {
   return axios.get(`/portfolio-guide/member/${memberId}/pdf`, {
     responseType: 'blob'  // ⚡ PDF 다운로드 필수 설정
   });
+}
+
+
+function deleteAll(memberId){
+   const params = memberId ? { memberId } : {};
+  return axios.delete(`/portfolio-guide/delete`,{params})
+}
+
+function deleteGuideId(guideId, memberId) {
+   const params = { memberId };  
+   return axios.delete(`/portfolio-guide/${guideId}`, { params });
 }
 
 export default {
@@ -139,7 +134,7 @@ export default {
   getAllStandards,
  
   getStandardsByJob,
-  getStandardsByMember,    // ⭐ 추가
+  getStandardsByMember,    
  
 
   // 가이드 생성 및 저장
@@ -156,5 +151,8 @@ export default {
 
   // PDF 다운로드
   downloadGuidePdf,
-  downloadMemberPdf
+  downloadMemberPdf,
+
+  deleteAll,
+  deleteGuideId
 };
