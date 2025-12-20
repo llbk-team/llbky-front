@@ -122,8 +122,19 @@ function useInterviewMock(memberId) {
       formData.append("documentFile", selectedFileObject.value);
 
       const res = await interviewApi.createAiQuestions(formData);
-      questions.value = res.data.map((q) => q.aiQuestion);
+
+      // 고정 질문
+      const introQuestion = "1분 자기소개해주세요.";
+
+      // 화면 표시용 (고정 질문 포함)
+      questions.value = [
+        introQuestion,
+        ...res.data.map((q) => q.aiQuestion),
+      ];
+
+      // DB 저장용 (고정 질문 포함)
       aiQuestions.value = [...questions.value];
+
     } catch (err) {
       console.error("AI 질문 생성 오류:", err);
     } finally {
