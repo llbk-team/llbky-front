@@ -496,3 +496,13 @@
  .step-icon.complete {
      color: #28a745; /* 초록색 체크 */
    }
+
+
+
+.modal.show {
+  display: block !important;
+}
+
+.modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.5);
+}

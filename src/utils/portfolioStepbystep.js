@@ -42,10 +42,18 @@ function portfolioStepbystep() {
     const originalContent = ref("");
     const aiLoading = ref(false);
 
-    // ⭐ 임시 저장 관련 상태
+    // 임시 저장 관련 상태
     const isSaving = ref(false);
     const lastSavedTime = ref(null);
     const hasUnsavedChanges = ref(false);
+
+    //초기화 관련 상태
+    const isResetting = ref(false);
+    const showResetConfirm = ref(false);
+    const guideCreatedAt = ref(null);
+
+    const showDownloadCompleteModal = ref(false);
+
 
     // 모든 단계 완료 여부
     const isAllComplete = computed(() => {
@@ -53,6 +61,13 @@ function portfolioStepbystep() {
         const allStagesComplete = portfolioSteps.value.every(step => step.progress === 100);
         return stage5 && stage5.progress === 100 && allStagesComplete;
     });
+
+    //24시간 경과 여부
+    const isExpired = computed(() => {
+        if (!guideCreatedAt.value) return false;
+        const hoursDiff = (new Date() - new Date(guideCreatedAt.value)) / (1000 * 60 * 60);
+        return hoursDiff > 24;
+    })
 
     // ⭐ 임시 저장 키 생성 (사용자별 고유키)
     const getStorageKey = () => {
@@ -183,9 +198,139 @@ function portfolioStepbystep() {
         }
     };
 
+    // ⭐ 전체 초기화 확인 대화상자
+    const confirmReset = () => {
+        showResetConfirm.value = true;
+    };
+
+    // 전체 내용 초기화 함수
+    const resetAllContent = async () => {
+        if (isResetting.value) return;
+        try {
+            isResetting.value = true;
+            showResetConfirm.value = false;
+            console.log('전체 내용 초기화 시작');
+             hasUnsavedChanges.value = false;
+            // 기존 가이드 삭제
+            if (guideId.value) {
+                try {
+                    await deleteGuide();
+                } catch (error) {
+                    console.warn('가이드 삭제 중 오류:', error);
+                }
+            }
+
+            // 로컬 상태 초기화
+            resetLocalState();
+
+            // ✅ 임시저장 데이터 삭제 (함수 호출)
+            clearTemporaryContent();
+
+            // ✅ 새 가이드 생성 및 표준 데이터 다시 로드 (함수 호출)
+            await fetchPortfolioStandards();
+            
+            // ⭐ 표준 데이터 로드 후 플래그 재설정
+            hasUnsavedChanges.value = false;
+            
+            // ⭐ 새 가이드 생성 (24시간 타이머 리셋)
+            await createGuide();
+            
+            // ⭐ 가이드 생성 후 플래그 재설정
+            hasUnsavedChanges.value = false;
+
+            openStepIndex.value = 0;
+            currentStep.value = 1;
+            openItemIndex.value = null;
+            
+            console.log('✅ 초기화 완료 - 새 가이드 생성됨');
+            alert('모든 내용이 초기화되었습니다. 새로 시작하세요.');
+
+        } catch (error) {
+            console.error('❌ 초기화 실패:', error);
+            alert('초기화 중 오류가 발생했습니다. 페이지를 새로고침해주세요.');
+        } finally {
+            isResetting.value = false;
+        }
+    };
+    const resetLocalState = () => {
+        guideId.value = null;
+        isGuideCreated.value = false;
+        guideCreatedAt.value = null;
+
+        overallProgress.value = 0;
+        currentStep.value = 1;
+
+        openStepIndex.value = 0;
+        openItemIndex.value = null;
+        currentContent.value = '';
+        selectedItem.value = null;
+
+        // AI 피드백 상태 초기화
+        showItemFeedback.value = Array(20).fill(false);
+        currentAiFeedback.value = null;
+        selectedExample.value = '';
+        selectedExampleIndex.value = null;
+        originalContent.value = '';
+
+        lastSavedTime.value = null;
+        hasUnsavedChanges.value = false;
+        console.log('로컬 상태 초기화 완료');
+
+    };
+
+    const deleteGuide = async () => {
+        if (!guideId.value) return;
+        try {
+            console.log('가이드 삭제 시작 - guideId:', guideId.value);
+
+            // ✅ 올바른 API 함수 이름 사용
+            await portfolioGuideApi.deleteGuideId(guideId.value, memberId.value);
+
+            console.log('✅ 가이드 삭제 완료');
+        } catch (error) {
+            console.error('❌ 가이드 삭제 실패:', error);
+            throw error; // 상위로 에러 전파
+        }
+    };
+
+    //완료된 항목 다시 편집하기
+    const editCompletedItem = (stepIndex, itemIndex) => {
+        const item = portfolioSteps.value[stepIndex].items[itemIndex];
+
+        item.status = '작성중';
+
+        openStepIndex.value = stepIndex;
+        openItemIndex.value = itemIndex;
+        selectedItem.value = item;
+
+        currentContent.value = item.userInput || '';
+        showItemFeedback.value[itemIndex] = false;
+        currentAiFeedback.value = null;
+        updateProgress();
+
+        hasUnsavedChanges.value = true;
+        console.log(`📝 완료된 항목 재편집 시작: ${item.title}`);
+    };
+
+    const checkAndHandleExpiration = () => {
+        if (isExpired.value) {
+            const shouldReset = confirm(
+                '⏰ 가이드가 생성된 지 24시간이 경과했습니다.\n' +
+                '내용을 초기화하고 새로 시작하시겠습니까?\n\n' +
+                '(취소하면 기존 내용을 계속 사용합니다)'
+            );
+
+            if (shouldReset) {
+                resetAllContent();
+            }
+        }
+    };
+
+
 
     // ⭐ 변경사항 감지 (currentContent 변경 시)
     watch(currentContent, () => {
+        if (isResetting.value) return;
         hasUnsavedChanges.value = true;
     });
 
@@ -532,11 +677,11 @@ function portfolioStepbystep() {
     // 서브 질문 추출 함수
     const extractSubQuestions = (questionText) => {
         const subQuestions = [];
-        
+
         // 콜론 이후 부분 추출
         const afterColon = questionText.split(':')[1];
         if (!afterColon) return subQuestions;
-        
+
         // 1), 2), 3) 등으로 분리
         const matches = afterColon.match(/\d+\)\s*[^0-9)]+/g);
         if (matches) {
@@ -548,7 +693,7 @@ function portfolioStepbystep() {
                 }
             });
         }
-        
+
         return subQuestions;
     };
 
@@ -604,10 +749,10 @@ function portfolioStepbystep() {
             // ✅ 핵심 수정: prompt_template을 실제 질문으로 사용
             if (standard.promptTemplate && standard.promptTemplate.trim() !== '') {
                 const questionText = standard.promptTemplate;
-                
+
                 // 서브 질문 추출 (1), 2), 3) 형식 분리)
                 const subQuestions = extractSubQuestions(questionText);
-                
+
                 // console.log(`📌 ${stepNum}단계 질문 추가:`, {
                 //     topic: stepTopic,
                 //     mainQuestion: questionText.split(':')[0],
@@ -617,21 +762,21 @@ function portfolioStepbystep() {
                 stepMap[stepNum].items.push({
                     // ⭐ prompt_template의 메인 질문을 title로
                     title: questionText.split(':')[0].trim() || stepTopic,
-                    
+
                     // ⭐ 전체 질문 텍스트 (서브 질문 포함)
                     fullQuestion: questionText,
-                    
+
                     description: standard.standardDescription || standard.description || '',
                     status: '미작성',
                     placeholder: `질문에 대한 답변을 작성하세요`,
                     imageUpload: false,
                     userInput: '',
                     weight: standard.weightPercentage || 20,
-                    
+
                     // ⭐ 원본 메타데이터 보존
                     originalStandardId: standard.standardId,
                     subQuestions: subQuestions,  // 서브 질문 배열
-                    
+
                     // ⭐ AI 평가 기준 (evaluation_items)
                     evaluationCriteria: standard.evaluationItems || null
                 });
@@ -794,7 +939,7 @@ function portfolioStepbystep() {
         return true;
     };
 
-    // ⭐ 수정된 초기화 함수 (임시 저장 기능 포함)
+    // 수정된 초기화 함수 (임시 저장 기능 포함)
     const initializePortfolio = async () => {
         // 로그인 및 사용자 정보 설정
         const ok = setUserInfoFromStore();
@@ -804,7 +949,7 @@ function portfolioStepbystep() {
 
         // 표준 데이터 로드 (회원의 직군/직무 기반)
         await fetchPortfolioStandards();
-
+        hasUnsavedChanges.value = false;
         // ⭐ 기존 가이드 로드 시도
         try {
             const guidesResponse = await portfolioGuideApi.getGuidesByMember(memberId.value);
@@ -812,6 +957,9 @@ function portfolioStepbystep() {
                 const latestGuide = guidesResponse.data[0];
                 guideId.value = latestGuide.guideId;
                 isGuideCreated.value = true;
+
+                //가이드 생성시간 저장
+                guideCreatedAt.value = latestGuide.createdAt || latestGuide.created_at || new Date().toISOString();
 
                 // ⭐ 수정: standard와 저장된 내용 병합
                 if (latestGuide.guideContent) {
@@ -850,7 +998,9 @@ function portfolioStepbystep() {
                     currentStep.value = latestGuide.currentStep || 1;
                 }
 
-                // console.log('✅ 기존 가이드 로드 및 병합 완료:', guideId.value);
+                setTimeout(() => {
+                    checkAndHandleExpiration();
+                }, 1000); // 1초 후에 체크 (UI 로딩 후)  
             } else {
                 console.log('새 가이드를 생성합니다.');
                 await createGuide();
@@ -884,7 +1034,11 @@ function portfolioStepbystep() {
             if (response.data) {
                 guideId.value = response.data.guideId;
                 isGuideCreated.value = true;
-                // console.log('✅ 가이드 생성 완료:', guideId.value);
+
+                // 새로 생성된 가이드의 생성 시간 저장
+                guideCreatedAt.value = new Date().toISOString();
+
+                console.log('✅ 가이드 생성 완료:', guideId.value);
             }
 
         } catch (error) {
@@ -908,7 +1062,7 @@ function portfolioStepbystep() {
             const saveRequest = {
                 guideId: guideId.value,
                 currentStep: currentStep.value,
-                 completionPercentage: overallProgress.value, 
+                completionPercentage: overallProgress.value,
                 // 저장 전에 DTO 형식으로 변환
                 guideSteps: portfolioSteps.value.map(step => ({
                     stepNumber: parseInt(step.label),
@@ -928,11 +1082,11 @@ function portfolioStepbystep() {
             // console.log("📌 저장 요청 payload:", JSON.stringify(saveRequest, null, 2));
             if (response.data) {
                 lastSavedTime.value = new Date().toISOString();
-               
+
 
 
                 await saveTemporaryContent();
-                
+
             }
 
 
@@ -978,10 +1132,24 @@ function portfolioStepbystep() {
 
             console.log('✅ PDF 다운로드 성공');
 
+            showDownloadCompleteModal.value = true;
+
         } catch (error) {
             console.error('❌ PDF 다운로드 실패:', error);
             alert('PDF 다운로드에 실패했습니다. 다시 시도해주세요.');
         }
+    };
+
+    // ⭐ 새 가이드 작성 (초기화 + 모달 닫기)
+    const startNewGuide = async () => {
+        showDownloadCompleteModal.value = false;
+        await resetAllContent();
+    };
+
+    // ⭐ 목록으로 이동 (모달 닫기 + 라우팅)
+    const goToList = () => {
+        showDownloadCompleteModal.value = false;
+        router.push('/resume/portfolio');
     };
 
     // ⭐ 수동 임시 저장 함수 (사용자가 직접 호출)
@@ -1015,7 +1183,7 @@ function portfolioStepbystep() {
         originalContent,
         isAllComplete,
         aiLoading,
-
+         showDownloadCompleteModal,
         // ⭐ 임시 저장 관련 상태
         isSaving,
         lastSavedTime,
@@ -1047,6 +1215,18 @@ function portfolioStepbystep() {
         updateProgress,
         initializePortfolio,
 
+        isResetting,
+        showResetConfirm,
+        guideCreatedAt,
+        isExpired,
+
+        confirmReset,
+        resetAllContent,
+        deleteGuide,
+        editCompletedItem,
+        checkAndHandleExpiration,
+        clearTemporaryContent,
+
         // 가이드 생성 및 저장
         createGuide,
         saveGuide,
@@ -1054,6 +1234,8 @@ function portfolioStepbystep() {
 
         // 임시 저장
         saveManually,
+        startNewGuide,
+        goToList,
 
         router
     };
