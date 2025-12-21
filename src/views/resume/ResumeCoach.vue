@@ -562,10 +562,10 @@
           <div class="right-column">
             <div class="ai-card">
               <h2>✏️ AI 제안</h2>
-              <p class="edit-label">자소서 · 포트폴리오 맞춤 제안</p>
+              <p class="edit-label">자기소개서 · 포트폴리오 맞춤 제안</p>
 
               <div class="before">
-                <strong>자소서 강조 포인트</strong><br />
+                <strong>자기소개서 강조 포인트</strong><br />
                 <span v-if="coverLetterMain">{{ coverLetterMain }}</span>
                 <span v-else class="text-muted">데이터 없음</span>
               </div>
