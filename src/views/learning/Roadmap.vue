@@ -70,8 +70,9 @@
           </li>
         </ul>
 
-        <p class="text-center text-muted mb-3">질문을 입력하면 AI가 답변해드려요!<br />
-          <small>예: "Spring Security가 어려워요. 다른 순서로 바꿀 수 있나요?"</small>
+        <p class="text-center text-muted mb-3">수정하고 싶은 내용이 있으신가요?<br />
+          <small>AI에게 수정하고 싶은 부분을 요청하면 
+            다시 만들어드려요!</small>
         </p>
 
         <div class="ai-input">
@@ -112,7 +113,7 @@
           <router-link :to="`/learning/start?learningId=${roadmapData.learningId}`" class="btn btn-dark" @click="startLearning">▶ 학습 시작하기</router-link>
           <router-link :to="`/learning/coach`" class="btn btn-mint" @click="goToMyLearning">📁 내 학습함</router-link>
         </div>
-        <div class="ai-tip">💬 <strong>AI 팁:</strong> 이제 주차별 학습을 진행하면,<br />진행률과 피드백을 자동으로 기록해드릴게요!!!!!!!!!!!!!!!</div>
+        <div class="ai-tip">💬 <strong>AI 팁:</strong> 이제 주차별 학습을 진행하면,<br />진행률과 피드백을 자동으로 기록해드릴게요!</div>
       </div>
     </div>
 
