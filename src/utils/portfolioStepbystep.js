@@ -1149,7 +1149,7 @@ function portfolioStepbystep() {
     // ⭐ 목록으로 이동 (모달 닫기 + 라우팅)
     const goToList = () => {
         showDownloadCompleteModal.value = false;
-        router.push('/resume/portfolio');
+        router.push('/resume/portfolio/write');
     };
 
     // ⭐ 수동 임시 저장 함수 (사용자가 직접 호출)
