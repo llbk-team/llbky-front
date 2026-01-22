@@ -207,29 +207,32 @@ function useInterviewProgress(sessionId) {
     return new Blob([data.buffer], { type: "audio/wav" });
   };
 
-  // 영상에서 프레임 추출
-  const extractFrames = async (video) => {
+  // =======영상에서 프레임 추출==============
+  const extractFrames = async (video, maxFrames = 8) => {
     const ffmpeg = await getFFmpeg();
 
     // 1) Blob 형태의 video를 ffmpeg 가상 파일로 write
     await ffmpeg.writeFile("input.webm", await fetchFile(video));
 
     // 2) ffmpeg 명령 실행
-    await ffmpeg.exec(["-i", "input.webm", "-vf", "fps=1", "frame_%03d.png"]);
+    await ffmpeg.exec([
+      "-i", "input.webm", 
+      "-vf", "fps=1",
+      "-frames:v", String(maxFrames), 
+      "frame_%03d.png"
+    ]);
 
     const frames = [];
-    let index = 1;
 
     // 3) 순서대로 읽어오기
-    while (index >= 1) {
-      const name = `frame_${String(index).padStart(3, "0")}.png`;
+    for (let i = 1; i <= maxFrames; i++) {
+      const name = `frame_${String(i).padStart(3, "0")}.png`;
       try {
         const data = await ffmpeg.readFile(name);
         frames.push(new Blob([data.buffer], { type: "image/png" }));
         await ffmpeg.deleteFile(name);
-        index++;
       } catch {
-        break;
+        break;  //생성된 프레임이 이보다 적으면 종료
       }
     }
 
